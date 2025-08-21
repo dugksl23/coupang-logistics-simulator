@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>🚀 물류 이커머스 통합 대시보드 | Logistics eCommerce Unified Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root {
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --pri: #2563eb;
+      --good: #10b981;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --vio: #8b5cf6;
+      --cyan: #06b6d4;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", Segoe UI, Roboto, Helvetica, Arial
+    }
+
+    .wrap {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+      color: #fff;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(2, 6, 23, .15);
+    }
+
+    .header h1 {
+      margin: 0 0 6px 0;
+      font-size: 22px
+    }
+
+    .header .sub {
+      opacity: .9;
+      font-size: 13px
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 14px 0;
+      box-shadow: 0 4px 14px rgba(2, 6, 23, .06);
+    }
+
+    .controls {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: flex-end
+    }
+
+    .ctrl {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .ctrl label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600
+    }
+
+    .ctrl input, .ctrl select {
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-width: 120px
+    }
+
+    .btn {
+      background: var(--pri);
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed
+    }
+
+    .btn.secondary {
+      background: #374151
+    }
+
+    .btn.danger {
+      background: var(--bad)
+    }
+
+    /* 진행률 표시 */
+    .progress-container {
+      margin: 10px 0;
+      display: none
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--line);
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--pri);
+      width: 0%;
+      transition: width 0.3s ease
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      text-align: center
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px
+    }
+
+    .kpi {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      position: relative
+    }
+
+    .kpi h4 {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .3px
+    }
+
+    .kpi .v {
+      font-size: 26px;
+      font-weight: 800
+    }
+
+    .kpi .meta {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .kpi.primary {
+      border-top: 4px solid var(--pri)
+    }
+
+    .kpi.good {
+      border-top: 4px solid var(--good)
+    }
+
+    .kpi.warn {
+      border-top: 4px solid var(--warn)
+    }
+
+    .kpi.bad {
+      border-top: 4px solid var(--bad)
+    }
+
+    .kpi.vio {
+      border-top: 4px solid var(--vio)
+    }
+
+    .kpi.cyan {
+      border-top: 4px solid var(--cyan)
+    }
+
+    .sections {
+      display: grid;
+      grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));
+      gap: 16px;
+      margin-top: 10px
+    }
+
+    .section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px
+    }
+
+    .section h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px
+    }
+
+    .alerts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto
+    }
+
+    .alert {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      border: 1px solid
+    }
+
+    .alert.good {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #065f46
+    }
+
+    .alert.warn {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #92400e
+    }
+
+    .alert.bad {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b
+    }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0;
+      margin-top: 16px;
+      overflow: hidden
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: #f9fafb;
+      border-bottom: 1px solid var(--line)
+    }
+
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap
+    }
+
+    tbody {
+      max-height: 520px;
+      overflow: auto
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-size: 11px
+    }
+
+    .pill.ok {
+      background: #dcfce7;
+      color: #065f46
+    }
+
+    .pill.ng {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .pill.running {
+      background: #dbeafe;
+      color: #1e40af
+    }
+
+    @media (max-width: 720px) {
+      .controls {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .ctrl input, .ctrl select {
+        min-width: 220px
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>🚀 물류 이커머스 통합 대시보드 (현실 반영 최적화)</h1>
+    <div class="sub">실제 업계 데이터 기반 | 자동화 피킹 시스템 반영 | 정시 출고율 분석 | Real Industry Standards Reflected</div>
+  </div>
+
+  <!-- 컨트롤 패널 -->
+  <div class="panel">
+    <div class="controls">
+      <div class="ctrl">
+        <label>시작년도 / Start Year</label>
+        <select id="startYear"></select>
+      </div>
+      <div class="ctrl">
+        <label>종료년도 / End Year</label>
+        <select id="endYear"></select>
+      </div>
+      <div class="ctrl">
+        <label>고객 수 / #Users</label>
+        <input id="userCount" type="number" min="50" max="100000" value="10000">
+      </div>
+      <div class="ctrl">
+        <label>주문 수 / #Orders</label>
+        <input id="orderCount" type="number" min="100" max="10000000" step="1000" value="50000">
+      </div>
+      <div class="ctrl">
+        <label>청크 크기 / Chunk Size</label>
+        <input id="chunkSize" type="number" min="100" max="10000" step="100" value="2000">
+      </div>
+      <button class="btn" id="btnGen">🔄 데이터 생성 / Generate</button>
+      <button class="btn danger" id="btnStop" disabled style="display:none">⏹️ 중단 / Stop</button>
+      <button class="btn secondary" id="btnCsv" disabled>📥 CSV 다운로드 / Download CSV</button>
+      <div id="status" class="pill ok" style="margin-left:auto">READY</div>
+    </div>
+
+    <!-- 진행률 표시 -->
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText">처리 중... / Processing...</div>
+      <div class="progress-stats">
+        <span id="progressStats">-</span>
+        <span id="progressETA">예상 완료: - / ETA: -</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 섹션 -->
+  <div class="sections">
+    <div class="section">
+      <h3>💰 매출·수익 / Sales & Profit</h3>
+      <div class="kpi-grid">
+        <div class="kpi primary"><h4>총 매출 / Total Sales</h4>
+          <div class="v" id="k_totalSales">-</div>
+          <div class="meta">₩</div>
+        </div>
+        <div class="kpi good"><h4>순이익률 / Net Margin Rate</h4>
+          <div class="v" id="k_netMargin">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>평균주문금액 / AOV</h4>
+          <div class="v" id="k_aov">-</div>
+          <div class="meta">₩</div>
+        </div>
+        <div class="kpi"><h4>ARPPU / ARPPU</h4>
+          <div class="v" id="k_arppu">-</div>
+          <div class="meta">₩</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>👥 고객 / Customer</h3>
+      <div class="kpi-grid">
+        <div class="kpi"><h4>LTV:CAC 비율 / LTV:CAC</h4>
+          <div class="v" id="k_ltvCac">-</div>
+        </div>
+        <div class="kpi"><h4>유지율 / Retention Rate</h4>
+          <div class="v" id="k_retention">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>이탈률 / Churn Rate</h4>
+          <div class="v" id="k_churn">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>AI 이탈 예측 정확도 / AI Churn Accuracy</h4>
+          <div class="v" id="k_ai">-</div>
+          <div class="meta">%</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>🚚 배송·물류 / Logistics</h3>
+      <div class="kpi-grid">
+        <div class="kpi good"><h4>정시율 / On-Time Rate</h4>
+          <div class="v" id="k_onTime">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>SLA 위반율 / SLA Breach</h4>
+          <div class="v" id="k_sla">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>적재율 / Load Factor</h4>
+          <div class="v" id="k_load">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>연비 / Fuel Efficiency</h4>
+          <div class="v" id="k_fuel">-</div>
+          <div class="meta">km/L</div>
+        </div>
+        <div class="kpi"><h4>라우팅 점수 / Routing Score</h4>
+          <div class="v" id="k_route">-</div>
+          <div class="meta">/100</div>
+        </div>
+        <div class="kpi warn"><h4>배송 예외율 / Delivery Exception</h4>
+          <div class="v" id="k_exception">-</div>
+          <div class="meta">%</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>📦 출고·풀필먼트 / Fulfillment</h3>
+      <div class="kpi-grid">
+        <div class="kpi good"><h4>정시 출고율 / On-Time Shipment</h4>
+          <h4>정시 출고율 / On-Time Shipment <span class="pill" style="margin-left:6px">목표 ≥ 96%</span></h4>
+          <div class="v" id="k_onTimeShip">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>평균 출고 시간 / Avg Ship Time</h4>
+          <div class="v" id="k_avgShipTime">-</div>
+          <div class="meta">시간</div>
+        </div>
+        <div class="kpi"><h4>피킹 속도 / Picking Speed</h4>
+          <div class="v" id="k_pickSpeed">-</div>
+          <div class="meta">초/개</div>
+        </div>
+        <div class="kpi"><h4>패킹 속도 / Packing Speed</h4>
+          <div class="v" id="k_packSpeed">-</div>
+          <div class="meta">초/개</div>
+        </div>
+        <div class="kpi"><h4>풀필먼트 효율 / Fulfillment Efficiency</h4>
+          <div class="v" id="k_fulfillEff">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi cyan"><h4>60분내 출고율 / <60min Ship Rate</h4>
+          <div class="v" id="k_ship60">-</div>
+          <div class="meta">%</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>📦 반품 / Returns</h3>
+      <div class="kpi-grid">
+        <div class="kpi warn"><h4>반품률 / Return Rate</h4>
+          <div class="v" id="k_returnRate">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>반품 손실률 / Return Cost Rate</h4>
+          <div class="v" id="k_returnCost">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>재판매 가능률 / Resellable Rate</h4>
+          <div class="v" id="k_resell">-</div>
+          <div class="meta">%</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>🌟 WOW / Membership</h3>
+      <div class="kpi-grid">
+        <div class="kpi"><h4>WOW 비중 / WOW Share</h4>
+          <div class="v" id="k_wowShare">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>WOW AOV / WOW AOV</h4>
+          <div class="v" id="k_wowAov">-</div>
+          <div class="meta">₩</div>
+        </div>
+        <div class="kpi"><h4>비회원 AOV / Non-WOW AOV</h4>
+          <div class="v" id="k_nonWowAov">-</div>
+          <div class="meta">₩</div>
+        </div>
+        <div class="kpi"><h4>WOW 재고회전 기여 / WOW Inv. Turnover Contrib</h4>
+          <div class="v" id="k_wowInv">-</div>
+          <div class="meta">회</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>🏭 WMS·재고 / WMS·Inventory</h3>
+      <div class="kpi-grid">
+        <div class="kpi"><h4>재고 회전율 / Inventory Turnover</h4>
+          <div class="v" id="k_invTurn">-</div>
+          <div class="meta">회</div>
+        </div>
+        <div class="kpi"><h4>품절률 / Stockout Rate</h4>
+          <div class="v" id="k_stockout">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>과재고 비율 / Overstock Rate</h4>
+          <div class="v" id="k_overstock">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>재고 정확도 / Inventory Accuracy</h4>
+          <div class="v" id="k_invAcc">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>재고 손실률 / Shrinkage</h4>
+          <div class="v" id="k_shrink">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>WMS 활용률 / WMS Utilization</h4>
+          <div class="v" id="k_wms">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi good"><h4>자동화 활용률 / Automation Rate</h4>
+          <div class="v" id="k_autoRate">-</div>
+          <div class="meta">%</div>
+        </div>
+        <div class="kpi"><h4>OMS 연동 효율 / OMS Integration Eff</h4>
+          <div class="v" id="k_omsEff">-</div>
+          <div class="meta">%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 검증 & 복합 위험 -->
+  <div class="sections">
+    <div class="section">
+      <h3>✅ 정합성 검사 / Data Integrity Checks</h3>
+      <div id="validateSummary" class="pill ok">-</div>
+      <div class="alerts" id="validateList"></div>
+    </div>
+    <div class="section">
+      <h3>⚠️ 복합 위험 요소 / Composite Risk</h3>
+      <div class="alerts" id="riskList"></div>
+    </div>
+    <div class="section">
+      <h3>📊 처리 성능 / Performance Metrics</h3>
+      <div class="alerts" id="perfList"></div>
+    </div>
+  </div>
+
+  <!-- 데이터 테이블 -->
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  /* -------------------------
+     0) 공통 상수·맵 (도메인 기반) - 현실 반영 개선
+  --------------------------*/
+
+  const SHIP_ON_TIME_TARGET = 96;     // 업계 권장 하한(%)
+  const SHIP_ON_TIME_GOOD   = 98;     // 우수 기준(%)
+  const SHIP_ON_TIME_GRACE_MIN = 10;  // 정시 판정 허용 지연(분)
+
+
+
+  const DELIVERY_MODES = {
+    '당일': {delayRate: 0.015, baseDays: 0, cutoffHour: 20},
+    '새벽': {delayRate: 0.008, baseDays: 1},
+    '익일': {delayRate: 0.025, baseDays: 1},
+    '택배': {delayRate: 0.035, baseDays: 2}
+  };
+  const REGIONS = ['수도권', '영남', '호남', '충청', '강원', '제주'];
+  const CITIES_BY_REGION = {
+    '수도권': ['서울', '인천', '성남', '고양'],
+    '영남': ['부산', '대구', '울산', '창원'],
+    '호남': ['광주', '전주', '여수'],
+    '충청': ['대전', '청주', '천안'],
+    '강원': ['춘천', '원주'],
+    '제주': ['제주시', '서귀포시']
+  };
+  const DISTRICTS_BY_CITY = {
+    '서울': ['강남구', '서초구', '송파구', '마포구', '용산구'],
+    '인천': ['남동구', '부평구', '연수구'],
+    '성남': ['분당구', '중원구', '수정구'],
+    '고양': ['일산동구', '일산서구', '덕양구'],
+    '부산': ['해운대구', '수영구', '부산진구', '남구'],
+    '대구': ['중구', '동구', '남구', '수성구'],
+    '울산': ['중구', '남구', '동구'],
+    '창원': ['성산구', '의창구', '마산합포구'],
+    '광주': ['북구', '남구', '서구'],
+    '전주': ['덕진구', '완산구'],
+    '여수': ['여천동', '돌산읍'],
+    '대전': ['서구', '유성구', '중구'],
+    '청주': ['흥덕구', '상당구'],
+    '천안': ['동남구', '서북구'],
+    '춘천': ['신북읍', '퇴계동'],
+    '원주': ['단구동', '무실동'],
+    '제주시': ['아라동', '노형동'],
+    '서귀포시': ['중문동', '서귀동']
+  };
+  const FULFILLMENT_BY_CITY = {
+    '서울': '서울1센터', '인천': '인천센터', '성남': '경기1센터', '고양': '고양센터',
+    '부산': '부산센터', '대구': '대구센터', '울산': '울산센터', '창원': '경남센터',
+    '광주': '광주센터', '전주': '전북센터', '여수': '여수센터',
+    '대전': '대전센터', '청주': '충청센터', '천안': '천안센터',
+    '춘천': '강원센터', '원주': '원주센터',
+    '제주시': '제주센터', '서귀포시': '서귀포센터'
+  };
+  const REGION_COST = {
+    '수도권': {avgDistance: 15, baseCost: 2500},
+    '영남': {avgDistance: 25, baseCost: 3200},
+    '호남': {avgDistance: 28, baseCost: 3500},
+    '충청': {avgDistance: 20, baseCost: 3000},
+    '강원': {avgDistance: 32, baseCost: 3800},
+    '제주': {avgDistance: 35, baseCost: 4500}
+  };
+  const WEATHER_CONDITIONS = ['맑음', '흐림', '비', '눈'];
+
+  function weatherSeverity(cond) {
+    if (cond === '맑음') return 0.05;
+    if (cond === '흐림') return 0.25;
+    if (cond === '비') return 0.65;
+    if (cond === '눈') return 0.85;
+    return 0.3;
+  }
+
+  const CATEGORY = {
+    '의류': {
+      returnRate: 0.12,
+      margin: 0.35,
+      price: [15000, 80000],
+      skus: ['TOP001', 'PANTS002', 'SHOES003', 'ACC004'],
+      pickComplexity: 1.0
+    },
+    '가전': {
+      returnRate: 0.03,
+      margin: 0.15,
+      price: [50000, 300000],
+      skus: ['TV001', 'REF002', 'WASH003', 'AIR004'],
+      pickComplexity: 1.8
+    },
+    '식품': {
+      returnRate: 0.02,
+      margin: 0.20,
+      price: [5000, 25000],
+      skus: ['SNACK001', 'DRINK002', 'FRESH003', 'FROZEN004'],
+      pickComplexity: 0.8
+    },
+    '생활용품': {
+      returnRate: 0.04,
+      margin: 0.30,
+      price: [8000, 35000],
+      skus: ['CLEAN001', 'BATH002', 'KITCHEN003', 'ROOM004'],
+      pickComplexity: 1.2
+    },
+    '반려용품': {
+      returnRate: 0.06,
+      margin: 0.28,
+      price: [10000, 60000],
+      skus: ['FOOD001', 'TOY002', 'CARE003', 'HEALTH004'],
+      pickComplexity: 1.1
+    },
+    '문구류': {
+      returnRate: 0.03,
+      margin: 0.40,
+      price: [3000, 15000],
+      skus: ['PEN001', 'BOOK002', 'OFFICE003', 'ART004'],
+      pickComplexity: 0.9
+    }
+  };
+  const ABC_DIST = {A: 0.2, B: 0.3, C: 0.5};
+  const VEHICLES = ['소형밴', '중형트럭', '대형트럭', '오토바이'];
+  const DRIVER_GRADE = ['신입', '숙련', '베테랑', 'MVP'];
+  const RETURN_REASONS = ['단순변심', '상품불량', '배송지연', '오배송', '파손', '기타'];
+
+  // 업계 표준 피킹/패킹 시간 (현실 반영)
+  // [PATCH 1] AUTOMATION_LEVELS (시간만 조정)
+  const AUTOMATION_LEVELS = {
+    MANUAL: {pickTimePerItem: 32, packTimePerItem: 26, accuracy: 0.975, cost: 1.0},
+    SEMI_AUTO: {pickTimePerItem: 18, packTimePerItem: 15, accuracy: 0.985, cost: 1.3},
+    AUTOMATED: {pickTimePerItem: 6, packTimePerItem: 9, accuracy: 0.995, cost: 2.1},
+    AI_OPTIMIZED: {pickTimePerItem: 5, packTimePerItem: 8, accuracy: 0.998, cost: 3.2}
+  };
+
+
+  // [PATCH 2] WMS_MATURITY (order_processing_time·system_uptime만 조정)
+  const WMS_MATURITY = {
+    LEGACY: {
+      efficiency: 0.70,
+      picking_accuracy: 0.978,
+      inventory_sync: 0.90,
+      order_processing_time: 70,
+      system_uptime: 0.975
+    },
+    STANDARD: {
+      efficiency: 0.86,
+      picking_accuracy: 0.990,
+      inventory_sync: 0.96,
+      order_processing_time: 25,
+      system_uptime: 0.988
+    },
+    ADVANCED: {
+      efficiency: 0.95,
+      picking_accuracy: 0.996,
+      inventory_sync: 0.985,
+      order_processing_time: 10,
+      system_uptime: 0.997
+    }
+  };
+
+
+  const OMS_MATURITY = {
+    MANUAL: {order_accuracy: 0.94, processing_speed: 0.80, integration_score: 0.70, auto_allocation: 0.40},
+    BASIC: {order_accuracy: 0.97, processing_speed: 0.90, integration_score: 0.85, auto_allocation: 0.75},
+    ADVANCED: {order_accuracy: 0.99, processing_speed: 0.97, integration_score: 0.95, auto_allocation: 0.92}
+  };
+
+  /* 유틸 함수 */
+  const rnd = (a, b) => Math.random() * (b - a) + a;
+  const irnd = (a, b) => Math.floor(rnd(a, b));
+  const pick = (arr) => arr[irnd(0, arr.length)];
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const pad = (n, len = 2) => String(n).padStart(len, '0');
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function calcQuartilesFromValues(values) {
+    if (!values.length) return {q1: 0, q2: 0, q3: 0};
+    const arr = [...values].sort((a, b) => a - b);
+    const p = (k) => {
+      if (arr.length === 1) return arr[0];
+      const idx = (arr.length - 1) * k, lo = Math.floor(idx), hi = Math.ceil(idx);
+      if (lo === hi) return arr[lo];
+      return arr[lo] + (arr[hi] - arr[lo]) * (idx - lo);
+    };
+    return {q1: p(0.25), q2: p(0.50), q3: p(0.75)};
+  }
+
+  function toQuartile(x, qs) {
+    const {q1, q2, q3} = qs;
+    if (x <= q1) return 1;
+    if (x <= q2) return 2;
+    if (x <= q3) return 3;
+    return 4;
+  }
+
+  function mapDistance(region) {
+    const base = REGION_COST[region].avgDistance;
+    return clamp(Math.round(base + irnd(-4, 5)), 5, 60);
+  }
+
+  function addressLine(city, district) {
+    const roadNo = irnd(1, 200);
+    const bldg = irnd(1, 50);
+    return `${city} ${district} 물류로 ${roadNo}-${bldg}`;
+  }
+
+  // 자동화 수준 결정 (업체 규모와 지역에 따라)
+  function determineAutomationLevel(region, deliveryCenter) {
+    // 수도권 대형센터: 80% 확률로 고도 자동화
+    if (region === '수도권' && deliveryCenter.includes('서울')) {
+      const r = Math.random();
+      if (r < 0.4) return 'AI_OPTIMIZED';
+      if (r < 0.8) return 'AUTOMATED';
+      return 'SEMI_AUTO';
+    }
+    // 기타 주요 도시: 중간 수준 자동화
+    if (['영남', '충청'].includes(region)) {
+      const r = Math.random();
+      if (r < 0.2) return 'AI_OPTIMIZED';
+      if (r < 0.6) return 'AUTOMATED';
+      if (r < 0.9) return 'SEMI_AUTO';
+      return 'MANUAL';
+    }
+    // 소규모 지역: 낮은 자동화
+    const r = Math.random();
+    if (r < 0.1) return 'AUTOMATED';
+    if (r < 0.4) return 'SEMI_AUTO';
+    return 'MANUAL';
+  }
+
+  // WMS 성숙도 결정 (자동화 수준과 연동)
+  function determineWMSMaturity(automationLevel, deliveryCenter) {
+    if (automationLevel === 'AI_OPTIMIZED') return 'ADVANCED';
+    if (automationLevel === 'AUTOMATED') return Math.random() < 0.7 ? 'ADVANCED' : 'STANDARD';
+    if (automationLevel === 'SEMI_AUTO') return Math.random() < 0.6 ? 'STANDARD' : 'LEGACY';
+    return Math.random() < 0.3 ? 'STANDARD' : 'LEGACY';
+  }
+
+  // OMS 성숙도 결정
+  function determineOMSMaturity(wmsMaturity) {
+    if (wmsMaturity === 'ADVANCED') return Math.random() < 0.8 ? 'ADVANCED' : 'BASIC';
+    if (wmsMaturity === 'STANDARD') return Math.random() < 0.6 ? 'BASIC' : 'MANUAL';
+    return Math.random() < 0.4 ? 'BASIC' : 'MANUAL';
+  }
+
+  /* -------------------------
+     1) 대용량 처리를 위한 전역 변수 및 상태 관리
+  --------------------------*/
+  let DATA = [];
+  let MONTHLY_BY_CUST = {};
+  let VALIDATION_ISSUES = [];
+  let PERFORMANCE_METRICS = {};
+
+  // 처리 상태 관리
+  let PROCESSING_STATE = {
+    isRunning: false,
+    shouldStop: false,
+    startTime: null,
+    processedRows: 0,
+    totalRows: 0,
+    currentChunk: 0,
+    totalChunks: 0
+  };
+
+  // 청크 처리 설정
+  const CHUNK_CONFIG = {
+    defaultSize: 2000,
+    maxMemoryRows: 100000,
+    batchUpdateInterval: 5,
+    gcInterval: 10
+  };
+
+  /* -------------------------
+     2) 청크 기반 데이터 생성 - 현실 반영 개선
+  --------------------------*/
+  function preAssignChurn(uniqueCustomers) {
+    const map = {};
+    const churnCnt = Math.round(uniqueCustomers * 0.08);
+    for (let i = 0; i < uniqueCustomers; i++) {
+      map[`CUST${String(1000 + i).padStart(6, '0')}`] = 0;
+    }
+    const keys = Object.keys(map).sort(() => Math.random() - 0.5);
+    for (let i = 0; i < churnCnt; i++) map[keys[i]] = 1;
+    return map;
+  }
+
+  // 단일 행 생성 함수 (현실 반영 대폭 개선)
+  function generateSingleRow(i, nUsers, yStart, yEnd, churnMap) {
+    // 지역/도시/구
+    const region = pick(REGIONS);
+    const city = pick(CITIES_BY_REGION[region]);
+    const district = pick(DISTRICTS_BY_CITY[city] || ['기타구']);
+    const deliveryCenter = FULFILLMENT_BY_CITY[city] || '기타센터';
+    const distanceKm = mapDistance(region);
+    const addr = addressLine(city, district);
+
+    // 자동화 및 시스템 성숙도 결정
+    const automationLevel = determineAutomationLevel(region, deliveryCenter);
+    const wmsMaturity = determineWMSMaturity(automationLevel, deliveryCenter);
+    const omsMaturity = determineOMSMaturity(wmsMaturity);
+
+    const autoConfig = AUTOMATION_LEVELS[automationLevel];
+    const wmsConfig = WMS_MATURITY[wmsMaturity];
+    const omsConfig = OMS_MATURITY[omsMaturity];
+
+    // 상품, 가격, 수량
+    const catKey = pick(Object.keys(CATEGORY));
+    const cat = CATEGORY[catKey];
+    const sku = pick(cat.skus);
+    const price = irnd(cat.price[0], cat.price[1]);
+    const qty = irnd(1, 4);
+    const orderAmt = price * qty;
+
+    // ABC 등급
+    const r = Math.random();
+    const abc = r < ABC_DIST.A ? 'A' : (r < ABC_DIST.A + ABC_DIST.B ? 'B' : 'C');
+
+    // 고객
+    const custId = `CUST${String(1000 + (i % nUsers)).padStart(6, '0')}`;
+    const isWOW = Math.random() < 0.65 ? 1 : 0;
+    const wowJoin = isWOW ? new Date(Date.now() - irnd(10, 365) * 86400000) : null;
+
+    // 주문시각
+    const year = irnd(yStart, yEnd + 1);
+    const orderDate = new Date(year, irnd(0, 12), irnd(1, 29), irnd(8, 22), irnd(0, 60), irnd(0, 60));
+
+    // **핵심 개선: 현실적인 출고 프로세스 타임라인**
+
+    // 1) 주문 접수 완료 시간 (OMS 처리 시간)
+    const orderCompleteDate = new Date(orderDate.getTime() + omsConfig.processing_speed * wmsConfig.order_processing_time * 60 * 1000);
+
+    // 2) 실제 피킹/패킹 시간 계산 (업계 표준 반영)
+    const basePickTime = autoConfig.pickTimePerItem * qty * cat.pickComplexity; // 초
+    const basePackTime = autoConfig.packTimePerItem * qty; // 초
+
+    // 작업자 숙련도 및 시간대별 효율성 반영
+// [PATCH 4] hourEfficiency (야간 0.85 → 0.95)
+    const hourEfficiency = (orderDate.getHours() >= 9 && orderDate.getHours() <= 17) ? 1.0 : 0.95;
+
+    const actualPickTime = Math.round(basePickTime / hourEfficiency);
+    const actualPackTime = Math.round(basePackTime / hourEfficiency);
+
+    // 3) 계획 출고 시간 (주문완료 + 피킹패킹시간 + 버퍼)
+// [PATCH 3] fulfillmentBuffer (숫자만 조정)
+    const fulfillmentBuffer =
+      (wmsMaturity === 'ADVANCED' ? 5 :
+        wmsMaturity === 'STANDARD' ? 10 : 20); // 기존 5/12/30 → 5/10/20
+
+
+    const plannedShipDate = new Date(orderCompleteDate.getTime() +
+      (actualPickTime + actualPackTime) * 1000 + fulfillmentBuffer * 60 * 1000);
+
+    // 4) 실제 출고 시간 (지연 요인 반영)
+    let actualShipDate = new Date(plannedShipDate);
+    let shipDelayMinutes = 0;
+
+    // 출고 지연 요인들
+// 확률 완화
+// [PATCH 5] 지연 발생 확률 완화
+// [추가 PATCH A] 지연 발생 확률 더 완화
+    const systemDowntime = Math.random() > wmsConfig.system_uptime ? 1 : 0;
+    const inventoryIssue = Math.random() < (abc === 'A' ? 0.003 : 0.012) ? 1 : 0; // 확률 낮춤
+    const qualityCheck = orderAmt > 200000 && Math.random() < 0.08 ? 1 : 0;    // 10% → 8%
+
+
+// 지연 폭 축소
+// [추가 PATCH B] 지연 시간 단축
+    if (systemDowntime) shipDelayMinutes += irnd(10, 30);  // 기존 15–40 → 10–30
+    if (inventoryIssue) shipDelayMinutes += irnd(15, 45);  // 기존 20–60 → 15–45
+    if (qualityCheck) shipDelayMinutes += irnd(5, 10);   // 기존 5–15 → 5–10
+
+
+// 야간 피크 지연 가산 축소
+    // [추가 PATCH C] 야간 출고 효율
+    if (orderDate.getHours() >= 19) shipDelayMinutes += irnd(0, 5); // 기존 0–10 → 0–5
+
+
+// 야간 피크 지연 축소
+//     if (orderDate.getHours() >= 19) shipDelayMinutes += irnd(0, 20); // 0–60 → 0–20
+
+
+    actualShipDate.setMinutes(actualShipDate.getMinutes() + shipDelayMinutes);
+
+    // 5) 배송 계획 및 실제 배송 (기존 로직 활용하되 출고 기준으로 조정)
+    const mode = pick(Object.keys(DELIVERY_MODES));
+    const modeCfg = DELIVERY_MODES[mode];
+
+    // 계획 배송일 (출고일 기준)
+    const plannedDeliveryDate = new Date(actualShipDate);
+    if (mode === '당일') {
+      // 당일배송은 출고 후 당일 도착
+      plannedDeliveryDate.setHours(actualShipDate.getHours() + 4 + irnd(0, 4));
+    } else {
+      plannedDeliveryDate.setDate(plannedDeliveryDate.getDate() + modeCfg.baseDays);
+      plannedDeliveryDate.setHours(mode === '새벽' ? 6 + irnd(0, 2) : 8 + irnd(0, 12), irnd(0, 60), 0, 0);
+    }
+
+    // 날씨 및 배송 지연
+    const weather = pick(WEATHER_CONDITIONS);
+    const wsev = weatherSeverity(weather);
+    const delayed = Math.random() < (modeCfg.delayRate + (wsev > 0.7 ? 0.02 : 0));
+    const actualDeliveryDate = new Date(plannedDeliveryDate);
+    let deliveryDelayHours = 0;
+
+    if (delayed) {
+      const bump = wsev >= 0.65 ? 6 : 0;
+      deliveryDelayHours = irnd(2 + bump, 24 + bump);
+      actualDeliveryDate.setHours(actualDeliveryDate.getHours() + deliveryDelayHours);
+    }
+
+    // 차량/기사
+    const vType = pick(VEHICLES);
+    const vehicleId = `V${irnd(1000, 9999)}`;
+    const driverId = `D${irnd(100, 999)}`;
+    const driverGrade = pick(DRIVER_GRADE);
+    const loadFactor = clamp(Math.round((0.6 + rnd(0, 0.35)) * 100), 0, 100);
+    const fuelEff = (() => {
+      if (vType === '오토바이') return Math.round((25 + rnd(0, 10)) * 10) / 10;
+      if (vType === '소형밴') return Math.round((12 + rnd(0, 5)) * 10) / 10;
+      if (vType === '중형트럭') return Math.round((8 + rnd(0, 3)) * 10) / 10;
+      return Math.round((6 + rnd(0, 2)) * 10) / 10;
+    })();
+    const routingScore = Math.round((0.8 + rnd(0, 0.15)) * 100);
+
+    // 물류비 (거리, 무게, 자동화 수준 반영)
+    const base = REGION_COST[region].baseCost;
+    const weightKg = qty * (catKey === '가전' ? 3.5 : (catKey === '식품' ? 1.2 : 0.8));
+    const automationCostFactor = autoConfig.cost;
+    const logisticsCost = Math.round(
+      (base + (distanceKm * 15) + (weightKg * 50)) * automationCostFactor +
+      (wsev * 200)
+    );
+
+    let custDeliveryCharge = 0;
+    if (isWOW === 0 && orderAmt < 50000) custDeliveryCharge = 3000;
+
+    // CAC / LTV 계산 (멤버십과 주문 패턴 기반)
+    const baseCAC = isWOW ? irnd(2500, 5500) : irnd(800, 2000);
+    const regionCACMultiplier = region === '수도권' ? 1.2 : (region === '제주' ? 0.8 : 1.0);
+    const CAC = Math.round(baseCAC * regionCACMultiplier);
+
+    const margin = Math.floor(orderAmt * cat.margin);
+    const returnFlag = Math.random() < cat.returnRate ? 1 : 0;
+    const returnReason = returnFlag ? pick(RETURN_REASONS) : null;
+    const returnCost = returnFlag ? Math.floor(orderAmt * 0.15) : 0;
+
+    // 재고 관리 (ABC 등급과 자동화 수준 반영)
+    const baseStock = abc === 'A' ? irnd(200, 800) : (abc === 'B' ? irnd(100, 400) : irnd(50, 200));
+    const automationStockMultiplier = automationLevel === 'AI_OPTIMIZED' ? 0.7 : (automationLevel === 'AUTOMATED' ? 0.85 : 1.0);
+    const currentStock = Math.round(baseStock * automationStockMultiplier);
+    const reorderPoint = Math.floor(currentStock * (abc === 'A' ? 0.4 : (abc === 'B' ? 0.35 : 0.3)));
+
+    const stockTurn = abc === 'A' ? (8 + rnd(0, 4)) : (abc === 'B' ? (4 + rnd(0, 3)) : (2 + rnd(0, 2)));
+    const stockout = Math.random() < (abc === 'A' ? 0.015 : (abc === 'B' ? 0.04 : 0.08)) ? 1 : 0;
+
+    // 정확도 (자동화 수준 반영)
+    const invAcc = Math.round((wmsConfig.inventory_sync + rnd(-0.01, 0.01)) * 1000) / 1000;
+    const pickingAcc = Math.round((autoConfig.accuracy + rnd(-0.005, 0.005)) * 1000) / 1000;
+
+    // 실제 업계 표준 피킹/패킹 시간 (초 단위)
+    const pickingTimeSec = actualPickTime;
+    const packingTimeSec = actualPackTime;
+
+    // 작업자 생산성 (시간당 처리 건수)
+    const itemsPerHour = Math.round(3600 / (pickingTimeSec + packingTimeSec));
+
+    // WMS/OMS 효율성 지표
+    const wmsUtilizationRate = Math.round(wmsConfig.efficiency * 100);
+    const omsIntegrationScore = Math.round(omsConfig.integration_score * 100);
+    const autoAllocationRate = Math.round(omsConfig.auto_allocation * 100);
+
+    // 재고 관리 비용
+    const inventoryCarryingCost = Math.floor((currentStock * price * 0.001) / 12);
+    const stockoutCost = stockout ? Math.floor(orderAmt * 0.05) : 0;
+
+    // 이탈 관련
+    const churnFlag = churnMap[custId];
+    let churnScore = churnFlag ? (0.6 + rnd(0, 0.4)) : (rnd(0, 0.7));
+    if (!churnFlag && Math.random() < 0.05) churnScore += 0.1;
+    churnScore = Math.min(1, Math.round(churnScore * 1000) / 1000);
+
+    // LTV 계산 (멤버십, 지역, 자동화 효율성 반영)
+    const baseMult = isWOW ? rnd(3.5, 5.5) : rnd(2.0, 3.5);
+    const regionLTVMultiplier = region === '수도권' ? 1.15 : (region === '제주' ? 0.9 : 1.0);
+    const LTV = Math.round(orderAmt * baseMult * regionLTVMultiplier);
+
+    const customerAOV = orderAmt;
+    const grossProfit = margin;
+    const monthlyCAC = CAC / 12;
+    const fulfillmentCost = Math.round((pickingTimeSec + packingTimeSec) * 0.15); // 시간당 인건비 반영
+    const netProfit = Math.round(grossProfit - logisticsCost - returnCost - monthlyCAC - inventoryCarryingCost - stockoutCost - fulfillmentCost);
+
+    // 재판매 가능성
+    let isResellable = null, resellReason = null;
+    if (returnFlag) {
+      if (['단순변심', '기타'].includes(returnReason)) {
+        isResellable = Math.random() < 0.95 ? 1 : 0;
+        resellReason = isResellable ? '정상상품' : '포장손상';
+      } else if (['상품불량', '파손'].includes(returnReason)) {
+        isResellable = Math.random() < 0.20 ? 1 : 0;
+        resellReason = isResellable ? '부분수리가능' : '상품손상';
+      } else {
+        isResellable = Math.random() < 0.60 ? 1 : 0;
+        resellReason = isResellable ? '경미한손상' : '재포장불가';
+      }
+    }
+
+    // 출고 관련 지표
+    const shipOnTime = shipDelayMinutes <= SHIP_ON_TIME_GRACE_MIN ? 1 : 0;
+
+    const shipWithin60Min = (actualShipDate.getTime() - orderCompleteDate.getTime()) <= 60 * 60 * 1000 ? 1 : 0;
+    const fulfillmentEfficiency = Math.round(((plannedShipDate.getTime() - orderCompleteDate.getTime()) /
+      (actualShipDate.getTime() - orderCompleteDate.getTime())) * 100);
+
+    // 배송 관련
+    const deliveryOnTime = deliveryDelayHours === 0 ? 1 : 0;
+    const totalLeadTimeHours = Math.round((actualDeliveryDate.getTime() - orderDate.getTime()) / (1000 * 60 * 60));
+
+    // KPI용 월별 집계 키
+    const mKey = `${custId}-${orderDate.getFullYear()}-${pad(orderDate.getMonth() + 1)}`;
+
+    // 다양한 플래그들
+    const isDelayed = deliveryDelayHours > 0 ? 1 : 0;
+    const slaBreach = isDelayed ? 1 : 0;
+    const isWeatherRisk = (weather === '비' || weather === '눈') ? 1 : 0;
+    const isLongDistance = distanceKm >= 30 ? 1 : 0;
+    const isPremiumOrder = orderAmt >= 100000 ? 1 : 0;
+    const isBulkOrder = qty >= 5 ? 1 : 0;
+    const isFreeShipping = (custDeliveryCharge === 0) ? 1 : 0;
+    const isSameDay = (mode === '당일') ? 1 : 0;
+    const isHighLTV = LTV >= 150000 ? 1 : 0;
+    const isChurnRisk = churnScore > 0.7 ? 1 : 0;
+    const isVIP = isHighLTV ? 1 : 0;
+    const isLossOrder = netProfit < 0 ? 1 : 0;
+    const isStockOutFlag = stockout;
+    const isAGrade = abc === 'A' ? 1 : 0;
+    const isOverStock = currentStock > reorderPoint * 3 ? 1 : 0;
+    const isHighEff = (routingScore > 90 && loadFactor > 80) ? 1 : 0;
+    const isAutomated = automationLevel !== 'MANUAL' ? 1 : 0;
+    const isAIOptimized = automationLevel === 'AI_OPTIMIZED' ? 1 : 0;
+    const isFastFulfillment = shipWithin60Min;
+    const isQualityIssue = (returnFlag && ['상품불량', '파손'].includes(returnReason)) ? 1 : 0;
+    const isInventoryRisk = (stockout || isOverStock || invAcc < 0.97) ? 1 : 0;
+    const deliveryStatus = (slaBreach === 1 || deliveryDelayHours > 0) ? 'Late' : 'On-Time';
+    const shipmentStatus = shipOnTime ? 'On-Time' : 'Delayed';
+
+    // 행 객체 (대폭 확장된 컬럼셋)
+    return {
+      // 주문·시간 흐름
+      Order_ID: `ORD${String(1000 + i).padStart(6, '0')}`,
+      Order_Date: `${orderDate.getFullYear()}-${pad(orderDate.getMonth() + 1)}-${pad(orderDate.getDate())}`,
+      Order_Timestamp: orderDate.toISOString(),
+      Order_Complete_Timestamp: orderCompleteDate.toISOString(),
+      Planned_Ship_Date: `${plannedShipDate.getFullYear()}-${pad(plannedShipDate.getMonth() + 1)}-${pad(plannedShipDate.getDate())}`,
+      Planned_Ship_Timestamp: plannedShipDate.toISOString(),
+      Actual_Ship_Date: `${actualShipDate.getFullYear()}-${pad(actualShipDate.getMonth() + 1)}-${pad(actualShipDate.getDate())}`,
+      Actual_Ship_Timestamp: actualShipDate.toISOString(),
+      Planned_Delivery_Date: `${plannedDeliveryDate.getFullYear()}-${pad(plannedDeliveryDate.getMonth() + 1)}-${pad(plannedDeliveryDate.getDate())}`,
+      Actual_Delivery_Date: `${actualDeliveryDate.getFullYear()}-${pad(actualDeliveryDate.getMonth() + 1)}-${pad(actualDeliveryDate.getDate())}`,
+      Delivery_Timestamp: actualDeliveryDate.toISOString(),
+
+      // 시간 지표
+      Ship_Delay_Minutes: shipDelayMinutes,
+      Delivery_Delay_Hours: deliveryDelayHours,
+      Total_Lead_Time_Hours: totalLeadTimeHours,
+      Order_Processing_Time_Minutes: Math.round((orderCompleteDate.getTime() - orderDate.getTime()) / (1000 * 60)),
+      Fulfillment_Time_Minutes: Math.round((actualShipDate.getTime() - orderCompleteDate.getTime()) / (1000 * 60)),
+      Transit_Time_Hours: Math.round((actualDeliveryDate.getTime() - actualShipDate.getTime()) / (1000 * 60 * 60)),
+
+      // 상태
+      Delivery_Mode: mode,
+      Shipment_Status: shipmentStatus,
+      Delivery_Status: deliveryStatus,
+      SLA_Breach: slaBreach,
+
+      // 지역·주소·센터
+      Region: region, City: city, District: district, Address: addr,
+      Delivery_Center: deliveryCenter, Distance_km: distanceKm,
+
+      // 고객·멤버십
+      Customer_ID: custId,
+      Is_WOW_Member: isWOW,
+      WOW_Join_Date: isWOW ? wowJoin.toISOString().split('T')[0] : null,
+      WOW_Tenure_Days: isWOW ? Math.floor((orderDate - wowJoin) / 86400000) : 0,
+      Customer_Segment: (LTV >= 200000 ? 'Platinum' : (LTV >= 120000 ? 'Gold' : (LTV >= 60000 ? 'Silver' : 'Bronze'))),
+      Customer_AOV: customerAOV,
+
+      // 상품·가격
+      Product_Category: catKey, SKU: sku, ABC_Category: abc,
+      Quantity: qty, Order_Amount: orderAmt, Weight_kg: weightKg,
+      Margin_Rate: Math.round(cat.margin * 100),
+
+      // 운송
+      Vehicle_ID: vehicleId, Vehicle_Type: vType, Driver_ID: driverId, Driver_Grade: driverGrade,
+      Load_Factor: loadFactor, Fuel_Efficiency: fuelEff, Routing_Score: routingScore,
+      Real_Time_Tracking: Math.random() < 0.92 ? 1 : 0,
+
+      // 자동화 및 시스템
+      Automation_Level: automationLevel,
+      WMS_Maturity: wmsMaturity,
+      OMS_Maturity: omsMaturity,
+      WMS_Utilization_Rate: wmsUtilizationRate,
+      OMS_Integration_Score: omsIntegrationScore,
+      Auto_Allocation_Rate: autoAllocationRate,
+      System_Downtime_Flag: systemDowntime,
+      Inventory_Issue_Flag: inventoryIssue,
+      Quality_Check_Flag: qualityCheck,
+
+      // 현실적인 피킹/패킹 시간 (초 단위)
+      Picking_Time_Seconds: pickingTimeSec,
+      Packing_Time_Seconds: packingTimeSec,
+      Total_Fulfillment_Seconds: pickingTimeSec + packingTimeSec,
+      Picking_Accuracy: pickingAcc,
+      Worker_Items_Per_Hour: itemsPerHour,
+      Fulfillment_Efficiency: fulfillmentEfficiency,
+
+      // 비용
+      Actual_Logistics_Cost: logisticsCost,
+      Customer_Delivery_Charge: custDeliveryCharge,
+      Fulfillment_Cost: fulfillmentCost,
+      CAC: CAC, Gross_Profit: grossProfit,
+      Inventory_Carrying_Cost: inventoryCarryingCost,
+      Stockout_Cost: stockoutCost,
+      Net_Profit: netProfit,
+
+      // 반품
+      Return_Flag: returnFlag, Return_Reason: returnReason, Return_Cost: returnCost,
+      Is_Resellable: isResellable, Resellability_Reason: resellReason,
+
+      // 재고·WMS
+      Inventory_Level: currentStock,
+      Reorder_Point: reorderPoint,
+      Inventory_Turnover: Math.round(stockTurn * 10) / 10,
+      Stockout_Rate: Math.round((stockout ? 1 : 0) * 1000) / 10,
+      Overstock_Rate: isOverStock ? 100 : 0,
+      Inventory_Accuracy: invAcc,
+      Demand_Forecast_Accuracy: Math.round(((abc === 'A' ? 0.92 : rnd(0.75, 0.95))) * 1000) / 1000,
+
+      // 고객 가치
+      Customer_LTV: LTV, LTV_to_CAC: Math.round((LTV / Math.max(CAC, 1)) * 100) / 100,
+      Churn_Flag: churnFlag, Predicted_Churn_Score: churnScore,
+
+      // 품질/NPS
+      Customer_NPS: irnd(60, 91),
+      Service_Quality_Score: Math.round((0.8 + rnd(0, 0.15)) * 100),
+      Claim_Processing_Hours: irnd(2, 50),
+
+      // 날씨
+      Weather_Condition: weather,
+      Weather_Severity_Score: wsev,
+
+      // 분석용 플래그들
+      Is_Delayed: isDelayed,
+      Is_Returned: returnFlag,
+      Is_Premium_Order: isPremiumOrder,
+      Is_Bulk_Order: isBulkOrder,
+      Is_Weekend_Order: [0, 6].includes(orderDate.getDay()) ? 1 : 0,
+      Is_Peak_Hour: (orderDate.getHours() >= 19 && orderDate.getHours() <= 21) ? 1 : 0,
+      Is_Free_Shipping: isFreeShipping,
+      Is_Same_Day: isSameDay,
+      Is_Weather_Risk: isWeatherRisk,
+      Is_Long_Distance: isLongDistance,
+      Is_High_LTV: isHighLTV,
+      Is_Churn_Risk: isChurnRisk,
+      Is_VIP_Customer: isVIP,
+      Is_Loss_Order: isLossOrder,
+      Is_Stock_Out_Flag: isStockOutFlag,
+      Is_A_Grade: isAGrade,
+      Is_Over_Stock: isOverStock,
+      Is_High_Efficiency: isHighEff,
+      Is_Automated: isAutomated,
+      Is_AI_Optimized: isAIOptimized,
+      Is_Fast_Fulfillment: isFastFulfillment,
+      Is_Ship_On_Time: shipOnTime,
+      Is_Quality_Issue: isQualityIssue,
+      Is_Inventory_Risk: isInventoryRisk,
+
+      // 월별 집계 키 (내부용)
+      _monthlyKey: mKey
+    };
+  }
+
+  // 청크 생성 함수
+  async function generateDataChunk(startIdx, chunkSize, nUsers, yStart, yEnd, churnMap) {
+    const chunk = [];
+    const chunkMonthly = {};
+
+    for (let i = 0; i < chunkSize; i++) {
+      if (PROCESSING_STATE.shouldStop) break;
+
+      const row = generateSingleRow(startIdx + i, nUsers, yStart, yEnd, churnMap);
+      chunk.push(row);
+
+      // 월별 집계 추가
+      const mKey = row._monthlyKey;
+      chunkMonthly[mKey] = (chunkMonthly[mKey] || 0) + row.Order_Amount;
+
+      // 주기적으로 CPU 양보
+      if (i % 100 === 0) {
+        await sleep(0);
+      }
+    }
+
+    return {chunk, chunkMonthly};
+  }
+
+  // 메인 데이터 생성 함수
+  async function generateDataInChunks(nOrders, nUsers, yStart, yEnd, chunkSize) {
+    // 초기화
+    DATA = [];
+    MONTHLY_BY_CUST = {};
+    VALIDATION_ISSUES = [];
+    PERFORMANCE_METRICS = {};
+
+    PROCESSING_STATE = {
+      isRunning: true,
+      shouldStop: false,
+      startTime: performance.now(),
+      processedRows: 0,
+      totalRows: nOrders,
+      currentChunk: 0,
+      totalChunks: Math.ceil(nOrders / chunkSize)
+    };
+
+    updateUIState('running');
+
+    try {
+      // 이탈 고객 사전 할당
+      const churnMap = preAssignChurn(nUsers);
+
+      // 청크별 처리
+      for (let chunkIdx = 0; chunkIdx < PROCESSING_STATE.totalChunks; chunkIdx++) {
+        if (PROCESSING_STATE.shouldStop) break;
+
+        const startIdx = chunkIdx * chunkSize;
+        const currentChunkSize = Math.min(chunkSize, nOrders - startIdx);
+
+        // 청크 생성
+        const {chunk, chunkMonthly} = await generateDataChunk(
+          startIdx, currentChunkSize, nUsers, yStart, yEnd, churnMap
+        );
+
+        // 데이터 추가 (메모리 관리)
+        if (DATA.length + chunk.length > CHUNK_CONFIG.maxMemoryRows) {
+          // 테이블 표시용으로 최근 데이터만 유지
+          DATA = DATA.slice(-CHUNK_CONFIG.maxMemoryRows / 2).concat(chunk);
+        } else {
+          DATA = DATA.concat(chunk);
+        }
+
+        // 월별 집계 업데이트
+        Object.keys(chunkMonthly).forEach(key => {
+          MONTHLY_BY_CUST[key] = (MONTHLY_BY_CUST[key] || 0) + chunkMonthly[key];
+        });
+
+        // 상태 업데이트
+        PROCESSING_STATE.processedRows = startIdx + currentChunkSize;
+        PROCESSING_STATE.currentChunk = chunkIdx + 1;
+
+        // 주기적 UI 업데이트
+        if (chunkIdx % CHUNK_CONFIG.batchUpdateInterval === 0 || chunkIdx === PROCESSING_STATE.totalChunks - 1) {
+          updateProgress();
+
+          // KPI 부분 업데이트 (전체 데이터 기준)
+          if (chunkIdx % (CHUNK_CONFIG.batchUpdateInterval * 2) === 0) {
+            const partialKPI = calcKPIsFromPartialData();
+            updateKPI(partialKPI);
+          }
+        }
+
+        // 가비지 컬렉션 힌트
+        if (chunkIdx % CHUNK_CONFIG.gcInterval === 0) {
+          await sleep(10);
+        }
+
+        await sleep(1); // UI 블로킹 방지
+      }
+
+      // 최종 처리
+      if (!PROCESSING_STATE.shouldStop) {
+        // CLV 4분위 계산
+        const clvValues = DATA.map(r => r.Customer_LTV || 0);
+        const qs = calcQuartilesFromValues(clvValues);
+        DATA.forEach(r => {
+          const q = toQuartile(r.Customer_LTV || 0, qs);
+          r.CLV_Quartile = q;
+          r.CLV_Quartile_Label = `Q${q}`;
+        });
+
+        // 최종 KPI 계산
+        const finalKPI = calcKPIs();
+        updateKPI(finalKPI);
+
+        // 검증 실행
+        await runValidations();
+        renderValidations();
+        renderRisks();
+        renderTable();
+
+        // 성능 메트릭 계산
+        const endTime = performance.now();
+        PERFORMANCE_METRICS = {
+          totalTime: Math.round(endTime - PROCESSING_STATE.startTime),
+          rowsPerSecond: Math.round(nOrders / ((endTime - PROCESSING_STATE.startTime) / 1000)),
+          chunksProcessed: PROCESSING_STATE.totalChunks,
+          memoryEfficiency: Math.round((DATA.length / nOrders) * 100)
+        };
+        renderPerformanceMetrics();
+
+        document.getElementById('btnCsv').disabled = false;
+        updateUIState('completed');
+      } else {
+        updateUIState('stopped');
+      }
+
+    } catch (error) {
+      console.error('데이터 생성 중 오류:', error);
+      updateUIState('error');
+      alert('데이터 생성 중 오류가 발생했습니다: ' + error.message);
+    }
+
+    PROCESSING_STATE.isRunning = false;
+  }
+
+  /* -------------------------
+     3) KPI 계산 (신규 지표 추가)
+  --------------------------*/
+  function calcKPIs() {
+    const rows = DATA;
+    const totalOrders = rows.length;
+    const totalSales = rows.reduce((s, r) => s + r.Order_Amount, 0);
+    const totalNet = rows.reduce((s, r) => s + r.Net_Profit, 0);
+    const netMargin = totalSales ? Math.round((totalNet / totalSales) * 1000) / 10 : 0;
+
+    // 배송 관련
+    const onTime = rows.filter(r => r.SLA_Breach === 0).length;
+    const onTimeRate = Math.round((onTime / totalOrders) * 1000) / 10;
+    const slaRate = 100 - onTimeRate;
+
+    // 출고 관련 (신규)
+    const shipOnTime = rows.filter(r => r.Is_Ship_On_Time === 1).length;
+    const shipOnTimeRate = Math.round((shipOnTime / totalOrders) * 1000) / 10;
+    const avgShipTime = Math.round(rows.reduce((s, r) => s + r.Fulfillment_Time_Minutes, 0) / Math.max(totalOrders, 1));
+    const ship60 = rows.filter(r => r.Is_Fast_Fulfillment === 1).length;
+    const ship60Rate = Math.round((ship60 / totalOrders) * 1000) / 10;
+
+    // 피킹/패킹 속도 (초 단위)
+    const avgPickSpeed = Math.round(rows.reduce((s, r) => s + r.Picking_Time_Seconds, 0) / Math.max(totalOrders, 1));
+    const avgPackSpeed = Math.round(rows.reduce((s, r) => s + r.Packing_Time_Seconds, 0) / Math.max(totalOrders, 1));
+
+    // 풀필먼트 효율성
+    const avgFulfillEff = Math.round(rows.reduce((s, r) => s + (r.Fulfillment_Efficiency || 100), 0) / Math.max(totalOrders, 1));
+
+    const load = Math.round(rows.reduce((s, r) => s + r.Load_Factor, 0) / Math.max(totalOrders, 1));
+    const fuel = Math.round((rows.reduce((s, r) => s + r.Fuel_Efficiency, 0) / Math.max(totalOrders, 1)) * 10) / 10;
+    const route = Math.round(rows.reduce((s, r) => s + r.Routing_Score, 0) / Math.max(totalOrders, 1));
+    const exceptions = rows.filter(r => r.Return_Reason && ['오배송', '파손'].includes(r.Return_Reason)).length;
+    const exceptionRate = Math.round((exceptions / totalOrders) * 1000) / 10;
+
+    const returns = rows.filter(r => r.Return_Flag === 1).length;
+    const returnRate = Math.round((returns / totalOrders) * 1000) / 10;
+    const returnCostRate = totalSales ? Math.round((rows.reduce((s, r) => s + r.Return_Cost, 0) / totalSales) * 1000) / 10 : 0;
+    const resellable = rows.filter(r => r.Is_Resellable === 1).length;
+    const resellRate = returns ? Math.round((resellable / returns) * 1000) / 10 : 0;
+
+    const wow = rows.filter(r => r.Is_WOW_Member === 1);
+    const nonwow = rows.filter(r => r.Is_WOW_Member === 0);
+    const wowShare = Math.round((wow.length / Math.max(totalOrders, 1)) * 1000) / 10;
+    const wowAOV = wow.length ? Math.round(wow.reduce((s, r) => s + r.Order_Amount, 0) / wow.length) : 0;
+    const nonwowAOV = nonwow.length ? Math.round(nonwow.reduce((s, r) => s + r.Order_Amount, 0) / nonwow.length) : 0;
+
+    // 재고 KPI
+    const invTurn = Math.round((rows.reduce((s, r) => s + r.Inventory_Turnover, 0) / totalOrders) * 10) / 10;
+    const stockoutRate = Math.round((rows.filter(r => r.Is_Stock_Out_Flag === 1).length / totalOrders) * 1000) / 10;
+    const overstockRate = Math.round((rows.filter(r => r.Is_Over_Stock === 1).length / totalOrders) * 1000) / 10;
+    const invAcc = Math.round((rows.reduce((s, r) => s + r.Inventory_Accuracy, 0) / totalOrders) * 1000) / 10;
+    const shrink = totalSales ? Math.round((rows.reduce((s, r) => s + r.Inventory_Carrying_Cost + r.Stockout_Cost, 0) / totalSales) * 1000) / 10 : 0;
+    const wmsUtil = Math.round((rows.reduce((s, r) => s + r.WMS_Utilization_Rate, 0) / totalOrders));
+
+    // 자동화 관련 (신규)
+    const autoRate = Math.round((rows.filter(r => r.Is_Automated === 1).length / totalOrders) * 1000) / 10;
+    const omsEff = Math.round(rows.reduce((s, r) => s + r.OMS_Integration_Score, 0) / Math.max(totalOrders, 1));
+
+    // 고객 KPI
+    const avgLTV = Math.round(rows.reduce((s, r) => s + r.Customer_LTV, 0) / Math.max(totalOrders, 1));
+    const avgCAC = Math.round(rows.reduce((s, r) => s + r.CAC, 0) / Math.max(totalOrders, 1));
+    const ltvCac = avgCAC ? Math.round((avgLTV / avgCAC) * 100) / 100 : 0;
+    const churnCust = new Set(rows.filter(r => r.Churn_Flag === 1).map(r => r.Customer_ID)).size;
+    const uniqCust = new Set(rows.map(r => r.Customer_ID)).size;
+    const churnRate = uniqCust ? Math.round((churnCust / uniqCust) * 1000) / 10 : 0;
+    const retention = Math.round((100 - churnRate) * 10) / 10;
+
+    // AI 정확도
+    const correct = rows.filter(r => (r.Churn_Flag === 1 && r.Predicted_Churn_Score > 0.7) || (r.Churn_Flag === 0 && r.Predicted_Churn_Score <= 0.7)).length;
+    const aiAcc = Math.round((correct / totalOrders) * 1000) / 10;
+
+    // ARPPU: 고객-월 집계 평균
+    const monthlyTotals = Object.values(MONTHLY_BY_CUST);
+    const arppu = monthlyTotals.length ? Math.round(monthlyTotals.reduce((s, a) => s + a, 0) / monthlyTotals.length) : 0;
+
+    // WOW 재고회전 기여
+    const wowInv = wow.length ? Math.round((wow.reduce((s, r) => s + r.Inventory_Turnover, 0) / wow.length) * 10) / 10 : 0;
+
+    return {
+      totalSales, netMargin, aov: Math.round(totalSales / Math.max(totalOrders, 1)),
+      arppu, ltvCac, retention, churnRate, aiAcc,
+      onTimeRate, slaRate, load, fuel, route, exceptionRate,
+      returnRate, returnCostRate, resellRate,
+      wowShare, wowAOV, nonwowAOV, wowInv,
+      invTurn, stockoutRate, overstockRate, invAcc, shrink, wmsUtil,
+      // 신규 지표들
+      shipOnTimeRate, avgShipTime, avgPickSpeed, avgPackSpeed, avgFulfillEff, ship60Rate,
+      autoRate, omsEff
+    };
+  }
+
+  // 부분 KPI 계산 (진행 중 표시용)
+  function calcKPIsFromPartialData() {
+    if (!DATA.length) return calcKPIs();
+
+    // 샘플링으로 성능 최적화
+    const sampleSize = Math.min(DATA.length, 10000);
+    const sampleRows = DATA.slice(-sampleSize);
+
+    const totalOrders = sampleRows.length;
+    const totalSales = sampleRows.reduce((s, r) => s + r.Order_Amount, 0);
+    const avgOrderAmt = Math.round(totalSales / Math.max(totalOrders, 1));
+
+    return {
+      totalSales: Math.round((totalSales / sampleSize) * PROCESSING_STATE.processedRows),
+      aov: avgOrderAmt,
+      onTimeRate: Math.round((sampleRows.filter(r => r.SLA_Breach === 0).length / totalOrders) * 1000) / 10,
+      returnRate: Math.round((sampleRows.filter(r => r.Return_Flag === 1).length / totalOrders) * 1000) / 10,
+      wowShare: Math.round((sampleRows.filter(r => r.Is_WOW_Member === 1).length / totalOrders) * 1000) / 10,
+      shipOnTimeRate: Math.round((sampleRows.filter(r => r.Is_Ship_On_Time === 1).length / totalOrders) * 1000) / 10
+    };
+  }
+
+  /* -------------------------
+     4) 검증 및 위험 요소 분석 (시간 흐름 정합성 강화)
+  --------------------------*/
+  async function runValidations() {
+    const issues = [];
+    const rows = DATA.slice(-10000); // 최근 1만건만 검증 (성능상)
+
+    let validatedCount = 0;
+    const totalToValidate = Math.min(rows.length, 5000);
+
+    for (let i = 0; i < totalToValidate; i++) {
+      const r = rows[i];
+
+      // 1) 시간 흐름 논리적 정합성 검증 (강화)
+      const orderTime = new Date(r.Order_Timestamp);
+      const completeTime = new Date(r.Order_Complete_Timestamp);
+      const plannedShipTime = new Date(r.Planned_Ship_Timestamp);
+      const actualShipTime = new Date(r.Actual_Ship_Timestamp);
+      const plannedDeliveryTime = new Date(r.Planned_Delivery_Date + 'T00:00:00+09:00');
+      const actualDeliveryTime = new Date(r.Delivery_Timestamp);
+
+      // 시간 순서 검증
+      if (!(orderTime <= completeTime)) issues.push({
+        level: 'bad',
+        msg: `Order complete before order time: ${r.Order_ID}`
+      });
+      if (!(completeTime <= plannedShipTime)) issues.push({
+        level: 'bad',
+        msg: `Planned ship before complete: ${r.Order_ID}`
+      });
+      if (!(plannedShipTime <= actualShipTime)) issues.push({
+        level: 'warn',
+        msg: `Actual ship before planned: ${r.Order_ID}`
+      });
+      if (!(actualShipTime <= actualDeliveryTime)) issues.push({
+        level: 'bad',
+        msg: `Delivery before shipment: ${r.Order_ID}`
+      });
+
+      // 2) 시간 간격 합리성 검증
+      const processingMin = (completeTime - orderTime) / (1000 * 60);
+      const fulfillmentMin = (actualShipTime - completeTime) / (1000 * 60);
+      const transitHours = (actualDeliveryTime - actualShipTime) / (1000 * 60 * 60);
+
+      if (processingMin < 0 || processingMin > 480) issues.push({
+        level: 'warn',
+        msg: `Unrealistic processing time ${processingMin}min: ${r.Order_ID}`
+      });
+      if (fulfillmentMin < 5 || fulfillmentMin > 2880) issues.push({
+        level: 'warn',
+        msg: `Unrealistic fulfillment time ${fulfillmentMin}min: ${r.Order_ID}`
+      });
+      if (transitHours < 0.5 || transitHours > 168) issues.push({
+        level: 'warn',
+        msg: `Unrealistic transit time ${transitHours}h: ${r.Order_ID}`
+      });
+
+      // 3) 자동화 수준과 피킹 시간 정합성
+      const expectedPickTime = AUTOMATION_LEVELS[r.Automation_Level]?.pickTimePerItem || 45;
+      const actualPickTimePerItem = r.Picking_Time_Seconds / r.Quantity;
+      if (Math.abs(actualPickTimePerItem - expectedPickTime) > expectedPickTime * 0.5) {
+        issues.push({level: 'warn', msg: `Pick time inconsistent with automation level: ${r.Order_ID}`});
+      }
+
+      // 4) WMS 성숙도와 지표 정합성
+      const wmsConfig = WMS_MATURITY[r.WMS_Maturity];
+      if (wmsConfig) {
+        if (Math.abs(r.Picking_Accuracy - wmsConfig.picking_accuracy) > 0.02) {
+          issues.push({level: 'warn', msg: `Picking accuracy inconsistent with WMS maturity: ${r.Order_ID}`});
+        }
+        if (Math.abs(r.WMS_Utilization_Rate - wmsConfig.efficiency * 100) > 15) {
+          issues.push({level: 'warn', msg: `WMS utilization inconsistent: ${r.Order_ID}`});
+        }
+      }
+
+      // 5) 거리-센터-지역 검증
+      if (!r.Delivery_Center) issues.push({level: 'bad', msg: `Missing center: ${r.Order_ID}`});
+      if (r.Distance_km < 0 || r.Distance_km > 120) issues.push({
+        level: 'warn',
+        msg: `Suspicious distance ${r.Distance_km}km: ${r.Order_ID}`
+      });
+
+      // 6) SLA_Breach vs 지연시간 정합성
+      if ((r.SLA_Breach === 1 && r.Delivery_Delay_Hours <= 0) || (r.SLA_Breach === 0 && r.Delivery_Delay_Hours > 0)) {
+        issues.push({level: 'bad', msg: `SLA vs Delay mismatch: ${r.Order_ID}`});
+      }
+
+      // 7) WOW 무료배송 로직
+      if (r.Is_WOW_Member === 1 && r.Customer_Delivery_Charge !== 0) issues.push({
+        level: 'bad',
+        msg: `WOW charged shipping: ${r.Order_ID}`
+      });
+      if (r.Is_WOW_Member === 1 && r.Actual_Logistics_Cost <= 0) issues.push({
+        level: 'bad',
+        msg: `WOW missing logistics cost: ${r.Order_ID}`
+      });
+
+      // 8) 재고 수치
+      if (r.Inventory_Level < 0) issues.push({level: 'bad', msg: `Negative inventory: ${r.Order_ID}`});
+      if (r.Overstock_Rate > 100) issues.push({level: 'warn', msg: `Overstock rate >100%: ${r.Order_ID}`});
+
+      // 9) 연비
+      if (r.Fuel_Efficiency <= 0) issues.push({level: 'bad', msg: `Nonpositive fuel efficiency: ${r.Order_ID}`});
+
+      // 10) 60분 내 출고와 실제 시간 정합성
+      const actualFulfillmentMin = r.Fulfillment_Time_Minutes;
+      if (r.Is_Fast_Fulfillment === 1 && actualFulfillmentMin > 60) {
+        issues.push({level: 'bad', msg: `Fast fulfillment flag but >60min: ${r.Order_ID}`});
+      }
+
+      validatedCount++;
+
+      // 주기적으로 CPU 양보
+      if (i % 100 === 0) {
+        await sleep(0);
+      }
+
+      if (PROCESSING_STATE.shouldStop) break;
+    }
+
+    VALIDATION_ISSUES = issues;
+
+    // 추가 통계 검증
+    const totalRows = rows.length;
+    const wowRate = rows.filter(r => r.Is_WOW_Member === 1).length / totalRows;
+    const returnRate = rows.filter(r => r.Return_Flag === 1).length / totalRows;
+    const delayRate = rows.filter(r => r.Is_Delayed === 1).length / totalRows;
+    const autoRate = rows.filter(r => r.Is_Automated === 1).length / totalRows;
+
+    if (wowRate < 0.5 || wowRate > 0.8) {
+      issues.push({
+        level: 'warn',
+        msg: `WOW membership rate ${Math.round(wowRate * 100)}% outside expected range (50-80%)`
+      });
+    }
+    if (returnRate < 0.02 || returnRate > 0.15) {
+      issues.push({level: 'warn', msg: `Return rate ${Math.round(returnRate * 100)}% outside expected range (2-15%)`});
+    }
+    if (delayRate < 0.01 || delayRate > 0.1) {
+      issues.push({level: 'warn', msg: `Delay rate ${Math.round(delayRate * 100)}% outside expected range (1-10%)`});
+    }
+    if (autoRate < 0.3 || autoRate > 0.9) {
+      issues.push({
+        level: 'warn',
+        msg: `Automation rate ${Math.round(autoRate * 100)}% outside expected range (30-90%)`
+      });
+    }
+
+    return issues;
+  }
+
+  function compositeRisks() {
+    const sampleRows = DATA.slice(-5000); // 성능을 위해 최근 5천건만 분석
+
+    const longBadWeather = sampleRows.filter(r => r.Is_Long_Distance === 1 && r.Weather_Severity_Score >= 0.65);
+    const longWOW = sampleRows.filter(r => r.Is_Long_Distance === 1 && r.Is_WOW_Member === 1);
+    const badWeatherPremium = sampleRows.filter(r => r.Weather_Severity_Score >= 0.65 && r.Is_Premium_Order === 1);
+    const highRiskCombo = sampleRows.filter(r => r.Is_Churn_Risk === 1 && r.Is_Loss_Order === 1);
+    // 신규 위험 요소
+    const shipDelayStock = sampleRows.filter(r => r.Ship_Delay_Minutes > 60 && r.Is_Stock_Out_Flag === 1);
+    const manualHighVol = sampleRows.filter(r => r.Automation_Level === 'MANUAL' && r.Is_Bulk_Order === 1);
+
+    return {
+      longBadWeather: longBadWeather.slice(0, 20).map(r => r.Order_ID),
+      longWOW: longWOW.slice(0, 20).map(r => r.Order_ID),
+      badWeatherPremium: badWeatherPremium.slice(0, 20).map(r => r.Order_ID),
+      highRiskCombo: highRiskCombo.slice(0, 20).map(r => r.Order_ID),
+      shipDelayStock: shipDelayStock.slice(0, 20).map(r => r.Order_ID),
+      manualHighVol: manualHighVol.slice(0, 20).map(r => r.Order_ID),
+      counts: {
+        longBadWeather: longBadWeather.length,
+        longWOW: longWOW.length,
+        badWeatherPremium: badWeatherPremium.length,
+        highRiskCombo: highRiskCombo.length,
+        shipDelayStock: shipDelayStock.length,
+        manualHighVol: manualHighVol.length
+      }
+    };
+  }
+
+  /* -------------------------
+     5) UI 업데이트 함수들 (신규 KPI 추가)
+  --------------------------*/
+  function setText(id, v, suffix = '') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = (v === undefined || v === null || Number.isNaN(v)) ? '-' : (typeof v === 'number' ? v.toLocaleString() : v);
+    if (suffix) el.nextElementSibling && (el.nextElementSibling.textContent = suffix);
+  }
+
+  function updateKPI(k) {
+    // 기존 KPI
+    setText('k_totalSales', Math.round(k.totalSales || 0));
+    setText('k_netMargin', k.netMargin || 0);
+    setText('k_aov', k.aov || 0);
+    setText('k_arppu', k.arppu || 0);
+    setText('k_ltvCac', k.ltvCac || 0);
+    setText('k_retention', k.retention || 0);
+    setText('k_churn', k.churnRate || 0);
+    setText('k_ai', k.aiAcc || 0);
+    setText('k_onTime', k.onTimeRate || 0);
+    setText('k_sla', k.slaRate || 0);
+    setText('k_load', k.load || 0);
+    setText('k_fuel', k.fuel || 0);
+    setText('k_route', k.route || 0);
+    setText('k_exception', k.exceptionRate || 0);
+    setText('k_returnRate', k.returnRate || 0);
+    setText('k_returnCost', k.returnCostRate || 0);
+    setText('k_resell', k.resellRate || 0);
+    setText('k_wowShare', k.wowShare || 0);
+    setText('k_wowAov', k.wowAOV || 0);
+    setText('k_nonWowAov', k.nonwowAOV || 0);
+    setText('k_wowInv', k.wowInv || 0);
+    setText('k_invTurn', k.invTurn || 0);
+    setText('k_stockout', k.stockoutRate || 0);
+    setText('k_overstock', k.overstockRate || 0);
+    setText('k_invAcc', k.invAcc || 0);
+    setText('k_shrink', k.shrink || 0);
+    setText('k_wms', k.wmsUtil || 0);
+
+    // 신규 KPI
+    setText('k_onTimeShip', k.shipOnTimeRate || 0);
+    const shipCard = document.getElementById('k_onTimeShip')?.closest('.kpi');
+    if (shipCard) {
+      if (k.shipOnTimeRate >= SHIP_ON_TIME_GOOD)       shipCard.className = 'kpi good';
+      else if (k.shipOnTimeRate >= SHIP_ON_TIME_TARGET) shipCard.className = 'kpi primary';
+      else                                              shipCard.className = 'kpi warn';
+    }
+
+    setText('k_avgShipTime', k.avgShipTime || 0);
+    setText('k_pickSpeed', k.avgPickSpeed || 0);
+    setText('k_packSpeed', k.avgPackSpeed || 0);
+    setText('k_fulfillEff', k.avgFulfillEff || 0);
+    setText('k_ship60', k.ship60Rate || 0);
+    setText('k_autoRate', k.autoRate || 0);
+    setText('k_omsEff', k.omsEff || 0);
+  }
+
+  function updateProgress() {
+    const progress = Math.round((PROCESSING_STATE.processedRows / PROCESSING_STATE.totalRows) * 100);
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const progressStats = document.getElementById('progressStats');
+    const progressETA = document.getElementById('progressETA');
+
+    if (progressFill) progressFill.style.width = `${progress}%`;
+    if (progressText) progressText.textContent = `${progress}% 완료 (${PROCESSING_STATE.processedRows.toLocaleString()} / ${PROCESSING_STATE.totalRows.toLocaleString()}) | Processing ${progress}%`;
+
+    if (progressStats) {
+      const elapsed = performance.now() - PROCESSING_STATE.startTime;
+      const rate = Math.round(PROCESSING_STATE.processedRows / (elapsed / 1000));
+      progressStats.textContent = `${rate.toLocaleString()} rows/sec | 청크 ${PROCESSING_STATE.currentChunk}/${PROCESSING_STATE.totalChunks}`;
+    }
+
+    if (progressETA && PROCESSING_STATE.processedRows > 0) {
+      const elapsed = performance.now() - PROCESSING_STATE.startTime;
+      const remaining = (PROCESSING_STATE.totalRows - PROCESSING_STATE.processedRows);
+      const rate = PROCESSING_STATE.processedRows / (elapsed / 1000);
+      const etaSeconds = remaining / rate;
+      const etaText = etaSeconds > 60 ? `${Math.round(etaSeconds / 60)}분` : `${Math.round(etaSeconds)}초`;
+      progressETA.textContent = `예상 완료: ${etaText} | ETA: ${etaText}`;
+    }
+  }
+
+  function updateUIState(state) {
+    const status = document.getElementById('status');
+    const btnGen = document.getElementById('btnGen');
+    const btnStop = document.getElementById('btnStop');
+    const progressContainer = document.getElementById('progressContainer');
+
+    switch (state) {
+      case 'running':
+        status.textContent = 'PROCESSING';
+        status.className = 'pill running';
+        btnGen.disabled = true;
+        btnStop.disabled = false;
+        btnStop.style.display = 'inline-block';
+        progressContainer.style.display = 'block';
+        break;
+      case 'completed':
+        status.textContent = 'COMPLETED';
+        status.className = 'pill ok';
+        btnGen.disabled = false;
+        btnStop.disabled = true;
+        btnStop.style.display = 'none';
+        break;
+      case 'stopped':
+        status.textContent = 'STOPPED';
+        status.className = 'pill ng';
+        btnGen.disabled = false;
+        btnStop.disabled = true;
+        btnStop.style.display = 'none';
+        break;
+      case 'error':
+        status.textContent = 'ERROR';
+        status.className = 'pill ng';
+        btnGen.disabled = false;
+        btnStop.disabled = true;
+        btnStop.style.display = 'none';
+        break;
+      default:
+        status.textContent = 'READY';
+        status.className = 'pill ok';
+        btnGen.disabled = false;
+        btnStop.disabled = true;
+        btnStop.style.display = 'none';
+        progressContainer.style.display = 'none';
+    }
+  }
+
+  function renderValidations() {
+    const box = document.getElementById('validateList');
+    const sum = document.getElementById('validateSummary');
+    box.innerHTML = '';
+    if (!VALIDATION_ISSUES.length) {
+      sum.className = 'pill ok';
+      sum.textContent = 'All checks passed (모든 검증 통과)';
+      box.innerHTML = `<div class="alert good">✅ 데이터 정합성 이상 없음</div>`;
+      return;
+    }
+    sum.className = 'pill ng';
+    sum.textContent = `${VALIDATION_ISSUES.length} issue(s) found`;
+    VALIDATION_ISSUES.slice(0, 100).forEach(it => {
+      const div = document.createElement('div');
+      div.className = `alert ${it.level === 'bad' ? 'bad' : 'warn'}`;
+      div.textContent = it.msg;
+      box.appendChild(div);
+    });
+  }
+
+  function renderRisks() {
+    const r = compositeRisks();
+    const box = document.getElementById('riskList');
+    box.innerHTML = '';
+    const items = [
+      {title: `장거리+악천후 / Long Distance + Bad Weather`, count: r.counts.longBadWeather, list: r.longBadWeather},
+      {title: `장거리+WOW / Long Distance + WOW`, count: r.counts.longWOW, list: r.longWOW},
+      {title: `악천후+고가 / Bad Weather + Premium`, count: r.counts.badWeatherPremium, list: r.badWeatherPremium},
+      {title: `이탈위험+손실주문 / Churn Risk + Loss Order`, count: r.counts.highRiskCombo, list: r.highRiskCombo},
+      {title: `출고지연+품절 / Ship Delay + Stockout`, count: r.counts.shipDelayStock, list: r.shipDelayStock},
+      {title: `수동처리+대량주문 / Manual + Bulk Order`, count: r.counts.manualHighVol, list: r.manualHighVol}
+    ];
+    items.forEach(it => {
+      const div = document.createElement('div');
+      div.className = it.count ? 'alert warn' : 'alert good';
+      div.innerHTML = `<strong>${it.title}</strong> — ${it.count}건<br>${it.list.join(', ')}`;
+      box.appendChild(div);
+    });
+  }
+
+  function renderPerformanceMetrics() {
+    const box = document.getElementById('perfList');
+    if (!box) return;
+
+    box.innerHTML = '';
+
+    if (Object.keys(PERFORMANCE_METRICS).length === 0) {
+      box.innerHTML = '<div class="alert good">성능 메트릭을 계산 중입니다...</div>';
+      return;
+    }
+
+    const metrics = [
+      {
+        title: `처리 시간 / Total Time`,
+        value: `${(PERFORMANCE_METRICS.totalTime / 1000).toFixed(1)}초`,
+        level: PERFORMANCE_METRICS.totalTime < 60000 ? 'good' : 'warn'
+      },
+      {
+        title: `처리 속도 / Processing Rate`,
+        value: `${PERFORMANCE_METRICS.rowsPerSecond.toLocaleString()} rows/sec`,
+        level: PERFORMANCE_METRICS.rowsPerSecond > 1000 ? 'good' : 'warn'
+      },
+      {
+        title: `청크 처리 / Chunks Processed`,
+        value: `${PERFORMANCE_METRICS.chunksProcessed}개`,
+        level: 'good'
+      },
+      {
+        title: `메모리 효율성 / Memory Efficiency`,
+        value: `${PERFORMANCE_METRICS.memoryEfficiency}% 메모리 유지`,
+        level: PERFORMANCE_METRICS.memoryEfficiency < 50 ? 'good' : 'warn'
+      }
+    ];
+
+    metrics.forEach(metric => {
+      const div = document.createElement('div');
+      div.className = `alert ${metric.level}`;
+      div.innerHTML = `<strong>${metric.title}</strong>: ${metric.value}`;
+      box.appendChild(div);
+    });
+  }
+
+  /* -------------------------
+     6) 테이블 & CSV (기존 기능 유지)
+  --------------------------*/
+  function renderTable() {
+    const tbl = document.getElementById('tbl');
+    const thead = tbl.querySelector('thead');
+    const tbody = tbl.querySelector('tbody');
+    thead.innerHTML = '';
+    tbody.innerHTML = '';
+    if (!DATA.length) {
+      thead.innerHTML = '<tr><th>데이터 없음 / No data</th></tr>';
+      return;
+    }
+    const cols = Object.keys(DATA[0]).filter(c => !c.startsWith('_')); // 내부 필드 제외
+
+    // 헤더
+    const trh = document.createElement('tr');
+    cols.forEach(c => {
+      const th = document.createElement('th');
+      th.textContent = c;
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+
+    // 최근 500개 행만 표시 (성능상)
+    const displayRows = DATA.slice(-500);
+    displayRows.forEach(r => {
+      const tr = document.createElement('tr');
+      cols.forEach(c => {
+        const td = document.createElement('td');
+        let v = r[c];
+        if (v === null || v === undefined) v = '';
+        if (typeof v === 'number' && Math.abs(v) >= 1000) v = v.toLocaleString();
+        if (String(c).toLowerCase().includes('timestamp')) {
+          try {
+            v = new Date(r[c]).toLocaleString('ko-KR');
+          } catch (_) {
+          }
+        }
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    // 테이블 하단에 표시 행수 안내
+    const infoRow = document.createElement('tr');
+    const infoCell = document.createElement('td');
+    infoCell.colSpan = cols.length;
+    infoCell.style.textAlign = 'center';
+    infoCell.style.fontStyle = 'italic';
+    infoCell.style.color = 'var(--muted)';
+    infoCell.textContent = `최근 ${displayRows.length}개 행 표시 중 (전체: ${PROCESSING_STATE.processedRows.toLocaleString()}개) | Showing recent ${displayRows.length} rows (Total: ${PROCESSING_STATE.processedRows.toLocaleString()})`;
+    infoRow.appendChild(infoCell);
+    tbody.appendChild(infoRow);
+  }
+
+  function downloadCSV() {
+    if (!DATA.length) return;
+    const cols = Object.keys(DATA[0]).filter(c => !c.startsWith('_'));
+    const escape = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+
+    // 대용량 CSV 다운로드를 위한 청크 기반 처리
+    const chunkSize = 10000;
+    let csvContent = '\ufeff' + cols.join(',') + '\n';
+
+    const totalRows = Math.min(DATA.length, 100000); // 최대 10만개 행만 내보내기
+    for (let i = 0; i < totalRows; i += chunkSize) {
+      const chunk = DATA.slice(i, Math.min(i + chunkSize, totalRows));
+      chunk.forEach(r => {
+        csvContent += cols.map(c => escape(r[c])).join(',') + '\n';
+      });
+    }
+
+    const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `logistics_dashboard_enhanced_${new Date().toISOString().slice(0, 10)}_${totalRows}rows.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* -------------------------
+     7) 초기화 & 이벤트 핸들러
+  --------------------------*/
+  function initYearSelects() {
+    const s = document.getElementById('startYear');
+    const e = document.getElementById('endYear');
+    const now = new Date().getFullYear();
+    [now - 5, now - 4, now - 3, now - 2, now - 1, now].forEach(y => {
+      const o1 = new Option(y, y);
+      const o2 = new Option(y, y);
+      s.add(o1);
+      e.add(o2);
+    });
+    s.value = now;
+    e.value = now;
+    s.addEventListener('change', () => {
+      if (+s.value > +e.value) e.value = s.value;
+    });
+    e.addEventListener('change', () => {
+      if (+e.value < +s.value) s.value = e.value;
+    });
+  }
+
+  async function runAll() {
+    const y1 = +document.getElementById('startYear').value;
+    const y2 = +document.getElementById('endYear').value;
+    const users = +document.getElementById('userCount').value;
+    const orders = +document.getElementById('orderCount').value;
+    const chunkSize = +document.getElementById('chunkSize').value;
+
+    // 입력 검증
+    if (users < 50 || users > 100000) {
+      alert('고객 수는 50~100,000 사이');
+      return;
+    }
+    if (orders < 100 || orders > 10000000) {
+      alert('주문 수는 100~10,000,000 사이');
+      return;
+    }
+    if (orders < users) {
+      alert('주문 수는 고객 수 이상이어야 합니다');
+      return;
+    }
+    if (chunkSize < 100 || chunkSize > 10000) {
+      alert('청크 크기는 100~10,000 사이');
+      return;
+    }
+
+    // 대용량 처리 경고
+    if (orders > 100000) {
+      const confirm = window.confirm(`${orders.toLocaleString()}개의 주문 데이터를 생성합니다.\n처리 시간이 수 분 소요될 수 있습니다. 계속하시겠습니까?`);
+      if (!confirm) return;
+    }
+
+    await generateDataInChunks(orders, users, y1, y2, chunkSize);
+  }
+
+  function stopProcessing() {
+    PROCESSING_STATE.shouldStop = true;
+    updateUIState('stopped');
+  }
+
+  // 이벤트 리스너 등록
+  document.getElementById('btnGen').addEventListener('click', runAll);
+  document.getElementById('btnStop').addEventListener('click', stopProcessing);
+  document.getElementById('btnCsv').addEventListener('click', downloadCSV);
+
+  // 청크 크기 동적 조정 (주문 수에 따라)
+  document.getElementById('orderCount').addEventListener('change', function () {
+    const orders = +this.value;
+    const chunkSizeInput = document.getElementById('chunkSize');
+
+    if (orders <= 10000) chunkSizeInput.value = 1000;
+    else if (orders <= 100000) chunkSizeInput.value = 2000;
+    else if (orders <= 1000000) chunkSizeInput.value = 5000;
+    else chunkSizeInput.value = 10000;
+  });
+
+  // 초기화
+  initYearSelects();
+  updateUIState('ready');
+
+  // 페이지 로드 시 기본 데이터 생성 (작은 샘플)
+  setTimeout(async () => {
+    await generateDataInChunks(1000, 100, new Date().getFullYear(), new Date().getFullYear(), 500);
+  }, 100);
+</script>
+</body>
+</html>
