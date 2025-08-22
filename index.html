@@ -6,430 +6,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     :root {
-      --bg: #f7fafc;
-      --card: #fff;
-      --ink: #1f2937;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --pri: #2563eb;
-      --good: #10b981;
-      --warn: #f59e0b;
-      --bad: #ef4444;
-      --vio: #8b5cf6;
-      --cyan: #06b6d4;
-      --rocket: #ff6b35;
-      --wow: #9333ea;
-      --fresh: #059669
+      --bg:#f7fafc; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --pri:#2563eb;
+      --good:#10b981; --warn:#f59e0b; --bad:#ef4444; --vio:#8b5cf6; --cyan:#06b6d4; --rocket:#ff6b35; --wow:#9333ea; --fresh:#059669
     }
-
-    * {
-      box-sizing: border-box
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:1800px;margin:0 auto;padding:20px}
+    .header{background:linear-gradient(135deg,#ff6b35 0%,#f7931e 50%,#9333ea 100%);color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:0 12px 32px rgba(255,107,53,.25);position:relative;overflow:hidden}
+    .header::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,.05) 10px,rgba(255,255,255,.05) 20px);animation:slide 20s linear infinite}
+    @keyframes slide{0%{transform:translateX(-50px)}100%{transform:translateX(50px)}}
+    .header h1{margin:0 0 8px 0;font-size:24px;position:relative;z-index:1}
+    .header .sub{opacity:.9;font-size:14px;position:relative;z-index:1}
+    .header .reality-badge{position:absolute;top:20px;right:30px;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.3)}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 6px 20px rgba(2,6,23,.08)}
+    .controls{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+    .ctrl{display:flex;flex-direction:column;gap:6px}
+    .ctrl label{font-size:12px;color:var(--muted);font-weight:600}
+    .ctrl input,.ctrl select{padding:8px 12px;border:1px solid var(--line);border-radius:10px;min-width:130px}
+    .btn{background:var(--pri);color:#fff;border:none;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;transition:all .3s}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.3)}
+    .btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+    .btn.secondary{background:#374151}.btn.danger{background:var(--bad)}.btn.rocket{background:var(--rocket)}.btn.wow{background:var(--wow)}
+    .progress-container{margin:12px 0;display:none}
+    .progress-bar{width:100%;height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(45deg,var(--rocket),var(--wow));width:0%;transition:width .2s ease}
+    .progress-text{font-size:13px;color:var(--muted);margin-top:6px;text-align:center;font-weight:600}
+    .progress-stats{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+    .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative;transition:transform .3s}
+    .kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(2,6,23,.12)}
+    .kpi h4{margin:0 0 10px 0;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+    .kpi .v{font-size:28px;font-weight:800;margin-bottom:4px}.kpi .meta{font-size:11px;color:var(--muted)}
+    .kpi.primary{border-top:4px solid var(--pri)}.kpi.good{border-top:4px solid var(--good)}.kpi.warn{border-top:4px solid var(--warn)}.kpi.bad{border-top:4px solid var(--bad)}
+    .kpi.rocket{border-top:4px solid var(--rocket)}.kpi.wow{border-top:4px solid var(--wow)}.kpi.fresh{border-top:4px solid var(--fresh)}.kpi.cyan{border-top:4px solid var(--cyan)}
+    .pill{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600}
+    .pill.ok{background:#dcfce7;color:#065f46}.pill.ng{background:#fee2e2;color:#991b1b}.pill.running{background:#dbeafe;color:#1e40af}
+    .sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px;margin-top:12px}
+    .section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+    .section h3{margin:0 0 12px 0;font-size:17px;display:flex;align-items:center;gap:8px}
+    .alerts{display:flex;flex-direction:column;gap:10px;max-height:280px;overflow:auto}
+    .alert{padding:12px 15px;border-radius:12px;font-size:13px;border:1px solid;transition:all .3s}.alert:hover{transform:translateX(4px)}
+    .alert.good{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}.alert.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}.alert.bad{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+    .table-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0;margin-top:18px;overflow:hidden}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    thead{position:sticky;top:0;background:#f9fafb;border-bottom:2px solid var(--line)}
+    th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+    th{font-weight:700;color:var(--ink)}
+    .delivery-mode.rocket{color:var(--rocket);font-weight:600}
+    .delivery-mode.dawn{color:var(--wow);font-weight:600}
+    .delivery-mode.fresh{color:var(--fresh);font-weight:600}
+    @media (max-width:768px){
+      .controls{flex-direction:column;align-items:flex-start}
+      .ctrl input,.ctrl select{min-width:280px}
+      .sections{grid-template-columns:1fr}
+      .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
     }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", Segoe UI, Roboto, Helvetica, Arial
-    }
-
-    .wrap {
-      max-width: 1800px;
-      margin: 0 auto;
-      padding: 20px
-    }
-
-    .header {
-      background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #9333ea 100%);
-      color: #fff;
-      border-radius: 16px;
-      padding: 28px 32px;
-      margin-bottom: 20px;
-      box-shadow: 0 12px 32px rgba(255, 107, 53, .25);
-      position: relative;
-      overflow: hidden
-    }
-
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, .05) 10px, rgba(255, 255, 255, .05) 20px);
-      animation: slide 20s linear infinite
-    }
-
-    @keyframes slide {
-      0% {
-        transform: translateX(-50px)
-      }
-      100% {
-        transform: translateX(50px)
-      }
-    }
-
-    .header h1 {
-      margin: 0 0 8px 0;
-      font-size: 24px;
-      position: relative;
-      z-index: 1
-    }
-
-    .header .sub {
-      opacity: .9;
-      font-size: 14px;
-      position: relative;
-      z-index: 1
-    }
-
-    .header .reality-badge {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      background: rgba(255, 255, 255, .2);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 8px 16px;
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid rgba(255, 255, 255, .3)
-    }
-
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 20px;
-      margin: 16px 0;
-      box-shadow: 0 6px 20px rgba(2, 6, 23, .08)
-    }
-
-    .controls {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: flex-end
-    }
-
-    .ctrl {
-      display: flex;
-      flex-direction: column;
-      gap: 6px
-    }
-
-    .ctrl label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 600
-    }
-
-    .ctrl input, .ctrl select {
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      min-width: 130px
-    }
-
-    .btn {
-      background: var(--pri);
-      color: #fff;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all .3s
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(37, 99, 235, .3)
-    }
-
-    .btn:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-      transform: none
-    }
-
-    .btn.secondary {
-      background: #374151
-    }
-
-    .btn.danger {
-      background: var(--bad)
-    }
-
-    .btn.rocket {
-      background: var(--rocket)
-    }
-
-    .btn.wow {
-      background: var(--wow)
-    }
-
-    .progress-container {
-      margin: 12px 0;
-      display: none
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 10px;
-      background: var(--line);
-      border-radius: 6px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(45deg, var(--rocket), var(--wow));
-      width: 0%;
-      transition: width .3s ease
-    }
-
-    .progress-text {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 6px;
-      text-align: center;
-      font-weight: 600
-    }
-
-    .progress-stats {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 6px
-    }
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px
-    }
-
-    .kpi {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 16px;
-      position: relative;
-      transition: transform .3s
-    }
-
-    .kpi:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(2, 6, 23, .12)
-    }
-
-    .kpi h4 {
-      margin: 0 0 10px 0;
-      font-size: 13px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .4px;
-      display: flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .kpi .v {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 4px
-    }
-
-    .kpi .meta {
-      font-size: 11px;
-      color: var(--muted)
-    }
-
-    .kpi.primary {
-      border-top: 4px solid var(--pri)
-    }
-
-    .kpi.good {
-      border-top: 4px solid var(--good)
-    }
-
-    .kpi.warn {
-      border-top: 4px solid var(--warn)
-    }
-
-    .kpi.bad {
-      border-top: 4px solid var(--bad)
-    }
-
-    .kpi.rocket {
-      border-top: 4px solid var(--rocket)
-    }
-
-    .kpi.wow {
-      border-top: 4px solid var(--wow)
-    }
-
-    .kpi.fresh {
-      border-top: 4px solid var(--fresh)
-    }
-
-    .kpi.cyan {
-      border-top: 4px solid var(--cyan)
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 600
-    }
-
-    .pill.ok {
-      background: #dcfce7;
-      color: #065f46
-    }
-
-    .pill.ng {
-      background: #fee2e2;
-      color: #991b1b
-    }
-
-    .pill.running {
-      background: #dbeafe;
-      color: #1e40af
-    }
-
-    .sections {
-      display: grid;
-      grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));
-      gap: 18px;
-      margin-top: 12px
-    }
-
-    .section {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 18px
-    }
-
-    .section h3 {
-      margin: 0 0 12px 0;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    .alerts {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 280px;
-      overflow: auto
-    }
-
-    .alert {
-      padding: 12px 15px;
-      border-radius: 12px;
-      font-size: 13px;
-      border: 1px solid;
-      transition: all .3s
-    }
-
-    .alert:hover {
-      transform: translateX(4px)
-    }
-
-    .alert.good {
-      background: #ecfdf5;
-      border-color: #a7f3d0;
-      color: #065f46
-    }
-
-    .alert.warn {
-      background: #fffbeb;
-      border-color: #fde68a;
-      color: #92400e
-    }
-
-    .alert.bad {
-      background: #fef2f2;
-      border-color: #fecaca;
-      color: #991b1b
-    }
-
-    .table-wrap {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 0;
-      margin-top: 18px;
-      overflow: hidden
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px
-    }
-
-    thead {
-      position: sticky;
-      top: 0;
-      background: #f9fafb;
-      border-bottom: 2px solid var(--line)
-    }
-
-    th, td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--line);
-      text-align: center;
-      white-space: nowrap
-    }
-
-    th {
-      font-weight: 700;
-      color: var(--ink)
-    }
-
-    .delivery-mode.rocket {
-      color: var(--rocket);
-      font-weight: 600
-    }
-
-    .delivery-mode.dawn {
-      color: var(--wow);
-      font-weight: 600
-    }
-
-    .delivery-mode.fresh {
-      color: var(--fresh);
-      font-weight: 600
-    }
-
-    @media (max-width: 768px) {
-      .controls {
-        flex-direction: column;
-        align-items: flex-start
-      }
-
-      .ctrl input, .ctrl select {
-        min-width: 280px
-      }
-
-      .sections {
-        grid-template-columns:1fr
-      }
-
-      .kpi-grid {
-        grid-template-columns:repeat(auto-fit, minmax(250px, 1fr))
-      }
-    }
+    /* FAST MODE 토글 */
+    .switch{position:relative;display:inline-block;width:44px;height:24px}
+    .switch input{display:none}
+    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e1;border-radius:999px;transition:.2s}
+    .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+    .switch input:checked + .slider{background:#22c55e}
+    .switch input:checked + .slider:before{transform:translateX(20px)}
   </style>
 </head>
 <body>
@@ -444,56 +82,43 @@
     <div class="controls">
       <div class="ctrl"><label>시작년도 / Start Year</label><select id="startYear"></select></div>
       <div class="ctrl"><label>종료년도 / End Year</label><select id="endYear"></select></div>
-      <div class="ctrl"><label>고객 수 / #Users</label><input id="userCount" type="number" min="100" max="200000"
-                                                           value="15000"></div>
-      <div class="ctrl"><label>주문 수 / #Orders</label><input id="orderCount" type="number" min="500" max="10000000"
-                                                            step="1000" value="75000"></div>
-      <div class="ctrl"><label>청크 크기 / Chunk Size</label><input id="chunkSize" type="number" min="500" max="15000"
-                                                                step="500" value="3000"></div>
-      <div class="ctrl"><label>로켓배송 비중 / Rocket Rate (%)</label><input id="rocketRate" type="number" min="35" max="90"
-                                                                       value="55"></div>
-      <div class="ctrl"><label>WOW 가입률 / WOW Rate (%)</label><input id="wowRate" type="number" min="60" max="100"
-                                                                    value="80"></div>
-      <div class="ctrl"><label>목표 순이익률(%)</label><input id="targetNetMargin" type="number" step="0.1" value="3.2"
-                                                        min="-20" max="30"></div>
-
+      <div class="ctrl"><label>고객 수 / #Users</label><input id="userCount" type="number" min="100" max="200000" value="300"></div>
+      <div class="ctrl"><label>주문 수 / #Orders</label><input id="orderCount" type="number" min="500" max="10000000" step="1000" value="10000"></div>
+      <div class="ctrl"><label>청크 크기 / Chunk Size</label><input id="chunkSize" type="number" min="500" max="15000" step="500" value="3000"></div>
+      <div class="ctrl"><label>로켓배송 비중 / Rocket Rate (%)</label><input id="rocketRate" type="number" min="35" max="90" value="55"></div>
+      <div class="ctrl"><label>WOW 가입률 / WOW Rate (%)</label><input id="wowRate" type="number" min="60" max="100" value="80"></div>
+      <div class="ctrl"><label>목표 순이익률(%)</label><input id="targetNetMargin" type="number" step="0.1" value="3.2" min="-20" max="30"></div>
+      <div class="ctrl">
+        <label>FAST MODE</label>
+        <label class="switch"><input type="checkbox" id="fastMode"><span class="slider"></span></label>
+      </div>
       <button class="btn rocket" id="btnStart">▶️ 데이터 생성 / Generate</button>
       <button class="btn secondary" id="btnTune">⚙️ DIALS</button>
       <button class="btn danger" id="btnStop" disabled>⏹️ 중단 / Stop</button>
       <button class="btn wow" id="btnCsv" disabled>📥 CSV 다운로드 / Download CSV</button>
+      <button class="btn wow" id="btnCsvTurbo" disabled>⚡️ 초고속 CSV (GZIP)</button>
       <div id="status" class="pill ok" style="margin-left:auto">READY</div>
     </div>
     <div class="progress-container" id="progressContainer">
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       <div class="progress-text" id="progressText">처리 중... / Processing...</div>
       <div class="progress-stats"><span id="progressStats">-</span><span id="progressETA">예상 완료: - / ETA: -</span></div>
     </div>
   </div>
 
+  <!-- DIALS -->
   <div class="panel" id="tunePanel" style="display:block">
     <div class="controls" style="align-items:flex-start">
-      <div class="ctrl"><label>적자주문율 최소</label><input id="dial_loss_lo" type="number" step="0.001" min="0" max="1"
-                                                      value="0.07"></div>
-      <div class="ctrl"><label>적자주문율 최대</label><input id="dial_loss_hi" type="number" step="0.001" min="0" max="1"
-                                                      value="0.12"></div>
-      <div class="ctrl"><label>온도위반율 최소</label><input id="dial_temp_lo" type="number" step="0.001" min="0" max="1"
-                                                      value="0.01"></div>
-      <div class="ctrl"><label>온도위반율 최대</label><input id="dial_temp_hi" type="number" step="0.001" min="0" max="1"
-                                                      value="0.02"></div>
-      <div class="ctrl"><label>제주 악천후 최소</label><input id="dial_jeju_lo" type="number" step="0.001" min="0" max="1"
-                                                       value="0.10"></div>
-      <div class="ctrl"><label>제주 악천후 최대</label><input id="dial_jeju_hi" type="number" step="0.001" min="0" max="1"
-                                                       value="0.15"></div>
-      <div class="ctrl"><label>과재고 최소</label><input id="dial_over_lo" type="number" step="0.001" min="0" max="1"
-                                                    value="0.15"></div>
-      <div class="ctrl"><label>과재고 최대</label><input id="dial_over_hi" type="number" step="0.001" min="0" max="1"
-                                                    value="0.25"></div>
-      <div class="ctrl"><label>유통기한 임박 최소</label><input id="dial_exp_lo" type="number" step="0.001" min="0" max="1"
-                                                        value="0.005"></div>
-      <div class="ctrl"><label>유통기한 임박 최대</label><input id="dial_exp_hi" type="number" step="0.001" min="0" max="1"
-                                                        value="0.01"></div>
+      <div class="ctrl"><label>적자주문율 최소</label><input id="dial_loss_lo" type="number" step="0.001" min="0" max="1" value="0.07"></div>
+      <div class="ctrl"><label>적자주문율 최대</label><input id="dial_loss_hi" type="number" step="0.001" min="0" max="1" value="0.12"></div>
+      <div class="ctrl"><label>온도위반율 최소</label><input id="dial_temp_lo" type="number" step="0.001" min="0" max="1" value="0.01"></div>
+      <div class="ctrl"><label>온도위반율 최대</label><input id="dial_temp_hi" type="number" step="0.001" min="0" max="1" value="0.02"></div>
+      <div class="ctrl"><label>제주 악천후 최소</label><input id="dial_jeju_lo" type="number" step="0.001" min="0" max="1" value="0.10"></div>
+      <div class="ctrl"><label>제주 악천후 최대</label><input id="dial_jeju_hi" type="number" step="0.001" min="0" max="1" value="0.15"></div>
+      <div class="ctrl"><label>과재고 최소</label><input id="dial_over_lo" type="number" step="0.001" min="0" max="1" value="0.15"></div>
+      <div class="ctrl"><label>과재고 최대</label><input id="dial_over_hi" type="number" step="0.001" min="0" max="1" value="0.25"></div>
+      <div class="ctrl"><label>유통기한 임박 최소</label><input id="dial_exp_lo" type="number" step="0.001" min="0" max="1" value="0.005"></div>
+      <div class="ctrl"><label>유통기한 임박 최대</label><input id="dial_exp_hi" type="number" step="0.001" min="0" max="1" value="0.01"></div>
     </div>
     <div class="controls">
       <button class="btn wow" id="btnApplyDials">적용</button>
@@ -502,255 +127,99 @@
     </div>
   </div>
 
-  <!-- KPI 섹션 (UI 동일) -->
+  <!-- KPI 섹션들 (동일) -->
   <div class="sections">
     <div class="section"><h3>🚀 로켓배송 성과</h3>
       <div class="kpi-grid">
-        <div class="kpi rocket"><h4>로켓배송 비중</h4>
-          <div class="v" id="k_rocketShare">-</div>
-          <div class="meta">% of orders</div>
-        </div>
-        <div class="kpi rocket"><h4>로켓당일 성공률</h4>
-          <div class="v" id="k_rocketSameDayRate">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi rocket"><h4>로켓새벽 정시율</h4>
-          <div class="v" id="k_rocketDawnRate">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi rocket"><h4>30분내 출고율</h4>
-          <div class="v" id="k_fastShipRate">-</div>
-          <div class="meta">%</div>
-        </div>
+        <div class="kpi rocket"><h4>로켓배송 비중</h4><div class="v" id="k_rocketShare">-</div><div class="meta">% of orders</div></div>
+        <div class="kpi rocket"><h4>로켓당일 성공률</h4><div class="v" id="k_rocketSameDayRate">-</div><div class="meta">%</div></div>
+        <div class="kpi rocket"><h4>로켓새벽 정시율</h4><div class="v" id="k_rocketDawnRate">-</div><div class="meta">%</div></div>
+        <div class="kpi rocket"><h4>30분내 출고율</h4><div class="v" id="k_fastShipRate">-</div><div class="meta">%</div></div>
       </div>
     </div>
-
     <div class="section"><h3>📦 출고·풀필먼트</h3>
       <div class="kpi-grid">
-        <div class="kpi primary"><h4>정시 출고율</h4>
-          <div class="v" id="k_fcOnTimeShip">-</div>
-          <div class="meta">목표 ≥ 96%</div>
-        </div>
-        <div class="kpi"><h4>평균 출고 시간</h4>
-          <div class="v" id="k_fcAvgShipHour">-</div>
-          <div class="meta">시간</div>
-        </div>
-        <div class="kpi"><h4>피킹 속도</h4>
-          <div class="v" id="k_fcPickSecPerItem">-</div>
-          <div class="meta">초/개</div>
-        </div>
-        <div class="kpi"><h4>패킹 속도</h4>
-          <div class="v" id="k_fcPackSecPerItem">-</div>
-          <div class="meta">초/개</div>
-        </div>
-        <div class="kpi good"><h4>풀필먼트 효율</h4>
-          <div class="v" id="k_fcEfficiency">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi wow"><h4>60분내 출고율</h4>
-          <div class="v" id="k_fcShipUnder60">-</div>
-          <div class="meta">%</div>
-        </div>
+        <div class="kpi primary"><h4>정시 출고율</h4><div class="v" id="k_fcOnTimeShip">-</div><div class="meta">목표 ≥ 96%</div></div>
+        <div class="kpi"><h4>평균 출고 시간</h4><div class="v" id="k_fcAvgShipHour">-</div><div class="meta">시간</div></div>
+        <div class="kpi"><h4>피킹 속도</h4><div class="v" id="k_fcPickSecPerItem">-</div><div class="meta">초/개</div></div>
+        <div class="kpi"><h4>패킹 속도</h4><div class="v" id="k_fcPackSecPerItem">-</div><div class="meta">초/개</div></div>
+        <div class="kpi good"><h4>풀필먼트 효율</h4><div class="v" id="k_fcEfficiency">-</div><div class="meta">%</div></div>
+        <div class="kpi wow"><h4>60분내 출고율</h4><div class="v" id="k_fcShipUnder60">-</div><div class="meta">%</div></div>
       </div>
     </div>
-
     <div class="section"><h3>🌟 WOW 멤버십 & 프리미엄</h3>
       <div class="kpi-grid">
-        <div class="kpi wow"><h4>WOW 가입률</h4>
-          <div class="v" id="k_wowShare">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi wow"><h4>WOW Plus 비중</h4>
-          <div class="v" id="k_wowPlusShare">0</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi wow"><h4>WOW vs 비회원 AOV 차이</h4>
-          <div class="v" id="k_wowAovGap">-</div>
-          <div class="meta">₩</div>
-        </div>
-        <div class="kpi warn"><h4>WOW 이탈 위험 고객</h4>
-          <div class="v" id="k_wowChurnRisk">-</div>
-          <div class="meta">명</div>
-        </div>
+        <div class="kpi wow"><h4>WOW 가입률</h4><div class="v" id="k_wowShare">-</div><div class="meta">%</div></div>
+        <div class="kpi wow"><h4>WOW Plus 비중</h4><div class="v" id="k_wowPlusShare">0</div><div class="meta">%</div></div>
+        <div class="kpi wow"><h4>WOW vs 비회원 AOV 차이</h4><div class="v" id="k_wowAovGap">-</div><div class="meta">₩</div></div>
+        <div class="kpi warn"><h4>WOW 이탈 위험 고객</h4><div class="v" id="k_wowChurnRisk">-</div><div class="meta">명</div></div>
       </div>
     </div>
-
     <div class="section"><h3>❄️ 신선식품 & 콜드체인</h3>
       <div class="kpi-grid">
-        <div class="kpi fresh"><h4>신선식품 비중</h4>
-          <div class="v" id="k_freshShare">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi fresh"><h4>콜드체인 준수율</h4>
-          <div class="v" id="k_coldChainRate">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi warn"><h4>온도 위반율</h4>
-          <div class="v" id="k_tempViolation">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi fresh"><h4>냉동식품 품질 점수</h4>
-          <div class="v" id="k_frozenQuality">-</div>
-          <div class="meta">/100</div>
-        </div>
+        <div class="kpi fresh"><h4>신선식품 비중</h4><div class="v" id="k_freshShare">-</div><div class="meta">%</div></div>
+        <div class="kpi fresh"><h4>콜드체인 준수율</h4><div class="v" id="k_coldChainRate">-</div><div class="meta">%</div></div>
+        <div class="kpi warn"><h4>온도 위반율</h4><div class="v" id="k_tempViolation">-</div><div class="meta">%</div></div>
+        <div class="kpi fresh"><h4>냉동식품 품질 점수</h4><div class="v" id="k_frozenQuality">-</div><div class="meta">/100</div></div>
       </div>
     </div>
-
     <div class="section"><h3>🏭 허브&스포크 물류망</h3>
       <div class="kpi-grid">
-        <div class="kpi primary"><h4>메가허브 처리 비중</h4>
-          <div class="v" id="k_megaHubShare">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi primary"><h4>수도권 커버리지</h4>
-          <div class="v" id="k_seoulCoverage">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi good"><h4>평균 배송 거리</h4>
-          <div class="v" id="k_avgDistance">-</div>
-          <div class="meta">km</div>
-        </div>
-        <div class="kpi primary"><h4>네트워크 효율성</h4>
-          <div class="v" id="k_networkEff">-</div>
-          <div class="meta">점</div>
-        </div>
+        <div class="kpi primary"><h4>메가허브 처리 비중</h4><div class="v" id="k_megaHubShare">-</div><div class="meta">%</div></div>
+        <div class="kpi primary"><h4>수도권 커버리지</h4><div class="v" id="k_seoulCoverage">-</div><div class="meta">%</div></div>
+        <div class="kpi good"><h4>평균 배송 거리</h4><div class="v" id="k_avgDistance">-</div><div class="meta">km</div></div>
+        <div class="kpi primary"><h4>네트워크 효율성</h4><div class="v" id="k_networkEff">-</div><div class="meta">점</div></div>
       </div>
     </div>
-
     <div class="section"><h3>🤖 AI & 자동화 수준</h3>
       <div class="kpi-grid">
-        <div class="kpi cyan"><h4>AI 최적화 비율</h4>
-          <div class="v" id="k_aiOptimized">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi cyan"><h4>자동 피킹율</h4>
-          <div class="v" id="k_autoPickRate">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi good"><h4>평균 피킹 시간</h4>
-          <div class="v" id="k_avgPickTime">-</div>
-          <div class="meta">초</div>
-        </div>
-        <div class="kpi cyan"><h4>WMS 고도화 점수</h4>
-          <div class="v" id="k_wmsAdvanced">-</div>
-          <div class="meta">/100</div>
-        </div>
+        <div class="kpi cyan"><h4>AI 최적화 비율</h4><div class="v" id="k_aiOptimized">-</div><div class="meta">%</div></div>
+        <div class="kpi cyan"><h4>자동 피킹율</h4><div class="v" id="k_autoPickRate">-</div><div class="meta">%</div></div>
+        <div class="kpi good"><h4>평균 피킹 시간</h4><div class="v" id="k_avgPickTime">-</div><div class="meta">초</div></div>
+        <div class="kpi cyan"><h4>WMS 고도화 점수</h4><div class="v" id="k_wmsAdvanced">-</div><div class="meta">/100</div></div>
       </div>
     </div>
-
     <div class="section"><h3>💰 매출·수익</h3>
       <div class="kpi-grid">
-        <div class="kpi primary"><h4>총 매출</h4>
-          <div class="v" id="k_totalSales">-</div>
-          <div class="meta">₩</div>
-        </div>
-        <div class="kpi good"><h4>순이익률</h4>
-          <div class="v" id="k_netMargin">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>평균주문금액</h4>
-          <div class="v" id="k_aov">-</div>
-          <div class="meta">₩</div>
-        </div>
-        <div class="kpi"><h4>ARPPU</h4>
-          <div class="v" id="k_arppu">-</div>
-          <div class="meta">₩</div>
-        </div>
+        <div class="kpi primary"><h4>총 매출</h4><div class="v" id="k_totalSales">-</div><div class="meta">₩</div></div>
+        <div class="kpi good"><h4>순이익률</h4><div class="v" id="k_netMargin">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>평균주문금액</h4><div class="v" id="k_aov">-</div><div class="meta">₩</div></div>
+        <div class="kpi"><h4>ARPPU</h4><div class="v" id="k_arppu">-</div><div class="meta">₩</div></div>
       </div>
     </div>
-
     <div class="section"><h3>👥 고객</h3>
       <div class="kpi-grid">
-        <div class="kpi"><h4>LTV:CAC</h4>
-          <div class="v" id="k_ltvCac">-</div>
-        </div>
-        <div class="kpi"><h4>유지율</h4>
-          <div class="v" id="k_retention">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>이탈률</h4>
-          <div class="v" id="k_churn">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>AI 이탈 예측 정확도</h4>
-          <div class="v" id="k_ai">-</div>
-          <div class="meta">%</div>
-        </div>
+        <div class="kpi"><h4>LTV:CAC</h4><div class="v" id="k_ltvCac">-</div></div>
+        <div class="kpi"><h4>유지율</h4><div class="v" id="k_retention">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>이탈률</h4><div class="v" id="k_churn">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>AI 이탈 예측 정확도</h4><div class="v" id="k_ai">-</div><div class="meta">%</div></div>
       </div>
     </div>
-
     <div class="section"><h3>🚚 배송·물류</h3>
       <div class="kpi-grid">
-        <div class="kpi good"><h4>정시율</h4>
-          <div class="v" id="k_onTime">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>SLA 위반율</h4>
-          <div class="v" id="k_sla">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>적재율</h4>
-          <div class="v" id="k_load">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>연비</h4>
-          <div class="v" id="k_fuel">-</div>
-          <div class="meta">km/ℓ · km/kWh</div>
-        </div>
-        <div class="kpi"><h4>라우팅 점수</h4>
-          <div class="v" id="k_route">-</div>
-          <div class="meta">/100</div>
-        </div>
-        <div class="kpi warn"><h4>배송 예외율</h4>
-          <div class="v" id="k_exception">-</div>
-          <div class="meta">%</div>
-        </div>
+        <div class="kpi good"><h4>정시율</h4><div class="v" id="k_onTime">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>SLA 위반율</h4><div class="v" id="k_sla">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>적재율</h4><div class="v" id="k_load">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>연비</h4><div class="v" id="k_fuel">-</div><div class="meta">km/ℓ · km/kWh</div></div>
+        <div class="kpi"><h4>라우팅 점수</h4><div class="v" id="k_route">-</div><div class="meta">/100</div></div>
+        <div class="kpi warn"><h4>배송 예외율</h4><div class="v" id="k_exception">-</div><div class="meta">%</div></div>
       </div>
     </div>
-
     <div class="section"><h3>📦 반품</h3>
       <div class="kpi-grid">
-        <div class="kpi warn"><h4>반품률</h4>
-          <div class="v" id="k_returnRate">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>반품 손실률</h4>
-          <div class="v" id="k_returnCost">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>재판매 가능률</h4>
-          <div class="v" id="k_resell">-</div>
-          <div class="meta">%</div>
-        </div>
+        <div class="kpi warn"><h4>반품률</h4><div class="v" id="k_returnRate">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>반품 손실률</h4><div class="v" id="k_returnCost">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>재판매 가능률</h4><div class="v" id="k_resell">-</div><div class="meta">%</div></div>
       </div>
     </div>
-
     <div class="section"><h3>🏭 WMS·재고</h3>
       <div class="kpi-grid">
-        <div class="kpi"><h4>재고 회전율</h4>
-          <div class="v" id="k_invTurn">-</div>
-          <div class="meta">회</div>
-        </div>
-        <div class="kpi"><h4>품절률</h4>
-          <div class="v" id="k_stockout">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>과재고 비율</h4>
-          <div class="v" id="k_overstock">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>재고 정확도</h4>
-          <div class="v" id="k_invAcc">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>재고 손실률</h4>
-          <div class="v" id="k_shrink">-</div>
-          <div class="meta">%</div>
-        </div>
-        <div class="kpi"><h4>WMS 활용률</h4>
-          <div class="v" id="k_wms">-</div>
-          <div class="meta">%</div>
-        </div>
+        <div class="kpi"><h4>재고 회전율</h4><div class="v" id="k_invTurn">-</div><div class="meta">회</div></div>
+        <div class="kpi"><h4>품절률</h4><div class="v" id="k_stockout">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>과재고 비율</h4><div class="v" id="k_overstock">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>재고 정확도</h4><div class="v" id="k_invAcc">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>재고 손실률</h4><div class="v" id="k_shrink">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>WMS 활용률</h4><div class="v" id="k_wms">-</div><div class="meta">%</div></div>
       </div>
     </div>
   </div>
@@ -777,1557 +246,1334 @@
 </div>
 
 <script>
-  // ==========================
-  // 0) 네트워크 타임라인 키 (단일 진실원)
-  // ==========================
-  const NET_PREFIX = '__net_';
-  const N = s => NET_PREFIX + s;
-  const NET = Object.freeze({
-    ROUTE_TYPE: N('Route_Type'),
-    SORT_HUB_NAME: N('Sortation_Hub_Name'),
-    FC_EXIT: N('FC_Exit_TS'),
-    HUB_IN: N('Hub_In_TS'),
-    HUB_OUT: N('Hub_Out_TS'),
-    CAMP_IN: N('Camp_In_TS'),
-    LOAD_START: N('Loadout_Start_TS'),
-    LOAD_END: N('Loadout_End_TS'),
-    OFD: N('OFD_TS'),
-    FC_DWELL: N('FC_Dwell_Min'),
-    HUB_DWELL: N('Hub_Dwell_Min'),
-    CAMP_DWELL: N('Camp_Dwell_Min'),
+  /* ==========================
+     0) 네트워크 타임라인 키 (메인/워커 공통 키값)
+  ========================== */
+  const NET_PREFIX='__net_';
+  const N=s=>NET_PREFIX+s;
+  const NET=Object.freeze({
+    ROUTE_TYPE:N('Route_Type'),
+    SORT_HUB_NAME:N('Sortation_Hub_Name'),
+    FC_EXIT:N('FC_Exit_TS'),
+    HUB_IN:N('Hub_In_TS'),
+    HUB_OUT:N('Hub_Out_TS'),
+    CAMP_IN:N('Camp_In_TS'),
+    LOAD_START:N('Loadout_Start_TS'),
+    LOAD_END:N('Loadout_End_TS'),
+    OFD:N('OFD_TS'),
+    FC_DWELL:N('FC_Dwell_Min'),
+    HUB_DWELL:N('Hub_Dwell_Min'),
+    CAMP_DWELL:N('Camp_Dwell_Min'),
   });
 
-  // ==========================
-  // 1) 상수/매핑
-  // ==========================
-  const SHIP_SLA_MIN = {'로켓당일': 60, '로켓새벽': 90, '로켓익일': 90, '로켓프레시': 60, '일반택배': 120, DEFAULT: 90};
-
-  const DELIVERY_MODES = {
-    '로켓당일': {delayRate: 0.005, baseDays: 0, cutoffHour: 20, regions: ['수도권'], wowOnly: false, cost: 1.2},
-    '로켓새벽': {delayRate: 0.008, baseDays: 1, regions: ['수도권', '영남', '충청'], wowOnly: false, cost: 1.1},
-    '로켓익일': {delayRate: 0.012, baseDays: 1, regions: ['전국'], wowOnly: false, cost: 1.0},
-    '로켓프레시': {
-      delayRate: 0.015,
-      baseDays: 0,
-      cutoffHour: 18,
-      regions: ['수도권'],
-      wowOnly: false,
-      cost: 1.3,
-      coldChain: true
-    },
-    '일반택배': {delayRate: 0.035, baseDays: 2, regions: ['전국'], wowOnly: false, cost: 0.8}
+  /* ==========================
+     1) CSV 라벨/유틸 (그대로 유지)
+  ========================== */
+  const CSV_SPECIAL_LABELS={
+    Order_ID:'Order ID',Order_Date:'Order Date',Order_Timestamp:'Order Timestamp',Order_Hour:'Order Hour',
+    Delivery_Mode:'Delivery Mode',Planned_Delivery_Date:'Planned Delivery Date',Actual_Delivery_Date:'Actual Delivery Date',
+    Delivery_Timestamp:'Delivery Timestamp',Is_Delayed:'Is Delayed',Delay_Hours:'Delay Hours',SLA_Breach:'SLA Breach',Delivery_Status:'Delivery Status',
+    Fast_Ship_30min:'Fast Ship 30min',Order_To_Ship_Minutes:'Order To Ship Minutes',
+    Region:'Region',City:'City',District:'District',Address:'Address',Fulfillment_Center:'Fulfillment Center',Delivery_Center:'Delivery Center',Is_Mega_Hub:'Is Mega Hub',Distance_km:'Distance km',
+    Customer_ID:'Customer ID',Is_WOW_Member:'Is WOW Member',WOW_Tier:'WOW Tier',WOW_Join_Date:'WOW Join Date',WOW_Tenure_Days:'WOW Tenure Days',Customer_Segment:'Customer Segment',
+    Product_Category:'Product Category',SKU:'SKU',ABC_Category:'ABC Category',Unit_Price:'Unit Price',Quantity:'Quantity',Order_Amount:'Order Amount',
+    Is_Fresh_Food:'Is Fresh Food',Is_Cold_Chain_Required:'Is Cold Chain Required',Target_Temperature:'Target Temperature',Actual_Temperature:'Actual Temperature',
+    Temperature_Violation:'Temperature Violation',Cold_Chain_Quality_Score:'Cold Chain Quality Score',
+    Vehicle_ID:'Vehicle ID',Vehicle_Type:'Vehicle Type',Vehicle_Capacity:'Vehicle Capacity',Driver_ID:'Driver ID',Driver_Grade:'Driver Grade',
+    Load_Factor:'Load Factor',Fuel_Efficiency:'Fuel Efficiency',Routing_Score:'Routing Score',GPS_Tracking:'GPS Tracking',
+    Actual_Logistics_Cost:'Actual Logistics Cost',Customer_Delivery_Charge:'Customer Delivery Charge',Gross_Profit:'Gross Profit',Net_Profit:'Net Profit',
+    CAC:'CAC',Customer_LTV:'Customer LTV',LTV_to_CAC:'LTV to CAC',
+    Return_Flag:'Is Returned',Return_Reason:'Return Reason',Return_Cost:'Return Cost',Is_Resellable:'Is Resellable',Resellability_Reason:'Resellability Reason',
+    Current_Stock:'Current Stock',Reorder_Point:'Reorder Point',Stockout_Flag:'Stockout Flag',Overstock_Flag:'Overstock Flag',Inventory_Turnover:'Inventory Turnover',Inventory_Accuracy:'Inventory Accuracy',
+    Automation_Level:'Automation Level',Picking_Time_Seconds:'Picking Time Seconds',Packing_Time_Seconds:'Packing Time Seconds',Total_Process_Time:'Total Process Time',
+    WMS_Usage:'WMS Usage',OMS_Usage:'OMS Usage',WMS_Advanced_Score:'WMS Advanced Score',Service_Quality_Score:'Service Quality Score',Customer_NPS:'Customer NPS',Processing_Error_Rate:'Processing Error Rate',
+    Weather_Condition:'Weather Condition',Weather_Severity_Score:'Weather Severity Score',Churn_Flag:'Churn Flag',Predicted_Churn_Score:'Predicted Churn Score',
+    Is_Rocket_Delivery:'Is Rocket Delivery',Is_Same_Day_Delivery:'Is Same Day Delivery',Is_Dawn_Delivery:'Is Dawn Delivery',Is_Fresh_Delivery:'Is Fresh Delivery',
+    Is_Premium_Order:'Is Premium Order',Is_Bulk_Order:'Is Bulk Order',Is_Weekend_Order:'Is Weekend Order',Is_Peak_Hour_Order:'Is Peak Hour Order',Is_Free_Shipping:'Is Free Shipping',
+    Is_Weather_Risk:'Is Weather Risk',Is_Long_Distance:'Is Long Distance',Is_High_LTV:'Is High LTV',Is_Churn_Risk:'Is Churn Risk',Is_VIP_Customer:'Is VIP Customer',
+    Is_Loss_Order:'Is Loss Order',Is_AI_Optimized:'Is AI Optimized',
+    Receiving_Date:'Receiving Date',Putaway_Date:'Putaway Date',Lot_ID:'Lot ID',Expiry_Date:'Expiry Date',Bin:'Bin',Slot:'Slot',Unit_Cost:'Unit Cost',
+    Daily_OnHand_Snapshot:'Daily OnHand Snapshot',Safety_Stock:'Safety Stock',Forecast_Demand:'Forecast Demand',ASN_ID:'Asn Id',PO_ID:'Po Id',Replenishment_Type:'Replenishment Type',
+    Picking_Start_TS:'Picking Start TS',Picking_End_TS:'Picking End TS',Packing_Start_TS:'Packing Start TS',Packing_End_TS:'Packing End TS',
+    Planned_Ship_Timestamp:'Planned Ship Timestamp',
+    Actual_Ship_Timestamp:'Actual Ship Timestamp',On_Time_Dispatch_Flag:'On-time Dispatch Flag',
+    Is_Quality_Issue:'Is Quality Issue',Mis_Ship_Flag:'Mis ship Flag',
+    Damage_Rate:'Damage Rate',Damage_Flag:'Damage Flag',
+    Distance_Bucket:'Distance Bucket',Distance_Band_Label:'Distance Band Label',
+    [NET.ROUTE_TYPE]:'Route Type',[NET.SORT_HUB_NAME]:'Sortation Hub Name',[NET.FC_EXIT]:'FC Exit TS',[NET.HUB_IN]:'Hub In TS',[NET.HUB_OUT]:'Hub Out TS',
+    [NET.CAMP_IN]:'Camp In TS',[NET.LOAD_START]:'Loadout Start TS',[NET.LOAD_END]:'Loadout End TS',[NET.OFD]:'OFD TS',
+    [NET.FC_DWELL]:'FC Dwell Min',[NET.HUB_DWELL]:'Hub Dwell Min',[NET.CAMP_DWELL]:'Camp Dwell Min'
   };
+  function prettyHeader(key){if(CSV_SPECIAL_LABELS[key])return CSV_SPECIAL_LABELS[key];return key.replace(/^_+/,'').replace(/__/g,'_').replace(/[_]/g,' ').replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/\s+/g,' ').trim().replace(/\b\w/g,m=>m.toUpperCase())}
 
-  const REGIONS = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
+  /* ==========================
+     2) 전역 상태 / 유틸 (메인 스레드)
+  ========================== */
+  let DATA=[]; // 전체 데이터(메모리 보관) — 스키마 동일
+  let TABLE_KEYS=null;
+  let WORKER=null; // WORKER: 생성용 웹워커 핸들
+  let FAST_MODE=false;
 
-  const CITIES_BY_REGION = {
-    '서울특별시': ['서울시'],
-    '부산광역시': ['부산시'],
-    '대구광역시': ['대구시'],
-    '인천광역시': ['인천시'],
-    '광주광역시': ['광주시'],
-    '대전광역시': ['대전시'],
-    '울산광역시': ['울산시'],
-    '세종특별자치시': ['세종시'],
-    '경기도': ['성남시', '용인시', '수원시', '고양시', '남양주시'],
-    '강원특별자치도': ['춘천시', '원주시', '강릉시'],
-    '충청북도': ['청주시', '충주시', '제천시'],
-    '충청남도': ['천안시', '아산시', '서산시'],
-    '전북특별자치도': ['전주시', '익산시', '군산시'],
-    '전라남도': ['순천시', '여수시', '목포시'],
-    '경상북도': ['포항시', '구미시', '경산시'],
-    '경상남도': ['창원시', '김해시', '진주시'],
-    '제주특별자치도': ['제주시', '서귀포시']
-  };
-  const DISTRICTS_BY_CITY = {
-    '서울시': ['강남구', '서초구', '송파구', '마포구', '성동구', '강서구'],
-    '부산시': ['해운대구', '수영구', '남구', '부산진구'],
-    '대구시': ['수성구', '달서구', '중구', '동구'],
-    '인천시': ['남동구', '연수구', '부평구', '미추홀구'],
-    '광주시': ['서구', '남구', '북구', '광산구'],
-    '대전시': ['서구', '유성구', '대덕구', '동구'],
-    '울산시': ['남구', '중구', '북구', '울주군'],
-    '세종시': ['세종동', '새롬동', '보람동'],
-    '성남시': ['분당구', '수정구', '중원구'],
-    '용인시': ['수지구', '기흥구', '처인구'],
-    '수원시': ['영통구', '권선구', '팔달구', '장안구'],
-    '고양시': ['일산서구', '일산동구', '덕양구'],
-    '남양주시': ['화도읍', '진접읍', '별내동'],
-    '춘천시': ['퇴계동', '석사동', '후평동'],
-    '원주시': ['무실동', '단구동', '태장동'],
-    '강릉시': ['교동', '포남동', '입암동'],
-    '청주시': ['흥덕구', '서원구', '청원구'],
-    '충주시': ['연수동', '교현동', '호암동'],
-    '제천시': ['신백동', '청전동'],
-    '천안시': ['서북구', '동남구'],
-    '아산시': ['배방읍', '탕정면', '온양동'],
-    '서산시': ['동문동', '석남동'],
-    '전주시': ['완산구', '덕진구'],
-    '익산시': ['영등동', '부송동'],
-    '군산시': ['나운동', '수송동'],
-    '순천시': ['연향동', '조례동'],
-    '여수시': ['웅천동', '문수동'],
-    '목포시': ['하당동', '신흥동'],
-    '포항시': ['북구', '남구'],
-    '구미시': ['원평동', '형곡동'],
-    '경산시': ['중방동', '서상동'],
-    '창원시': ['성산구', '의창구', '마산합포구'],
-    '김해시': ['삼계동', '구산동', '장유동'],
-    '진주시': ['상대동', '평거동'],
-    '제주시': ['노형동', '연동', '아라동'],
-    '서귀포시': ['서귀동', '대정읍', '표선면']
-  };
+  const CHUNK_CONFIG={defaultSize:3000,maxMemoryRows:150000,batchUpdateInterval:3,gcInterval:8};
+  const RENDER_MAX_ROWS=2000; // PERF: 테이블 가상화 상한
 
-  const MEGA_HUBS = ['김포메가허브', '곤지암메가허브', '덕평허브', '평택허브'];
-  const HUB_COVERAGE = {
-    '김포메가허브': ['서울특별시', '인천광역시', '경기도'],
-    '곤지암메가허브': ['경기도', '강원특별자치도', '충청북도'],
-    '덕평허브': ['경기도', '충청남도', '세종특별자치시'],
-    '평택허브': ['경기도', '충청남도', '충청북도']
-  };
+  let PROCESSING_STATE={isRunning:false,shouldStop:false,startTime:null,processedRows:0,totalRows:0};
 
-  const FC_SITES = {
-    '서울특별시': '서울동부FC', '인천광역시': '인천FC', '경기도': '경기남부FC', '부산광역시': '부산FC',
-    '대구광역시': '대구FC', '광주광역시': '광주FC', '대전광역시': '대전FC', '울산광역시': '울산FC',
-    '세종특별자치시': '세종FC', '강원특별자치도': '강원FC', '충청북도': '충북FC', '충청남도': '충남FC',
-    '전북특별자치도': '전북FC', '전라남도': '전남FC', '경상북도': '경북FC', '경상남도': '경남FC', '제주특별자치도': '제주FC'
-  };
+  // PERF: 스로틀/애니메이션용
+  let _throttleTS=0;
+  const _THROTTLE_MS=100; // 최대 10Hz
+  const raf=(fn)=>window.requestAnimationFrame?requestAnimationFrame(fn):setTimeout(fn,16);
+  const qs=id=>document.getElementById(id);
+  const setText=(id,txt)=>{const el=qs(id);if(el)el.textContent=txt};
+  const setDisabled=(id,flag)=>{const el=qs(id);if(el)el.disabled=!!flag};
+  const setDisplay=(id,show)=>{const el=qs(id);if(el)el.style.display=show?'':'none'};
+  const pad=(n,l=2)=>String(n).padStart(l,'0');
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  function formatCurrencyKRW(n){if(!isFinite(n))return '-';return '₩'+Math.round(n).toLocaleString('ko-KR')}
 
-  const REGION_LOGISTICS = {
-    '서울특별시': {baseCost: 2800, perKmCost: 90, avgDistance: 16, populationWeight: 0.18},
-    '부산광역시': {baseCost: 3200, perKmCost: 95, avgDistance: 22, populationWeight: 0.06},
-    '대구광역시': {baseCost: 3100, perKmCost: 95, avgDistance: 20, populationWeight: 0.05},
-    '인천광역시': {baseCost: 2900, perKmCost: 90, avgDistance: 18, populationWeight: 0.06},
-    '광주광역시': {baseCost: 3100, perKmCost: 100, avgDistance: 24, populationWeight: 0.03},
-    '대전광역시': {baseCost: 3000, perKmCost: 95, avgDistance: 21, populationWeight: 0.03},
-    '울산광역시': {baseCost: 3200, perKmCost: 100, avgDistance: 23, populationWeight: 0.02},
-    '세종특별자치시': {baseCost: 3000, perKmCost: 95, avgDistance: 20, populationWeight: 0.01},
-    '경기도': {baseCost: 3000, perKmCost: 95, avgDistance: 26, populationWeight: 0.24},
-    '강원특별자치도': {baseCost: 3400, perKmCost: 110, avgDistance: 40, populationWeight: 0.04},
-    '충청북도': {baseCost: 3100, perKmCost: 100, avgDistance: 28, populationWeight: 0.04},
-    '충청남도': {baseCost: 3100, perKmCost: 100, avgDistance: 27, populationWeight: 0.05},
-    '전북특별자치도': {baseCost: 3200, perKmCost: 105, avgDistance: 29, populationWeight: 0.04},
-    '전라남도': {baseCost: 3300, perKmCost: 110, avgDistance: 36, populationWeight: 0.04},
-    '경상북도': {baseCost: 3300, perKmCost: 108, avgDistance: 34, populationWeight: 0.06},
-    '경상남도': {baseCost: 3250, perKmCost: 105, avgDistance: 31, populationWeight: 0.06},
-    '제주특별자치도': {baseCost: 4200, perKmCost: 130, avgDistance: 38, populationWeight: 0.02}
-  };
-
-  const WEATHER_CONDITIONS = ['맑음', '흐림', '비', '눈', '안개', '강풍'];
-
-  function weatherSeverity(c) {
-    const m = {'맑음': 0.02, '흐림': 0.15, '비': 0.45, '눈': 0.75, '안개': 0.35, '강풍': 0.55};
-    return m[c] || 0.2
+  // 진행 바
+  function setStatus(text,cls='ok'){const st=qs('status');st.textContent=text;st.className='pill '+cls;}
+  function showProgress(show){setDisplay('progressContainer',show)}
+  function _updateProgressUI(label, processed, total){
+    const pctNum=Math.min(100,Math.round(processed/Math.max(1,total)*100));
+    qs('progressFill').style.width=pctNum+'%';
+    qs('progressText').textContent=`${label}... ${processed.toLocaleString('ko-KR')} / ${total.toLocaleString('ko-KR')} (${pctNum}%)`;
+    const elapsed=(Date.now()-PROCESSING_STATE.startTime)/1000;
+    const rps=processed/Math.max(0.1,elapsed);
+    qs('progressStats').textContent=`속도 ${rps.toFixed(1)} r/s`;
+    const remain=(total-processed)/Math.max(0.1,rps);
+    qs('progressETA').textContent=`예상 완료: ${remain.toFixed(0)}s`;
+  }
+  function updateProgressFromState(label='Generating'){
+    const now=Date.now();
+    if(now-_throttleTS<_THROTTLE_MS) return;
+    _throttleTS=now;
+    raf(()=>_updateProgressUI(label, PROCESSING_STATE.processedRows, PROCESSING_STATE.totalRows));
+  }
+  function updateExportProgress(done,total){
+    const pctNum=Math.min(100,Math.round(done/Math.max(1,total)*100));
+    qs('progressFill').style.width=pctNum+'%';
+    qs('progressText').textContent=`Exporting CSV... ${done.toLocaleString('ko-KR')} / ${total.toLocaleString('ko-KR')} (${pctNum}%)`;
+    qs('progressStats').textContent=`청크 진행`;
+    qs('progressETA').textContent='';
   }
 
-  const COUPANG_CATEGORIES = {
-    '신선식품': {
-      margin: 0.18, price: [2000, 18000], coldChain: true, freshFood: true, tempRange: [0, 4], returnRate: 0.035,
-      skus: ['FRESH-APPLE-1KG', 'FRESH-PEAR-1KG', 'FRESH-LETTUCE', 'FRESH-MEAT-500G', 'FRESH-EGG-30', 'FRESH-MILK-1L']
-    },
-    '냉동식품': {
-      margin: 0.22, price: [3000, 22000], coldChain: true, freshFood: false, tempRange: [-18, -12], returnRate: 0.028,
-      skus: ['FROZ-DUMPLING-1KG', 'FROZ-PIZZA', 'FROZ-ICECREAM', 'FROZ-SHRIMP-500G', 'FROZ-CHICKEN-1KG']
-    },
-    '가전전자': {
-      margin: 0.14, price: [15000, 700000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.022,
-      skus: ['ELEC-MOUSE', 'ELEC-KEYBOARD', 'ELEC-HEADSET', 'ELEC-MONITOR-27', 'ELEC-ROBOTVAC', 'ELEC-AIRFRYER']
-    },
-    '패션의류': {
-      margin: 0.38, price: [9000, 180000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.11,
-      skus: ['FASH-TSHIRT', 'FASH-JEANS', 'FASH-JACKET', 'FASH-DRESS', 'FASH-SNEAKERS', 'FASH-HAT']
-    },
-    '생활용품': {
-      margin: 0.28, price: [2000, 55000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.03,
-      skus: ['LIFE-TISSUE', 'LIFE-TOILETPAPER', 'LIFE-DETERGENT', 'LIFE-FABRICSOFT', 'LIFE-SHOWERGEL', 'LIFE-DISHSOAP']
-    },
-    '주방용품': {
-      margin: 0.30, price: [4000, 120000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.025,
-      skus: ['KITCHEN-PAN28', 'KITCHEN-POT20', 'KITCHEN-KNIFE', 'KITCHEN-CUPSET', 'KITCHEN-FOODBOX']
-    },
-    '뷰티': {
-      margin: 0.35, price: [3000, 250000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.06,
-      skus: ['BEAUTY-TONER', 'BEAUTY-LOTION', 'BEAUTY-SERUM', 'BEAUTY-SUNSCREEN', 'BEAUTY-LIP', 'BEAUTY-MASKPACK']
-    },
-    '유아동': {
-      margin: 0.26, price: [4000, 350000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.05,
-      skus: ['KIDS-DIAPER', 'KIDS-WIPES', 'KIDS-TOYBLOCK', 'KIDS-STROLLER', 'KIDS-BOTTLE']
-    },
-    '반려동물': {
-      margin: 0.25, price: [3000, 220000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.04,
-      skus: ['PET-DRYFOOD', 'PET-WETFOOD', 'PET-LITTER', 'PET-LEASH', 'PET-SHAMPOO']
-    },
-    '스포츠·레저': {
-      margin: 0.24, price: [5000, 400000], coldChain: false, freshFood: false, tempRange: null, returnRate: 0.035,
-      skus: ['SPRT-YOGA-MAT', 'SPRT-DUMBBELL', 'SPRT-BICYCLE', 'SPRT-TENT', 'SPRT-COOLER', 'SPRT-BALL']
-    }
-  };
-
-  const ABC_DISTRIBUTION = {A: 0.15, B: 0.35, C: 0.5};
-
-  const VEHICLES = [
-    {type: '오토바이', capacity: 15, fuelEff: [28, 45], regions: ['도심']},
-    {type: '소형밴', capacity: 50, fuelEff: [11, 16], regions: ['전체']},
-    {type: '중형트럭', capacity: 200, fuelEff: [7, 11], regions: ['전체']},
-    {type: '대형트럭', capacity: 500, fuelEff: [5, 8], regions: ['간선']},
-    {type: '전기차', capacity: 40, fuelEff: [4.5, 6.8], regions: ['도심']}
-  ];
-  const DRIVER_GRADES = ['신입', '일반', '숙련', '베테랑', 'MVP'];
-  const RETURN_REASONS = ['단순변심', '상품불량', '배송지연', '오배송', '파손', '설명불일치', '사이즈불일치', '기타'];
-  const WOW_TIERS = {
-    'WOW_BASIC': {
-      freeShippingThreshold: 0,
-      deliveryDiscount: 0.0,
-      ltvMultiplier: 2.0,
-      priorityShipping: true,
-      returnBenefit: 1.2
-    }
-  };
-  const AUTOMATION_LEVELS = {
-    'MANUAL': {pickingTime: 45, packingTime: 25, errorRate: 0.008, regions: ['제주특별자치도', '강원특별자치도']},
-    'SEMI_AUTO': {pickingTime: 28, packingTime: 18, errorRate: 0.005, regions: ['전라남도', '경상북도', '충청북도']},
-    'AUTO': {pickingTime: 15, packingTime: 12, errorRate: 0.003, regions: ['부산광역시', '대구광역시', '광주광역시']},
-    'AI_OPTIMIZED': {pickingTime: 8, packingTime: 6, errorRate: 0.001, regions: ['서울특별시', '경기도', '인천광역시']}
-  };
-
-  // ===== DIALS / CAL =====
-  let DIALS = {
-    lossOrderTarget: [0.07, 0.12],
-    tempViolationTarget: [0.01, 0.02],
-    jejuWeatherExposureTarget: [0.10, 0.15],
-    overstockTarget: [0.15, 0.25],
-    expiryImminentTarget: [0.005, 0.01]
-  };
-  let CAL = {
-    costBias: 1.0,
-    tempViolationBase: 0.015,
-    jejuWeatherScale: 1.0,
-    overstockProb: 0.22,
-    expiryImminentRate: 0.008
-  };
-  let ENABLE_AUTOTUNE = false;
-
-  // ==========================
-  // 2) 유틸리티 & 전역 상태
-  // ==========================
-  const rnd = (a, b) => Math.random() * (b - a) + a;
-  const irnd = (a, b) => Math.floor(rnd(a, b + 1));
-  const pick = arr => arr[irnd(0, arr.length - 1)];
-  const weightedPick = w => {
-    const t = Object.values(w).reduce((s, x) => s + x, 0);
-    let r = Math.random() * t, c = 0;
-    for (const [k, v] of Object.entries(w)) {
-      c += v;
-      if (r <= c) return k
-    }
-    return Object.keys(w)[0]
-  };
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-  const pad = (n, l = 2) => String(n).padStart(l, '0');
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
-  const qs = id => document.getElementById(id);
-  const setText = (id, txt) => {
-    const el = qs(id);
-    if (el) el.textContent = txt
-  };
-  const setDisabled = (id, flag) => {
-    const el = qs(id);
-    if (el) el.disabled = !!flag
-  };
-  const setDisplay = (id, show) => {
-    const el = qs(id);
-    if (el) el.style.display = show ? '' : 'none'
-  };
-  const fmtPct = v => (isFinite(v) ? (Number(v).toFixed(1) + '%') : '-');
-
-  const CSV_SPECIAL_LABELS = {
-    Order_ID: 'Order ID',
-    Order_Date: 'Order Date',
-    Order_Timestamp: 'Order Timestamp',
-    Order_Hour: 'Order Hour',
-    Delivery_Mode: 'Delivery Mode',
-    Planned_Delivery_Date: 'Planned Delivery Date',
-    Actual_Delivery_Date: 'Actual Delivery Date',
-    Delivery_Timestamp: 'Delivery Timestamp',
-    Is_Delayed: 'Is Delayed',
-    Delay_Hours: 'Delay Hours',
-    SLA_Breach: 'SLA Breach',
-    Delivery_Status: 'Delivery Status',
-    Fast_Ship_30min: 'Fast Ship 30min',
-    Order_To_Ship_Minutes: 'Order To Ship Minutes',
-    Region: 'Region',
-    City: 'City',
-    District: 'District',
-    Address: 'Address',
-    Fulfillment_Center: 'Fulfillment Center',
-    Delivery_Center: 'Delivery Center',
-    Is_Mega_Hub: 'Is Mega Hub',
-    Distance_km: 'Distance km',
-    Customer_ID: 'Customer ID',
-    Is_WOW_Member: 'Is WOW Member',
-    WOW_Tier: 'WOW Tier',
-    WOW_Join_Date: 'WOW Join Date',
-    WOW_Tenure_Days: 'WOW Tenure Days',
-    Customer_Segment: 'Customer Segment',
-    Product_Category: 'Product Category',
-    SKU: 'SKU',
-    ABC_Category: 'ABC Category',
-    Unit_Price: 'Unit Price',
-    Quantity: 'Quantity',
-    Order_Amount: 'Order Amount',
-    Is_Fresh_Food: 'Is Fresh Food',
-    Is_Cold_Chain_Required: 'Is Cold Chain Required',
-    Target_Temperature: 'Target Temperature',
-    Actual_Temperature: 'Actual Temperature',
-    Temperature_Violation: 'Temperature Violation',
-    Cold_Chain_Quality_Score: 'Cold Chain Quality Score',
-    Vehicle_ID: 'Vehicle ID',
-    Vehicle_Type: 'Vehicle Type',
-    Vehicle_Capacity: 'Vehicle Capacity',
-    Driver_ID: 'Driver ID',
-    Driver_Grade: 'Driver Grade',
-    Load_Factor: 'Load Factor',
-    Fuel_Efficiency: 'Fuel Efficiency',
-    Routing_Score: 'Routing Score',
-    GPS_Tracking: 'GPS Tracking',
-    Actual_Logistics_Cost: 'Actual Logistics Cost',
-    Customer_Delivery_Charge: 'Customer Delivery Charge',
-    Gross_Profit: 'Gross Profit',
-    Net_Profit: 'Net Profit',
-    CAC: 'CAC',
-    Customer_LTV: 'Customer LTV',
-    LTV_to_CAC: 'LTV to CAC',
-    Return_Flag: 'Is Returned',
-    Return_Reason: 'Return Reason',
-    Return_Cost: 'Return Cost',
-    Is_Resellable: 'Is Resellable',
-    Resellability_Reason: 'Resellability Reason',
-    Current_Stock: 'Current Stock',
-    Reorder_Point: 'Reorder Point',
-    Stockout_Flag: 'Stockout Flag',
-    Overstock_Flag: 'Overstock Flag',
-    Inventory_Turnover: 'Inventory Turnover',
-    Inventory_Accuracy: 'Inventory Accuracy',
-    Automation_Level: 'Automation Level',
-    Picking_Time_Seconds: 'Picking Time Seconds',
-    Packing_Time_Seconds: 'Packing Time Seconds',
-    Total_Process_Time: 'Total Process Time',
-    WMS_Usage: 'WMS Usage',
-    OMS_Usage: 'OMS Usage',
-    WMS_Advanced_Score: 'WMS Advanced Score',
-    Service_Quality_Score: 'Service Quality Score',
-    Customer_NPS: 'Customer NPS',
-    Processing_Error_Rate: 'Processing Error Rate',
-    Weather_Condition: 'Weather Condition',
-    Weather_Severity_Score: 'Weather Severity Score',
-    Churn_Flag: 'Churn Flag',
-    Predicted_Churn_Score: 'Predicted Churn Score',
-    Is_Rocket_Delivery: 'Is Rocket Delivery',
-    Is_Same_Day_Delivery: 'Is Same Day Delivery',
-    Is_Dawn_Delivery: 'Is Dawn Delivery',
-    Is_Fresh_Delivery: 'Is Fresh Delivery',
-    Is_Premium_Order: 'Is Premium Order',
-    Is_Bulk_Order: 'Is Bulk Order',
-    Is_Weekend_Order: 'Is Weekend Order',
-    Is_Peak_Hour_Order: 'Is Peak Hour Order',
-    Is_Free_Shipping: 'Is Free Shipping',
-    Is_Weather_Risk: 'Is Weather Risk',
-    Is_Long_Distance: 'Is Long Distance',
-    Is_High_LTV: 'Is High LTV',
-    Is_Churn_Risk: 'Is Churn Risk',
-    Is_VIP_Customer: 'Is VIP Customer',
-    Is_Loss_Order: 'Is Loss Order',
-    Is_AI_Optimized: 'Is AI Optimized',
-    Receiving_Date: 'Receiving Date',
-    Putaway_Date: 'Putaway Date',
-    Lot_ID: 'Lot ID',
-    Expiry_Date: 'Expiry Date',
-    Bin: 'Bin',
-    Slot: 'Slot',
-    Unit_Cost: 'Unit Cost',
-    Daily_OnHand_Snapshot: 'Daily OnHand Snapshot',
-    Safety_Stock: 'Safety Stock',
-    Forecast_Demand: 'Forecast Demand',
-    ASN_ID: 'Asn Id',
-    PO_ID: 'Po Id',
-    Replenishment_Type: 'Replenishment Type',
-    Picking_Start_TS: 'Picking Start TS',
-    Picking_End_TS: 'Picking End TS',
-    Packing_Start_TS: 'Packing Start TS',
-    Packing_End_TS: 'Packing End TS',
-    Ship_SLA_Due_TS: 'Planned Ship Timestamp',
-    FC_SLA_Breach: 'FC SLA Breach',
-    CLV_Quartile: 'CLV Quartile',
-    CLV_Quartile_Label: 'CLV Quartile Label',
-    Planned_Ship_Timestamp: 'Planned Ship Timestamp',
-    Actual_Ship_Timestamp: 'Actual Ship Timestamp',
-    On_Time_Dispatch_Flag: 'On-time Dispatch Flag',
-    Is_Quality_Issue: 'Is Quality Issue',
-    Mis_Ship_Flag: 'Mis ship Flag',
-    Distance_Bucket: 'Distance Bucket',
-    Distance_Band_Label: 'Distance Band Label',
-    [NET.ROUTE_TYPE]: 'Route Type',
-    [NET.SORT_HUB_NAME]: 'Sortation Hub Name',
-    [NET.FC_EXIT]: 'FC Exit TS',
-    [NET.HUB_IN]: 'Hub In TS',
-    [NET.HUB_OUT]: 'Hub Out TS',
-    [NET.CAMP_IN]: 'Camp In TS',
-    [NET.LOAD_START]: 'Loadout Start TS',
-    [NET.LOAD_END]: 'Loadout End TS',
-    [NET.OFD]: 'OFD TS',
-    [NET.FC_DWELL]: 'FC Dwell Min',
-    [NET.HUB_DWELL]: 'Hub Dwell Min',
-    [NET.CAMP_DWELL]: 'Camp Dwell Min'
-  };
-
-  function prettyHeader(key) {
-    if (CSV_SPECIAL_LABELS[key]) return CSV_SPECIAL_LABELS[key];
-    return key
-      .replace(/^_+/, '').replace(/__/g, '_').replace(/[_]/g, ' ')
-      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .replace(/\s+/g, ' ').trim()
-      .replace(/\b\w/g, m => m.toUpperCase());
-  }
-
-  const HOURLY_ORDER_PATTERN = {
-    0: .008,
-    1: .005,
-    2: .003,
-    3: .002,
-    4: .002,
-    5: .003,
-    6: .008,
-    7: .015,
-    8: .025,
-    9: .035,
-    10: .045,
-    11: .052,
-    12: .058,
-    13: .048,
-    14: .042,
-    15: .055,
-    16: .065,
-    17: .075,
-    18: .085,
-    19: .125,
-    20: .135,
-    21: .095,
-    22: .068,
-    23: .035
-  };
-
-  function getOrderHour() {
-    const e = Object.entries(HOURLY_ORDER_PATTERN).map(([h, p]) => [parseInt(h), p]);
-    const total = e.reduce((s, [, p]) => s + p, 0);
-    const r = Math.random();
-    let cum = 0;
-    for (const [h, p] of e) {
-      cum += p / total;
-      if (r <= cum) return h
-    }
-    return 23
-  }
-
-  function macroRegionBySiDo(region) {
-    if (['서울특별시', '경기도', '인천광역시'].includes(region)) return '수도권';
-    if (['부산광역시', '대구광역시', '울산광역시', '경상북도', '경상남도'].includes(region)) return '영남';
-    if (['대전광역시', '세종특별자치시', '충청북도', '충청남도'].includes(region)) return '충청';
-    if (['광주광역시', '전북특별자치도', '전라남도'].includes(region)) return '호남';
-    if (['강원특별자치도'].includes(region)) return '강원';
-    if (['제주특별자치도'].includes(region)) return '제주';
-    return '기타'
-  }
-
-  function pickWeather(region, month) {
-    let w = {'맑음': 0.40, '흐림': 0.22, '비': 0.18, '눈': 0.06, '안개': 0.06, '강풍': 0.08};
-    if ([6, 7, 8].includes(month)) {
-      w['비'] += 0.10;
-      w['강풍'] += 0.03;
-      w['맑음'] -= 0.08
-    }
-    if ([12, 1, 2].includes(month)) {
-      w['눈'] += 0.07;
-      w['맑음'] -= 0.04
-    }
-    if (region === '제주특별자치도') {
-      w['강풍'] = Math.max(0.01, (w['강풍'] + 0.02) * CAL.jejuWeatherScale);
-      w['눈'] = Math.max(0, w['눈'] - 0.05)
-    }
-    const macro = macroRegionBySiDo(region);
-    if (['영남', '호남'].includes(macro)) w['강풍'] += 0.02;
-    const s = Object.values(w).reduce((a, b) => a + b, 0);
-    let r = Math.random() * s, acc = 0;
-    for (const k of Object.keys(w)) {
-      acc += w[k];
-      if (r <= acc) return k
-    }
-    return '맑음'
-  }
-
-  function selectFulfillmentCenter(region) {
-    return FC_SITES[region] || '지역FC'
-  }
-
-  function genBinSlot() {
-    const a = pad(irnd(1, 40)), b = pad(irnd(1, 30)), l = pad(irnd(1, 5)), s = pad(irnd(1, 20));
-    return {Bin: `A${a}-B${b}-L${l}`, Slot: `S${s}`}
-  }
-
-  function genLotAndExpiry(category, orderDate, receivingDate) {
-    const cold = COUPANG_CATEGORIES[category]?.coldChain;
-    if (!cold) return {Lot_ID: null, Expiry_Date: null};
-    const lot = `LOT${irnd(100000, 999999)}`;
-    let daysAhead = 90;
-    if (category === '신선식품') daysAhead = irnd(3, 10); else if (category === '냉동식품') daysAhead = irnd(180, 365);
-    let expiry = new Date(receivingDate.getTime() + daysAhead * 86400000);
-    if (expiry <= orderDate) {
-      expiry = new Date(orderDate.getTime() + irnd(2, 5) * 86400000)
-    }
-    if (Math.random() < CAL.expiryImminentRate) {
-      expiry = new Date(orderDate.getTime() + irnd(0, 1) * 86400000)
-    }
-    return {Lot_ID: lot, Expiry_Date: expiry.toISOString().split('T')[0]}
-  }
-
-  function estimateUnitCost(category, unitPrice) {
-    const m = COUPANG_CATEGORIES[category]?.margin || 0.3;
-    return Math.round(unitPrice * (1 - m) * rnd(0.97, 1.03))
-  }
-
-  function forecastByABC(abc) {
-    if (abc === 'A') return irnd(20, 60);
-    if (abc === 'B') return irnd(8, 25);
-    return irnd(2, 8)
-  }
-
-  function safetyStockCalc(forecastPerDay, leadDays) {
-    const z = 1.28;
-    const sigma = forecastPerDay * 0.3;
-    return Math.max(0, Math.round(z * sigma * Math.sqrt(Math.max(1, leadDays))))
-  }
-
-  let DATA = [];
-  let MONTHLY_BY_CUST = {};
-  let VALIDATION_ISSUES = [];
-  let PERFORMANCE_METRICS = {};
-  let COUPANG_REALITY_METRICS = {};
-  let PROCESSING_STATE = {
-    isRunning: false,
-    shouldStop: false,
-    startTime: null,
-    processedRows: 0,
-    totalRows: 0,
-    currentChunk: 0,
-    totalChunks: 0
-  };
-  const CHUNK_CONFIG = {defaultSize: 3000, maxMemoryRows: 150000, batchUpdateInterval: 3, gcInterval: 8};
-  let ROCKET_PLAN = [];
-
-  function buildRocketPlan(total, ratePct) {
-    const k = Math.round(total * (ratePct / 100));
-    const arr = Array(total).fill(false).map((_, i) => i < k);
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]]
-    }
-    return arr
-  }
-
-  // ==========================
-  // 3) 데이터 생성
-  // ==========================
-  function preAssignCustomerProfiles(uniqueCustomers, wowRate) {
-    const profiles = {};
-    const wowPlan = buildRocketPlan(uniqueCustomers, wowRate);
-    for (let i = 0; i < uniqueCustomers; i++) {
-      const custId = `CUST${String(100000 + i).padStart(7, '0')}`;
-      const isWow = wowPlan[i] ? 1 : 0;
-      profiles[custId] = {
-        isWow,
-        wowTier: isWow ? 'WOW_BASIC' : null,
-        churnFlag: Math.random() < 0.08 ? 1 : 0,
-        joinDate: isWow ? new Date(Date.now() - irnd(30, 1095) * 86400000) : null,
-        preferredRegion: selectRegionWeighted()
-      };
-    }
-    return profiles
-  }
-
-  function selectRegionWeighted() {
-    const w = {};
-    Object.entries(REGION_LOGISTICS).forEach(([r, d]) => w[r] = d.populationWeight);
-    return weightedPick(w)
-  }
-
-  function getAutomationLevel(region) {
-    for (const [level, cfg] of Object.entries(AUTOMATION_LEVELS)) {
-      if (cfg.regions.includes(region)) return level
-    }
-    if (region.includes('서울') || region.includes('경기') || region.includes('인천')) return Math.random() < 0.6 ? 'AI_OPTIMIZED' : 'AUTO';
-    return 'SEMI_AUTO'
-  }
-
-  function estimateLogisticsCost(row) {
-    const reg = REGION_LOGISTICS[row.Region] || {baseCost: 3000, perKmCost: 100};
-    const baseCost = reg.baseCost;
-    const distanceCost = (row.Distance_km || 0) * reg.perKmCost;
-    const modeCfg = DELIVERY_MODES[row.Delivery_Mode] || {cost: 1.0};
-    const weather = typeof row.Weather_Severity_Score === 'number' ? row.Weather_Severity_Score : 0.2;
-    const weatherMultiplier = weather > 0.6 ? 1.25 : (weather > 0.3 ? 1.1 : 1.0);
-    const peakMultiplier = row.Is_Peak_Hour_Order === 1 ? 1.15 : 1.0;
-    const islandMultiplier = row.Region === '제주특별자치도' ? (weather > 0.6 ? 1.8 : 1.5) : 1.0;
-    const handlingBase = 500;
-    return Math.round((baseCost + distanceCost + handlingBase) * modeCfg.cost * weatherMultiplier * peakMultiplier * islandMultiplier)
-  }
-
-  function generateAddress(region, city, district) {
-    const roads = ['물류로', '배송대로', '쿠팡길', '로켓로', '허브대로', '센터로'];
-    const no = irnd(1, 999), b = irnd(1, 150);
-    return `${city} ${district} ${pick(roads)} ${no}-${b}`
-  }
-
-  function calculateDistance(region, city) {
-    const base = REGION_LOGISTICS[region]?.avgDistance || 25;
-    const v = rnd(-0.3, 0.3);
-    return Math.max(3, Math.round(base * (1 + v)))
-  }
-
-  function generateTemperatureData(category, coldChain) {
-    if (!coldChain) return {temp: null, violation: false, quality: null};
-    const cfg = COUPANG_CATEGORIES[category];
-    const target = cfg.tempRange;
-    const targetTemp = rnd(target[0], target[1]);
-    let actualTemp = targetTemp + rnd(-2, 2);
-    let violation = Math.random() < CAL.tempViolationBase;
-    if (violation) {
-      if (Math.random() < 0.5) actualTemp = target[1] + rnd(4, 8); else actualTemp = target[0] - rnd(4, 8)
-    }
-    const quality = violation ? rnd(60, 85) : rnd(85, 98);
+  /* ==========================
+     3) KPI/검증 스트리밍 집계 (O(1) 업데이트)
+  ========================== */
+  const AGG=resetAgg();
+  function resetAgg(){
     return {
-      targetTemp: Math.round(targetTemp * 10) / 10,
-      actualTemp: Math.round(actualTemp * 10) / 10,
-      violation,
-      quality: Math.round(quality)
-    }
+      total:0,
+
+      // 배송 모드 관련
+      rocket:0,
+      sameDayTotal:0, sameDayOnTime:0,
+      dawnTotal:0, dawnOnTime:0,
+      fastShip30:0,
+      shipUnder60:0,
+      fcSlaBreach:0,
+
+      // 시간/효율
+      shipMinutesSum:0,
+      pickPerItemSum:0, packPerItemSum:0,
+      procErrRateSum:0,
+
+      // WOW
+      wowCount:0, wowSales:0, nonWowSales:0, wowOrders:0, nonWowOrders:0, wowChurnRisk:0,
+
+      // 카테고리/콜드체인
+      freshCount:0, coldReq:0, tempViol:0,
+      frozenQualitySum:0, frozenCnt:0,
+
+      // 네트워크/거리
+      megaHub:0, metro:0, distanceSum:0, routingSum:0,
+
+      // 자동화
+      aiOpt:0, autoPickScoreSum:0, pickTimeSum:0, wmsAdvSum:0,
+
+      // 재무
+      salesSum:0, netProfitSum:0,
+
+      // 고객
+      ltvSum:0, cacSum:0,
+      uniqueCustomers:new Set(),
+      churnRisk:0,
+      aiAccEqual:0, // (Is_Churn_Risk === Churn_Flag)
+
+      // 배송 지표
+      onTime:0, delay:0,
+      loadSum:0, fuelSum:0, routeSum:0, exception:0,
+
+      // 반품
+      returnCnt:0, returnCostSum:0, resellCnt:0,
+
+      // 재고/WMS
+      invTurnSum:0, stockoutCnt:0, overstockCnt:0, invAccSum:0, wmsActiveCnt:0,
+
+      // 위험/정합성용
+      lossOrderCnt:0,
+      jejuWeatherRiskCnt:0, jejuTotal:0,
+      expiryImminentCnt:0
+    };
   }
 
-  function generateCoupangRealisticRow(index, totalUsers, yearStart, yearEnd, customerProfiles, forceRocket) {
-    const custIndex = index % totalUsers;
-    const custId = `CUST${String(100000 + custIndex).padStart(7, '0')}`;
-    const customerProfile = customerProfiles[custId];
-    const region = Math.random() < 0.7 ? customerProfile.preferredRegion : selectRegionWeighted();
-    const city = pick(CITIES_BY_REGION[region] || ['기타시']);
-    const district = pick(DISTRICTS_BY_CITY[city] || ['기타구']);
-    const address = generateAddress(region, city, district);
-    const distanceKm = calculateDistance(region, city);
-    const categoryKeys = Object.keys(COUPANG_CATEGORIES);
-    const month = irnd(1, 12);
-    let categoryWeights = {};
-    categoryKeys.forEach(cat => {
-      let w = 1;
-      if (cat === '신선식품' && [6, 7, 8].includes(month)) w = 1.8;
-      if (cat === '냉동식품' && [12, 1, 2].includes(month)) w = 1.5;
-      if (cat === '패션의류' && [3, 4, 9, 10].includes(month)) w = 1.4;
-      categoryWeights[cat] = w;
-    });
-    const selectedCategory = weightedPick(categoryWeights);
-    const categoryData = COUPANG_CATEGORIES[selectedCategory] || COUPANG_CATEGORIES['생활용품'];
-    const skuList = (Array.isArray(categoryData.skus) && categoryData.skus.length) ? categoryData.skus : ['GEN-ITEM-001', 'GEN-ITEM-002'];
-    const sku = pick(skuList);
-    const unitPrice = irnd(categoryData.price[0], categoryData.price[1]);
-    const quantity = Math.random() < 0.7 ? 1 : irnd(2, 5);
-    const orderAmount = unitPrice * quantity;
-    const abcRand = Math.random();
-    const abcGrade = abcRand < ABC_DISTRIBUTION.A ? 'A' : (abcRand < ABC_DISTRIBUTION.A + ABC_DISTRIBUTION.B ? 'B' : 'C');
-    const year = irnd(yearStart, yearEnd);
-    const orderHour = getOrderHour();
-    const orderDate = new Date(year, month - 1, irnd(1, 28), orderHour, irnd(0, 59), irnd(0, 59));
+  function ingestRows(rows){
+    if(!rows||!rows.length) return;
 
-    // 배송 모드
-    let availableModes;
-    const mReg = macroRegionBySiDo(region);
-    if (forceRocket) {
-      availableModes = ['로켓당일', '로켓새벽', '로켓익일', '로켓프레시'].filter(mode => {
-        const cfg = DELIVERY_MODES[mode];
-        return cfg.regions.includes('전국') || cfg.regions.includes(region) || cfg.regions.includes(mReg)
-      });
-      if (mReg !== '수도권') availableModes = availableModes.filter(m => m !== '로켓당일');
-      if (categoryData.freshFood && availableModes.includes('로켓프레시') && Math.random() < 0.6) availableModes = ['로켓프레시'];
-      if (!availableModes.length) availableModes = ['로켓익일'];
-    } else {
-      availableModes = ['일반택배'];
-    }
-    const deliveryMode = pick(availableModes);
-    const modeConfig = DELIVERY_MODES[deliveryMode];
-
-    // 납기 계획
-    const plannedDelivery = new Date(orderDate);
-    if (deliveryMode === '로켓당일') {
-      const cutoffHour = modeConfig.cutoffHour;
-      if (orderDate.getHours() >= cutoffHour) {
-        plannedDelivery.setDate(plannedDelivery.getDate() + 1);
-        plannedDelivery.setHours(6 + irnd(0, 3), irnd(0, 59), 0, 0)
-      } else {
-        const h = Math.max(3, cutoffHour - orderDate.getHours() + irnd(-1, 2));
-        plannedDelivery.setHours(orderDate.getHours() + h, irnd(0, 59), 0, 0)
-      }
-    } else if (deliveryMode === '로켓새벽') {
-      plannedDelivery.setDate(plannedDelivery.getDate() + modeConfig.baseDays);
-      plannedDelivery.setHours(6, irnd(0, 30), 0, 0)
-    } else {
-      plannedDelivery.setDate(plannedDelivery.getDate() + modeConfig.baseDays);
-      plannedDelivery.setHours(irnd(9, 18), irnd(0, 59), 0, 0)
+    // 헤더 결정 (최초 1회)
+    if(!TABLE_KEYS){
+      TABLE_KEYS=Object.keys(rows[0]);
+      buildTableHeader(TABLE_KEYS);
     }
 
-    const weather = pickWeather(region, month);
-    const weatherSev = weatherSeverity(weather);
-    const isPeakTime = orderDate.getHours() >= 19 && orderDate.getHours() <= 21;
-    const isWeekend = [0, 6].includes(orderDate.getDay());
-    let actualDelayRate = modeConfig.delayRate;
-    if (weatherSev > 0.4) actualDelayRate *= 1.8;
-    if (isPeakTime) actualDelayRate *= 1.3;
-    if (isWeekend) actualDelayRate *= 0.8;
-    if (region === '제주특별자치도') actualDelayRate *= 2.2;
-    const isDelayed = Math.random() < actualDelayRate;
-    let actualDelivery = new Date(plannedDelivery);
-    let delayHours = 0;
-    if (isDelayed) {
-      const baseDelay = deliveryMode.includes('로켓') ? irnd(4, 24) : irnd(12, 48);
-      delayHours = baseDelay + (weatherSev > 0.6 ? irnd(0, 24) : 0);
-      actualDelivery.setHours(actualDelivery.getHours() + delayHours)
-    } else {
-      const early = deliveryMode.includes('로켓') ? rnd(0, 4) : rnd(0, 2);
-      actualDelivery.setTime(actualDelivery.getTime() - early * 3600000)
+    // 메모리 적재
+    for(const r of rows){ DATA.push(r); }
+    // 메모리 보호 (원본 정책 유지)
+    if(DATA.length>CHUNK_CONFIG.maxMemoryRows){
+      DATA.splice(0, DATA.length-CHUNK_CONFIG.maxMemoryRows);
     }
 
-    // 차량/기사/자동화
-    const suitableVehicles = VEHICLES.filter(v => v.regions.includes('전체') || (v.regions.includes('도심') && ['서울특별시', '부산광역시', '인천광역시', '대구광역시'].includes(region)) || (v.regions.includes('간선') && macroRegionBySiDo(region) !== '수도권'));
-    const vehicle = pick(suitableVehicles);
-    const vehicleId = `V${irnd(10000, 99999)}`;
-    const driverId = `D${irnd(1000, 9999)}`;
-    const driverGrade = pick(DRIVER_GRADES);
-    const baseLoadFactor = Math.random() < 0.3 ? rnd(40, 70) : rnd(70, 95);
-    const loadFactor = Math.round(clamp(baseLoadFactor, 20, 100));
-    const fuelEfficiency = Math.round(rnd(vehicle.fuelEff[0], vehicle.fuelEff[1]) * 10) / 10;
-    const automationLevel = getAutomationLevel(region);
-    const baseRouting = automationLevel === 'AI_OPTIMIZED' ? rnd(88, 98) : automationLevel === 'AUTO' ? rnd(78, 92) : automationLevel === 'SEMI_AUTO' ? rnd(65, 85) : rnd(50, 75);
-    const routingScore = Math.round(baseRouting);
+    // 스트리밍 집계
+    for(const r of rows){
+      AGG.total++;
 
-    // 비용
-    const regLog = REGION_LOGISTICS[region];
-    const baseCost = regLog.baseCost;
-    const distanceCost = distanceKm * regLog.perKmCost;
-    const modeCostMultiplier = modeConfig.cost;
-    const weatherMultiplier = weatherSev > 0.6 ? 1.25 : (weatherSev > 0.3 ? 1.1 : 1.0);
-    const peakMultiplier = isPeakTime ? 1.15 : 1.0;
-    const handlingBase = 500;
-    const islandMultiplier = region === '제주특별자치도' ? (weatherSev > 0.6 ? 1.8 : 1.5) : 1.0;
-    const estCost = Math.round((baseCost + distanceCost + handlingBase) * modeCostMultiplier * weatherMultiplier * peakMultiplier * islandMultiplier);
-    const driverFactor = 1 + rnd(-0.05, 0.05);
-    const vehicleFactor = (vehicle.type === '대형트럭' ? 1.08 : (vehicle.type === '오토바이' ? 0.92 : 1.0));
-    const hubFactor = (Math.random() < 0.5 && (Math.random() < 0.65)) ? 1 + rnd(0.02, 0.08) : 1.0;
-    const congestion = isPeakTime ? irnd(0, 400) : 0;
-    const weatherSurcharge = (weather === '강풍' || weather === '눈') ? irnd(200, 700) : 0;
-    const jitter = irnd(-150, 150);
-    const actualLogisticsCost = Math.max(0, Math.round((estCost * driverFactor * vehicleFactor * hubFactor + congestion + weatherSurcharge + jitter) * CAL.costBias));
+      // 배송 모드 집계
+      if(r.Is_Rocket_Delivery===1) AGG.rocket++;
+      if(r.Delivery_Mode==='로켓당일'){ AGG.sameDayTotal++; if(r.Is_Delayed===0) AGG.sameDayOnTime++; }
+      if(r.Delivery_Mode==='로켓새벽'){ AGG.dawnTotal++; if(r.Is_Delayed===0) AGG.dawnOnTime++; }
+      if(r.Fast_Ship_30min===1) AGG.fastShip30++;
+      if(r.Order_To_Ship_Minutes<=60) AGG.shipUnder60++;
+      if(r.FC_SLA_Breach===1) AGG.fcSlaBreach++;
+      AGG.shipMinutesSum += (r.Order_To_Ship_Minutes||0);
+      AGG.pickPerItemSum += (r.Picking_Time_Seconds/Math.max(1,r.Quantity));
+      AGG.packPerItemSum += (r.Packing_Time_Seconds/Math.max(1,r.Quantity));
+      AGG.procErrRateSum += (r.Processing_Error_Rate||0);
 
-    // 배송비
-    let customerDeliveryCharge = 0;
-    if (customerProfile.isWow === 0 && orderAmount < 50000) {
-      customerDeliveryCharge = deliveryMode.includes('로켓') ? 3500 : 3000
-    }
-    customerDeliveryCharge = Math.round(customerDeliveryCharge);
+      // WOW
+      if(r.Is_WOW_Member===1){ AGG.wowCount++; AGG.wowSales+=r.Order_Amount; AGG.wowOrders++; if(r.Is_Churn_Risk===1) AGG.wowChurnRisk++; }
+      else { AGG.nonWowSales+=r.Order_Amount; AGG.nonWowOrders++; }
 
-    // 콜드체인/반품
-    const tempData = generateTemperatureData(selectedCategory, !!categoryData.coldChain);
-    let returnRate = categoryData.returnRate;
-    if (tempData.violation) returnRate *= 2.5;
-    if (isDelayed && deliveryMode.includes('로켓')) returnRate *= 1.8;
-    const returnFlag = Math.random() < returnRate ? 1 : 0;
-    const returnReason = returnFlag ? pick(RETURN_REASONS) : null;
-    const returnCost = returnFlag ? Math.round(orderAmount * rnd(0.1, 0.25)) : 0;
-    let resellable = null, resellReason = null;
-    if (returnFlag) {
-      if (tempData.violation) {
-        resellable = 0;
-        resellReason = '온도관리실패'
-      } else if (['단순변심', '기타'].includes(returnReason)) {
-        resellable = Math.random() < 0.92 ? 1 : 0;
-        resellReason = resellable ? '정상상품' : '포장손상'
-      } else {
-        resellable = Math.random() < 0.45 ? 1 : 0;
-        resellReason = resellable ? '부분수리가능' : '상품손상'
+      // 콜드체인/카테고리
+      if(r.Is_Fresh_Food===1) AGG.freshCount++;
+      if(r.Is_Cold_Chain_Required===1){ AGG.coldReq++; if(r.Temperature_Violation===1) AGG.tempViol++; }
+      if(r.Product_Category==='냉동식품' && isFinite(r.Cold_Chain_Quality_Score)){ AGG.frozenQualitySum+=r.Cold_Chain_Quality_Score; AGG.frozenCnt++; }
+
+      // 네트워크/거리
+      if(r.Is_Mega_Hub===1) AGG.megaHub++;
+      if(['서울특별시','경기도','인천광역시'].includes(r.Region)) AGG.metro++;
+      AGG.distanceSum += (r.Distance_km||0);
+      AGG.routingSum += (r.Routing_Score||0);
+
+      // 자동화
+      if(r.Automation_Level==='AI_OPTIMIZED') AGG.aiOpt++;
+      AGG.autoPickScoreSum += (r.Automation_Level==='AI_OPTIMIZED'?90: r.Automation_Level==='AUTO'?70: r.Automation_Level==='SEMI_AUTO'?40:10);
+      AGG.pickTimeSum += (r.Picking_Time_Seconds||0);
+      AGG.wmsAdvSum += (r.WMS_Advanced_Score||0);
+
+      // 재무
+      AGG.salesSum += (r.Order_Amount||0);
+      AGG.netProfitSum += (r.Net_Profit||0);
+
+      // 고객
+      AGG.ltvSum += (r.Customer_LTV||0);
+      AGG.cacSum += (r.CAC||0);
+      AGG.uniqueCustomers.add(r.Customer_ID);
+      if(r.Is_Churn_Risk===1) AGG.churnRisk++;
+      if((r.Is_Churn_Risk===1)===(r.Churn_Flag===1)) AGG.aiAccEqual++;
+
+      // 배송
+      if(r.Is_Delayed===0) AGG.onTime++; else AGG.delay++;
+      AGG.loadSum += (r.Load_Factor||0);
+      AGG.fuelSum += (r.Fuel_Efficiency||0);
+      AGG.routeSum += (r.Routing_Score||0);
+      if(r.Temperature_Violation===1 || r.FC_SLA_Breach===1 || r.Return_Flag===1) AGG.exception++;
+
+      // 반품
+      if(r.Return_Flag===1){ AGG.returnCnt++; AGG.returnCostSum+=(r.Return_Cost||0); if(r.Is_Resellable===1) AGG.resellCnt++; }
+
+      // 재고/WMS
+      AGG.invTurnSum += (r.Inventory_Turnover||0);
+      if(r.Stockout_Flag===1) AGG.stockoutCnt++;
+      if(r.Overstock_Flag===1) AGG.overstockCnt++;
+      AGG.invAccSum += (r.Inventory_Accuracy||0);
+      if(r.WMS_Usage==='Active') AGG.wmsActiveCnt++;
+
+      // 위험/정합성
+      if(r.Is_Loss_Order===1) AGG.lossOrderCnt++;
+      if(r.Region==='제주특별자치도'){ AGG.jejuTotal++; if(r.Is_Weather_Risk===1) AGG.jejuWeatherRiskCnt++; }
+      if(r.Expiry_Date){
+        const d = (new Date(r.Expiry_Date)) - (new Date(r.Order_Date));
+        if(d<=86400000 && d>=-31536000000) AGG.expiryImminentCnt++; // 안전가드
       }
     }
 
-    // 재고
-    const currentStock = abcGrade === 'A' ? irnd(200, 800) : (abcGrade === 'B' ? irnd(50, 300) : irnd(10, 100));
-    const reorderPoint = Math.round(currentStock * (abcGrade === 'A' ? 0.4 : abcGrade === 'B' ? 0.3 : 0.2));
-    const stockTurnover = abcGrade === 'A' ? rnd(12, 20) : (abcGrade === 'B' ? rnd(6, 12) : rnd(2, 8));
-    const stockoutFlag = Math.random() < (abcGrade === 'A' ? 0.015 : abcGrade === 'B' ? 0.04 : 0.08) ? 1 : 0;
-    const overstockFlag = Math.random() < (CAL.overstockProb ?? 0.22) ? 1 : 0;
+    // 테이블 가상화 렌더
+    renderTableRowsVirtual(rows, TABLE_KEYS);
 
-    // 자동화
-    const automationConfig = AUTOMATION_LEVELS[automationLevel];
-    const pickingTime = automationConfig.pickingTime + rnd(-3, 5);
-    const packingTime = automationConfig.packingTime + rnd(-2, 3);
-    const totalProcessTime = Math.round((pickingTime + packingTime) * 10) / 10;
+    // KPI/검증 업데이트
+    updateKPIsFromAgg();
+    updateValidationAndRiskFromAgg();
 
-    // FC 출고 시간
-    const SLA = SHIP_SLA_MIN[deliveryMode] ?? SHIP_SLA_MIN.DEFAULT;
-    let orderToShipMinutes;
-    if (Math.random() < 0.90) orderToShipMinutes = irnd(10, Math.floor(SLA * 0.8)); else orderToShipMinutes = irnd(Math.floor(SLA * 0.8) + 1, Math.floor(SLA * 1.2));
-    const autoBoost = automationLevel === 'AI_OPTIMIZED' ? 0.85 : automationLevel === 'AUTO' ? 0.93 : automationLevel === 'SEMI_AUTO' ? 1.00 : 1.05;
-    const peakPenalty = (orderHour >= 19 && orderHour <= 21) ? 1.06 : 1.0;
-    orderToShipMinutes = Math.round(orderToShipMinutes * autoBoost * peakPenalty);
-    const pickStart = new Date(orderDate.getTime() + irnd(5, 15) * 60000);
-    const pickEnd = new Date(pickStart.getTime() + Math.max(5, pickingTime) * 1000);
-    const packStart = new Date(pickEnd.getTime() + irnd(2, 12) * 60000);
-    const packEnd = new Date(packStart.getTime() + Math.max(4, packingTime) * 1000);
-    const shipSlaDue = new Date(orderDate.getTime() + SLA * 60000);
-    let fcExit = new Date(orderDate.getTime() + Math.max(orderToShipMinutes, 5) * 60000);
-    const minBufferMin = irnd(3, 10);
-    if (fcExit < new Date(packEnd.getTime() + minBufferMin * 60000)) {
-      fcExit = new Date(packEnd.getTime() + minBufferMin * 60000)
-    }
-    orderToShipMinutes = Math.round((fcExit - orderDate) / 60000);
-    const fastShipFlag = orderToShipMinutes <= 30 ? 1 : 0;
-    const fcSlaBreach = fcExit > shipSlaDue ? 1 : 0;
+    // 진행률 상태 갱신
+    PROCESSING_STATE.processedRows += rows.length;
+    updateProgressFromState('Generating');
+  }
 
-    // CAC/LTV & 손익
-    const baseCac = customerProfile.isWow ? irnd(3500, 7000) : irnd(1200, 2800);
-    const wowTierConfig = customerProfile.wowTier ? WOW_TIERS[customerProfile.wowTier] : {ltvMultiplier: 1.5};
-    const customerLTV = Math.round(orderAmount * wowTierConfig.ltvMultiplier * rnd(2.8, 4.2));
-    const grossProfit = Math.round(orderAmount * categoryData.margin);
-    const inventoryCarryingCost = Math.round(currentStock * unitPrice * 0.002 / 12);
-    const stockoutCost = stockoutFlag ? Math.round(orderAmount * 0.08) : 0;
-    const qualityCost = tempData.violation ? Math.round(orderAmount * 0.05) : 0;
-    const netProfit = grossProfit - actualLogisticsCost - returnCost - inventoryCarryingCost - stockoutCost - qualityCost;
+  function updateKPIsFromAgg(){
+    const total=Math.max(1,AGG.total);
+    const fmtPct=v=>(isFinite(v)?(Number(v).toFixed(1)+'%'):'-');
 
-    let churnScore = customerProfile.churnFlag ? rnd(0.65, 0.95) : rnd(0.05, 0.55);
-    if (isDelayed && deliveryMode.includes('로켓')) churnScore += 0.15;
-    if (returnFlag && !resellable) churnScore += 0.1;
-    churnScore = Math.min(0.98, Math.round(churnScore * 1000) / 1000);
+    const rocketShare=(AGG.rocket/total*100);
+    const sameDaySuccess=(AGG.sameDayTotal?AGG.sameDayOnTime/AGG.sameDayTotal*100:0);
+    const dawnOnTime=(AGG.dawnTotal?AGG.dawnOnTime/AGG.dawnTotal*100:0);
+    const fastShip=(AGG.fastShip30/total*100);
 
-    const serviceQualityScore = Math.round((100 - (isDelayed ? 15 : 0) - (returnFlag ? 10 : 0) - (tempData.violation ? 20 : 0)) * (automationLevel === 'AI_OPTIMIZED' ? 1.05 : 1.0));
-    const wmsUsage = automationLevel === 'MANUAL' ? 'Legacy' : 'Active';
-    const omsUsage = Math.random() < 0.95 ? 'Active' : 'Manual';
-    const wmsAdvancedScore = automationLevel === 'AI_OPTIMIZED' ? rnd(88, 96) : automationLevel === 'AUTO' ? rnd(75, 87) : automationLevel === 'SEMI_AUTO' ? rnd(55, 74) : rnd(30, 54);
+    const fcOnTime=100-(AGG.fcSlaBreach/total*100);
+    const avgShipHr=(AGG.shipMinutesSum/total)/60;
+    const pickSecPerItem=(AGG.pickPerItemSum/total);
+    const packSecPerItem=(AGG.packPerItemSum/total);
+    const effFulfill=clamp(100-((AGG.procErrRateSum/total)*100*2),0,100);
+    const shipUnder60=(AGG.shipUnder60/total*100);
 
-    const monthlyKey = `${custId}-${year}-${pad(orderDate.getMonth() + 1)}`;
+    const wowShare=(AGG.wowCount/total*100);
+    const wowAov = (AGG.wowOrders?AGG.wowSales/AGG.wowOrders:0);
+    const nonWowAov = (AGG.nonWowOrders?AGG.nonWowSales/AGG.nonWowOrders:0);
+    const wowAovGap = (wowAov - nonWowAov);
+    const wowChurnRisk = AGG.wowChurnRisk;
 
-    const isRocketDelivery = deliveryMode.includes('로켓') ? 1 : 0;
-    const isSameDayDelivery = deliveryMode === '로켓당일' ? 1 : 0;
-    const isDawnDelivery = deliveryMode === '로켓새벽' ? 1 : 0;
-    const isFreshDelivery = deliveryMode === '로켓프레시' ? 1 : 0;
-    const isPremiumOrder = (selectedCategory === '가전전자' || orderAmount >= 200000) ? 1 : 0;
-    const isBulkOrder = quantity >= 3 ? 1 : 0;
-    const isFreeShipping = (customerProfile.isWow === 1 || orderAmount >= 50000) ? 1 : 0;
-    const isWeatherRisk = (weatherSev > 0.5) ? 1 : 0;
-    const isLongDistance = distanceKm > 35 ? 1 : 0;
-    const isHighLTV = customerLTV > 300000 ? 1 : 0;
-    const isChurnRisk = churnScore >= 0.65 ? 1 : 0;
-    const isVIPCustomer = (customerProfile.isWow === 1 && isHighLTV) ? 1 : 0;
-    const isLossOrder = (netProfit < 0) ? 1 : 0;
-    const isAIOptimized = (automationLevel === 'AI_OPTIMIZED') ? 1 : 0;
+    const freshShare=(AGG.freshCount/total*100);
+    const coldChainRate=(AGG.coldReq? (1-AGG.tempViol/AGG.coldReq)*100 : 100);
+    const tempViolRate=(AGG.coldReq? (AGG.tempViol/AGG.coldReq*100) : 0);
+    const frozenQuality=(AGG.frozenCnt? AGG.frozenQualitySum/AGG.frozenCnt : 0);
 
-    // WMS/OMS/품질
-    const processingErrorRate = AUTOMATION_LEVELS[automationLevel].errorRate;
-    const customerNPS = Math.round(clamp(70 + (isDelayed ? -10 : 5) + (returnFlag ? -12 : 0) + (tempData.violation ? -15 : 0) + (isAIOptimized ? 5 : 0), 0, 100));
+    const megaHubShare=(AGG.megaHub/total*100);
+    const metroCoverage=(AGG.metro/total*100);
+    const avgDist=(AGG.distanceSum/total);
+    const networkEff=(AGG.routingSum/total);
 
-    // WMS 고도화 점수 수치화
-    const wmsAdvanced = Math.round(wmsAdvancedScore);
+    const aiOptimized=(AGG.aiOpt/total*100);
+    const autoPickRate=(AGG.autoPickScoreSum/total);
+    const avgPickTime=(AGG.pickTimeSum/total);
+    const wmsAdvanced=(AGG.wmsAdvSum/total);
 
-    // 네트워크 타임라인 (FC→허브/캠프→OFD)
-    // 수도권은 FC→캠프 직접, 그 외는 FC→허브→캠프
-    const routeIsMetro = (['서울특별시', '경기도', '인천광역시'].includes(region));
-    const routeType = routeIsMetro ? 'FC→CAMP→OFD' : 'FC→HUB→CAMP→OFD';
-    const sortHub = routeIsMetro ? null : (pick(MEGA_HUBS));
-    const isMegaHub = sortHub ? 1 : 0;
+    const totalSales=AGG.salesSum;
+    const netMargin=(AGG.salesSum?AGG.netProfitSum/AGG.salesSum*100:0);
+    const aov=(AGG.salesSum/total);
+    const uniqueCust=Math.max(1,AGG.uniqueCustomers.size);
+    const arppu=(AGG.salesSum/uniqueCust);
 
-    // 이동/대기 시간 (분)
-    const fcDwellMin = irnd(5, 20);
-    const hubDwellMin = sortHub ? irnd(20, 90) : null;
-    const campDwellMin = irnd(8, 25);
+    const ltvAvg=(AGG.ltvSum/total);
+    const cacAvg=(AGG.cacSum/total);
+    const ltvCac=(cacAvg? (ltvAvg/cacAvg).toFixed(2):'0.00');
 
-    // 시간 스탬프
-    const fcExitTS = new Date(fcExit);
-    let hubInTS = null, hubOutTS = null;
-    if (sortHub) {
-      hubInTS = new Date(fcExitTS.getTime() + irnd(40, 120) * 60000);
-      hubOutTS = new Date(hubInTS.getTime() + (hubDwellMin ?? 30) * 60000);
-    }
-    const campInBase = sortHub ? hubOutTS : fcExitTS;
-    const campInTS = new Date(campInBase.getTime() + irnd(25, 80) * 60000);
-    const loadStartTS = new Date(campInTS.getTime() + campDwellMin * 60000);
-    const loadEndTS = new Date(loadStartTS.getTime() + irnd(5, 20) * 60000);
-    const ofdTS = new Date(loadEndTS.getTime() + irnd(15, 90) * 60000);
+    const churnRate=(AGG.churnRisk/total*100);
+    const aiAcc=(AGG.aiAccEqual/total*100);
 
-    // 배송 상태/지연
-    const plannedDeliveryDate = plannedDelivery.toISOString().split('T')[0];
-    const actualDeliveryDate = actualDelivery.toISOString().split('T')[0];
-    const delayHrs = Math.max(0, Math.round((actualDelivery - plannedDelivery) / 3600000));
-    const deliveryStatus = isDelayed ? 'Delayed Delivered' : 'Delivered';
-    const slaBreach = isDelayed ? 1 : 0;
+    const onTime=(AGG.onTime/total*100);
+    const sla=(AGG.fcSlaBreach/total*100);
+    const load=(AGG.loadSum/total);
+    const fuel=(AGG.fuelSum/total);
+    const route=(AGG.routeSum/total);
+    const exception=(AGG.exception/total*100);
 
-    // 거리 버킷
-    let distanceBucket, distanceBandLabel;
-    if (distanceKm <= 10) {
-      distanceBucket = 1;
-      distanceBandLabel = '≤10km'
-    } else if (distanceKm <= 20) {
-      distanceBucket = 2;
-      distanceBandLabel = '11–20km'
-    } else if (distanceKm <= 30) {
-      distanceBucket = 3;
-      distanceBandLabel = '21–30km'
-    } else if (distanceKm <= 40) {
-      distanceBucket = 4;
-      distanceBandLabel = '31–40km'
-    } else {
-      distanceBucket = 5;
-      distanceBandLabel = '>40km'
-    }
+    const retRate=(AGG.returnCnt/total*100);
+    const retCostRate=(AGG.salesSum?AGG.returnCostSum/AGG.salesSum*100:0);
+    const resell=(AGG.returnCnt?AGG.resellCnt/AGG.returnCnt*100:0);
 
-    // 입고/적치/유통기한/로케이션
-    const receivingDate = new Date(orderDate.getTime() - irnd(1, 5) * 86400000);
-    const putawayDate = new Date(receivingDate.getTime() + irnd(0, 2) * 86400000);
-    const {Bin, Slot} = genBinSlot();
-    const {Lot_ID, Expiry_Date} = genLotAndExpiry(selectedCategory, orderDate, receivingDate);
-    const unitCost = estimateUnitCost(selectedCategory, unitPrice);
-    const forecast = forecastByABC(abcGrade);
-    const safetyStock = safetyStockCalc(forecast, irnd(1, 7));
-    const dailyOnHandSnapshot = irnd(Math.max(0, currentStock - 50), currentStock + 50);
+    const invTurn=(AGG.invTurnSum/total);
+    const stockout=(AGG.stockoutCnt/total*100);
+    const overstock=(AGG.overstockCnt/total*100);
+    const invAcc=(AGG.invAccSum/total);
+    const shrink=(100 - invAcc);
+    const wmsUse=(AGG.wmsActiveCnt/total*100);
 
-    // CLV 사분위
-    const clvQuartile = (customerLTV >= 600000) ? 1 : (customerLTV >= 300000) ? 2 : (customerLTV >= 150000) ? 3 : 4;
-    const clvQuartileLabel = ['Top 25%', '25–50%', '50–75%', 'Bottom 25%'][clvQuartile - 1];
+    setText('k_rocketShare',fmtPct(rocketShare));
+    setText('k_rocketSameDayRate',fmtPct(sameDaySuccess));
+    setText('k_rocketDawnRate',fmtPct(dawnOnTime));
+    setText('k_fastShipRate',fmtPct(fastShip));
 
-    // 기타 ID
-    const asnId = 'ASN' + irnd(1000000, 9999999);
-    const poId = 'PO' + irnd(1000000, 9999999);
-    const replType = pick(['Regular', 'Safety Refill', 'Promotion', 'Seasonal']);
+    setText('k_fcOnTimeShip',fmtPct(fcOnTime));
+    setText('k_fcAvgShipHour',(avgShipHr||0).toFixed(2));
+    setText('k_fcPickSecPerItem',(pickSecPerItem||0).toFixed(1));
+    setText('k_fcPackSecPerItem',(packSecPerItem||0).toFixed(1));
+    setText('k_fcEfficiency',(effFulfill||0).toFixed(1));
+    setText('k_fcShipUnder60',fmtPct(shipUnder60));
 
-    const row = {
-      Order_ID: `ORD${String(1000000 + index).padStart(7, '0')}`,
-      Order_Date: orderDate.toISOString().split('T')[0],
-      Order_Timestamp: orderDate.toISOString(),
-      Order_Hour: orderHour,
+    setText('k_wowShare',fmtPct(wowShare));
+    setText('k_wowPlusShare','0');
+    setText('k_wowAovGap',formatCurrencyKRW(wowAovGap));
+    setText('k_wowChurnRisk',wowChurnRisk.toLocaleString('ko-KR'));
 
-      Delivery_Mode: deliveryMode,
-      Planned_Delivery_Date: plannedDeliveryDate,
-      Actual_Delivery_Date: actualDeliveryDate,
-      Delivery_Timestamp: actualDelivery.toISOString(),
-      Is_Delayed: isDelayed ? 1 : 0,
-      Delay_Hours: delayHrs,
-      SLA_Breach: slaBreach,
-      Delivery_Status: deliveryStatus,
+    setText('k_freshShare',fmtPct(freshShare));
+    setText('k_coldChainRate',fmtPct(coldChainRate));
+    setText('k_tempViolation',fmtPct(tempViolRate));
+    setText('k_frozenQuality',(frozenQuality||0).toFixed(0));
 
-      Fast_Ship_30min: fastShipFlag,
-      Order_To_Ship_Minutes: orderToShipMinutes,
+    setText('k_megaHubShare',fmtPct(megaHubShare));
+    setText('k_seoulCoverage',fmtPct(metroCoverage));
+    setText('k_avgDistance',(avgDist||0).toFixed(1));
+    setText('k_networkEff',(networkEff||0).toFixed(0));
 
-      Region: region, City: city, District: district, Address: address,
-      Fulfillment_Center: selectFulfillmentCenter(region),
-      Delivery_Center: `${city} 배송캠프`,
-      Is_Mega_Hub: isMegaHub,
-      Distance_km: distanceKm,
+    setText('k_aiOptimized',fmtPct(aiOptimized));
+    setText('k_autoPickRate',(autoPickRate||0).toFixed(1));
+    setText('k_avgPickTime',(avgPickTime||0).toFixed(1));
+    setText('k_wmsAdvanced',(wmsAdvanced||0).toFixed(0));
 
-      Customer_ID: custId,
-      Is_WOW_Member: customerProfile.isWow,
-      WOW_Tier: customerProfile.wowTier,
-      WOW_Join_Date: customerProfile.joinDate ? customerProfile.joinDate.toISOString().split('T')[0] : null,
-      WOW_Tenure_Days: customerProfile.joinDate ? Math.round((orderDate - customerProfile.joinDate) / 86400000) : 0,
-      Customer_Segment: pick(['일반', '활성', '핵심', '휴면준비']),
+    setText('k_totalSales',formatCurrencyKRW(totalSales));
+    setText('k_netMargin',(netMargin||0).toFixed(2));
+    setText('k_aov',formatCurrencyKRW(aov));
+    setText('k_arppu',formatCurrencyKRW(arppu));
 
-      Product_Category: selectedCategory,
-      SKU: sku,
-      ABC_Category: abcGrade,
-      Unit_Price: unitPrice,
-      Quantity: quantity,
-      Order_Amount: orderAmount,
+    setText('k_ltvCac',ltvCac);
+    setText('k_retention',(100-churnRate).toFixed(1));
+    setText('k_churn',churnRate.toFixed(1));
+    setText('k_ai',aiAcc.toFixed(1));
 
-      Is_Fresh_Food: categoryData.freshFood ? 1 : 0,
-      Is_Cold_Chain_Required: categoryData.coldChain ? 1 : 0,
-      Target_Temperature: tempData.targetTemp ?? null,
-      Actual_Temperature: tempData.actualTemp ?? null,
-      Temperature_Violation: tempData.violation ? 1 : 0,
-      Cold_Chain_Quality_Score: tempData.quality ?? null,
+    setText('k_onTime',fmtPct(onTime));
+    setText('k_sla',fmtPct(sla));
+    setText('k_load',(load||0).toFixed(1));
+    setText('k_fuel',(fuel||0).toFixed(2));
+    setText('k_route',(route||0).toFixed(0));
+    setText('k_exception',fmtPct(exception));
 
-      Vehicle_ID: vehicleId,
-      Vehicle_Type: vehicle.type,
-      Vehicle_Capacity: vehicle.capacity,
-      Driver_ID: driverId,
-      Driver_Grade: driverGrade,
-      Load_Factor: loadFactor,
-      Fuel_Efficiency: fuelEfficiency,
-      Routing_Score: routingScore,
-      GPS_Tracking: 1,
+    setText('k_returnRate',fmtPct(retRate));
+    setText('k_returnCost',(retCostRate||0).toFixed(2));
+    setText('k_resell',fmtPct(resell));
 
-      Actual_Logistics_Cost: actualLogisticsCost,
-      Customer_Delivery_Charge: customerDeliveryCharge,
-      Gross_Profit: grossProfit,
-      Net_Profit: netProfit,
+    setText('k_invTurn',(invTurn||0).toFixed(1));
+    setText('k_stockout',fmtPct(stockout));
+    setText('k_overstock',fmtPct(overstock));
+    setText('k_invAcc',(invAcc||0).toFixed(1));
+    setText('k_shrink',(shrink||0).toFixed(1));
+    setText('k_wms',fmtPct(wmsUse));
+  }
 
-      CAC: baseCac,
-      Customer_LTV: customerLTV,
-      LTV_to_CAC: +(customerLTV / baseCac).toFixed(2),
+  function updateValidationAndRiskFromAgg(){
+    const list=qs('validateList');list.innerHTML='';
+    const risk=qs('riskList');risk.innerHTML='';
+    const perf=qs('perfList');perf.innerHTML='';
+    if(AGG.total===0){qs('validateSummary').textContent='-';return;}
 
-      Return_Flag: returnFlag,
-      Return_Reason: returnReason,
-      Return_Cost: returnCost,
-      Is_Resellable: resellable,
-      Resellability_Reason: resellReason,
+    const total=AGG.total;
+    const tempViolRate=(AGG.coldReq?AGG.tempViol/AGG.coldReq:0);
+    const lossRate=(AGG.lossOrderCnt/total);
+    const jejuRate=(AGG.jejuTotal?AGG.jejuWeatherRiskCnt/AGG.jejuTotal:0);
+    const overStockRate=(AGG.overstockCnt/total);
+    const expirySoonRate=(AGG.expiryImminentCnt/total);
 
-      Current_Stock: currentStock,
-      Reorder_Point: reorderPoint,
-      Stockout_Flag: stockoutFlag,
-      Overstock_Flag: overstockFlag,
-      Inventory_Turnover: Math.round(stockTurnover * 10) / 10,
-      Inventory_Accuracy: Math.round(rnd(94, 99) * 10) / 10,
+    function pill(text,type){const d=document.createElement('div');d.className='alert '+type;d.textContent=text;return d}
+    const okText=`콜드체인 위반율 ${(tempViolRate*100).toFixed(2)}% / 손실주문율 ${(lossRate*100).toFixed(2)}%`;
+    qs('validateSummary').textContent=okText;
 
-      Automation_Level: automationLevel,
-      Picking_Time_Seconds: Math.round(pickingTime),
-      Packing_Time_Seconds: Math.round(packingTime),
-      Total_Process_Time: totalProcessTime,
-      WMS_Usage: wmsUsage,
-      OMS_Usage: omsUsage,
-      WMS_Advanced_Score: wmsAdvanced,
-      Service_Quality_Score: serviceQualityScore,
-      Customer_NPS: customerNPS,
-      Processing_Error_Rate: processingErrorRate,
-
-      Weather_Condition: weather,
-      Weather_Severity_Score: Math.round(weatherSev * 100) / 100,
-      Churn_Flag: customerProfile.churnFlag,
-      Predicted_Churn_Score: churnScore,
-
-      Is_Rocket_Delivery: isRocketDelivery,
-      Is_Same_Day_Delivery: isSameDayDelivery,
-      Is_Dawn_Delivery: isDawnDelivery,
-      Is_Fresh_Delivery: isFreshDelivery,
-      Is_Premium_Order: isPremiumOrder,
-      Is_Bulk_Order: isBulkOrder,
-      Is_Weekend_Order: isWeekend ? 1 : 0,
-      Is_Peak_Hour_Order: isPeakTime ? 1 : 0,
-      Is_Free_Shipping: isFreeShipping ? 1 : 0,
-      Is_Weather_Risk: isWeatherRisk ? 1 : 0,
-      Is_Long_Distance: isLongDistance ? 1 : 0,
-      Is_High_LTV: isHighLTV ? 1 : 0,
-      Is_Churn_Risk: isChurnRisk ? 1 : 0,
-      Is_VIP_Customer: isVIPCustomer ? 1 : 0,
-      Is_Loss_Order: isLossOrder ? 1 : 0,
-      Is_AI_Optimized: isAIOptimized ? 1 : 0,
-
-      Receiving_Date: receivingDate.toISOString().split('T')[0],
-      Putaway_Date: putawayDate.toISOString().split('T')[0],
-      Lot_ID,
-      Expiry_Date,
-      Bin,
-      Slot,
-      Unit_Cost: unitCost,
-      Daily_OnHand_Snapshot: dailyOnHandSnapshot,
-      Safety_Stock: safetyStock,
-      Forecast_Demand: forecast,
-      ASN_ID: asnId,
-      PO_ID: poId,
-      Replenishment_Type: replType,
-
-      Picking_Start_TS: pickStart.toISOString(),
-      Picking_End_TS: pickEnd.toISOString(),
-      Packing_Start_TS: packStart.toISOString(),
-      Packing_End_TS: packEnd.toISOString(),
-      Ship_SLA_Due_TS: shipSlaDue.toISOString(),
-      FC_SLA_Breach: fcSlaBreach,
-      Planned_Ship_Timestamp: shipSlaDue.toISOString(),
-      Actual_Ship_Timestamp: fcExitTS.toISOString(),
-      On_Time_Dispatch_Flag: fcSlaBreach ? 0 : 1,
-
-      Distance_Bucket: distanceBucket,
-      Distance_Band_Label: distanceBandLabel,
-
-      [NET.ROUTE_TYPE]: routeType,
-      [NET.SORT_HUB_NAME]: sortHub,
-      [NET.FC_EXIT]: fcExitTS.toISOString(),
-      [NET.HUB_IN]: hubInTS ? hubInTS.toISOString() : null,
-      [NET.HUB_OUT]: hubOutTS ? hubOutTS.toISOString() : null,
-      [NET.CAMP_IN]: campInTS.toISOString(),
-      [NET.LOAD_START]: loadStartTS.toISOString(),
-      [NET.LOAD_END]: loadEndTS.toISOString(),
-      [NET.OFD]: ofdTS.toISOString(),
-      [NET.FC_DWELL]: fcDwellMin,
-      [NET.HUB_DWELL]: hubDwellMin,
-      [NET.CAMP_DWELL]: campDwellMin
+    // DIALS 한계치 (현재 입력값에서 읽음)
+    const DIALS_CUR={
+      tempHi: parseFloat(qs('dial_temp_hi').value),
+      lossHi: parseFloat(qs('dial_loss_hi').value),
+      jejuHi: parseFloat(qs('dial_jeju_hi').value),
+      overHi: parseFloat(qs('dial_over_hi').value),
+      expHi: parseFloat(qs('dial_exp_hi').value),
     };
 
-    // 월별 고객 통계 누적
-    if (!MONTHLY_BY_CUST[monthlyKey]) {
-      MONTHLY_BY_CUST[monthlyKey] = {
-        orders: 0,
-        amount: 0,
-        wow: customerProfile.isWow,
-        churnFlag: customerProfile.churnFlag
-      };
-    }
-    MONTHLY_BY_CUST[monthlyKey].orders += 1;
-    MONTHLY_BY_CUST[monthlyKey].amount += orderAmount;
+    if(tempViolRate > DIALS_CUR.tempHi) risk.appendChild(pill(`콜드체인 위반율 상한 초과 (${(tempViolRate*100).toFixed(2)}% > ${(DIALS_CUR.tempHi*100).toFixed(1)}%)`,'bad'));
+    if(lossRate > DIALS_CUR.lossHi) risk.appendChild(pill(`적자주문율 상한 초과 (${(lossRate*100).toFixed(2)}%)`,'bad'));
+    if(jejuRate > DIALS_CUR.jejuHi) risk.appendChild(pill(`제주 악천후 노출 과다 (${(jejuRate*100).toFixed(1)}%)`,'warn'));
+    if(overStockRate > DIALS_CUR.overHi) risk.appendChild(pill(`과재고 비율 과다 (${(overStockRate*100).toFixed(1)}%)`,'warn'));
+    if(expirySoonRate > DIALS_CUR.expHi) risk.appendChild(pill(`유통기한 임박 과다 (${(expirySoonRate*100).toFixed(2)}%)`,'warn'));
 
-    return row;
+    const rps=PROCESSING_STATE.processedRows/Math.max(1,((Date.now()-PROCESSING_STATE.startTime)/1000));
+    perf.appendChild(pill(`생성 처리속도: ${rps.toFixed(1)} rows/sec`,'good'));
+    perf.appendChild(pill(`메모리 보호: 최대 ${CHUNK_CONFIG.maxMemoryRows.toLocaleString('ko-KR')} rows 유지`,'good'));
   }
 
-  // ==========================
-  // 4) 렌더링 & 집계
-  // ==========================
-  function formatCurrencyKRW(n) {
-    if (!isFinite(n)) return '-';
-    return '₩' + Math.round(n).toLocaleString('ko-KR')
-  }
-
-  function avg(arr) {
-    const v = arr.filter(x => isFinite(x));
-    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0
-  }
-
-  function pct(num, den) {
-    return den ? (num / den * 100) : 0
-  }
-
-  function buildTableHeader(keys) {
-    const thead = qs('tbl').querySelector('thead');
-    thead.innerHTML = '';
-    const tr = document.createElement('tr');
-    keys.forEach(k => {
-      const th = document.createElement('th');
-      th.textContent = prettyHeader(k);
-      tr.appendChild(th);
-    });
+  /* ==========================
+     4) 테이블 렌더 — 가상화
+  ========================== */
+  function buildTableHeader(keys){
+    const thead=qs('tbl').querySelector('thead');thead.innerHTML='';
+    const tr=document.createElement('tr');
+    keys.forEach(k=>{const th=document.createElement('th');th.textContent=prettyHeader(k);tr.appendChild(th)});
     thead.appendChild(tr);
   }
 
-  function renderTableRows(rows, keys) {
-    const tbody = qs('tbl').querySelector('tbody');
-    const frag = document.createDocumentFragment();
-    rows.forEach(r => {
-      const tr = document.createElement('tr');
-      keys.forEach(k => {
-        const td = document.createElement('td');
-        let v = r[k];
-        td.textContent = (v === null || v === undefined) ? '' : v;
-        if (k === 'Delivery_Mode') {
-          td.className = 'delivery-mode ' + (v === '로켓새벽' ? 'dawn' : (v === '로켓프레시' ? 'fresh' : (v.includes('로켓') ? 'rocket' : '')));
+  // PERF: 최근 N행만 DOM 유지(가상화). 전체 데이터는 DATA에 보관.
+  function renderTableRowsVirtual(rows, keys){
+    const tbody=qs('tbl').querySelector('tbody');
+    const frag=document.createDocumentFragment();
+    for(const r of rows){
+      const tr=document.createElement('tr');
+      for(const k of keys){
+        const td=document.createElement('td');
+        const v=r[k];
+        td.textContent=(v===null||v===undefined)?'':v;
+        if(k==='Delivery_Mode'){
+          td.className='delivery-mode '+(v==='로켓새벽'?'dawn':(v==='로켓프레시'?'fresh':(String(v).includes('로켓')?'rocket':'')));
         }
         tr.appendChild(td);
-      });
+      }
       frag.appendChild(tr);
-    });
+    }
     tbody.appendChild(frag);
-  }
 
-  function updateKPIs() {
-    const total = DATA.length || 1;
-    const sum = (k, fn = Number) => DATA.reduce((a, r) => a + (isFinite(fn(r[k])) ? fn(r[k]) : 0), 0);
-    const cnt = (pred) => DATA.reduce((a, r) => a + (pred(r) ? 1 : 0), 0);
-
-    const rocketShare = pct(cnt(r => r.Is_Rocket_Delivery === 1), total);
-    const sameDaySuccess = pct(cnt(r => r.Delivery_Mode === '로켓당일' && r.Is_Delayed === 0), cnt(r => r.Delivery_Mode === '로켓당일'));
-    const dawnOnTime = pct(cnt(r => r.Delivery_Mode === '로켓새벽' && r.Is_Delayed === 0), cnt(r => r.Delivery_Mode === '로켓새벽'));
-    const fastShip = pct(cnt(r => r.Fast_Ship_30min === 1), total);
-
-    const fcOnTime = 100 - pct(cnt(r => r.FC_SLA_Breach === 1), total);
-    const avgShipHr = avg(DATA.map(r => r.Order_To_Ship_Minutes)) / 60;
-    const pickSecPerItem = avg(DATA.map(r => r.Picking_Time_Seconds / Math.max(1, r.Quantity)));
-    const packSecPerItem = avg(DATA.map(r => r.Packing_Time_Seconds / Math.max(1, r.Quantity)));
-    const effFulfill = clamp(100 - (avg(DATA.map(r => r.Processing_Error_Rate)) * 100 * 2), 0, 100);
-    const shipUnder60 = pct(cnt(r => r.Order_To_Ship_Minutes <= 60), total);
-
-    const wowShare = pct(cnt(r => r.Is_WOW_Member === 1), total);
-    const wowAov = avg(DATA.filter(r => r.Is_WOW_Member === 1).map(r => r.Order_Amount));
-    const nonWowAov = avg(DATA.filter(r => r.Is_WOW_Member === 0).map(r => r.Order_Amount));
-    const wowAovGap = (wowAov - nonWowAov);
-    const wowChurnRisk = cnt(r => r.Is_WOW_Member === 1 && r.Is_Churn_Risk === 1);
-
-    const freshShare = pct(cnt(r => r.Is_Fresh_Food === 1), total);
-    const coldChainRequired = cnt(r => r.Is_Cold_Chain_Required === 1);
-    const tempViol = pct(cnt(r => r.Temperature_Violation === 1), coldChainRequired);
-    const coldChainRate = 100 - tempViol;
-    const frozenQuality = avg(DATA.filter(r => r.Product_Category === '냉동식품' && isFinite(r.Cold_Chain_Quality_Score)).map(r => r.Cold_Chain_Quality_Score));
-
-    const metroCoverage = pct(cnt(r => ['서울특별시', '경기도', '인천광역시'].includes(r.Region)), total);
-    const avgDist = avg(DATA.map(r => r.Distance_km));
-    const networkEff = avg(DATA.map(r => r.Routing_Score));
-
-    const aiOpt = pct(cnt(r => r.Automation_Level === 'AI_OPTIMIZED'), total);
-    const autoPickRate = avg(DATA.map(r => {
-      return r.Automation_Level === 'AI_OPTIMIZED' ? 90 :
-        r.Automation_Level === 'AUTO' ? 70 :
-          r.Automation_Level === 'SEMI_AUTO' ? 40 : 10
-    }));
-    const avgPickTime = avg(DATA.map(r => r.Picking_Time_Seconds));
-    const wmsAdv = avg(DATA.map(r => r.WMS_Advanced_Score));
-
-    const totalSales = sum('Order_Amount');
-    const totalNet = sum('Net_Profit');
-    const netMargin = pct(totalNet, totalSales);
-    const aov = avg(DATA.map(r => r.Order_Amount));
-    const uniqueCust = new Set(DATA.map(r => r.Customer_ID)).size || 1;
-    const arppu = totalSales / uniqueCust;
-
-    const ltvAvg = avg(DATA.map(r => r.Customer_LTV));
-    const cacAvg = avg(DATA.map(r => r.CAC));
-    const ltvCac = (cacAvg ? (ltvAvg / cacAvg) : 0).toFixed(2);
-
-    const churnRate = pct(cnt(r => r.Is_Churn_Risk === 1), total);
-    // 간단한 AI 이탈 예측 정확도: (예측과 실제 Churn_Flag 일치율)
-    const aiAcc = pct(cnt(r => (r.Is_Churn_Risk === 1) === (r.Churn_Flag === 1)), total);
-
-    const onTime = pct(cnt(r => r.Is_Delayed === 0), total);
-    const sla = pct(cnt(r => r.SLA_Breach === 1), total);
-    const load = avg(DATA.map(r => r.Load_Factor));
-    const fuel = avg(DATA.map(r => r.Fuel_Efficiency));
-    const route = avg(DATA.map(r => r.Routing_Score));
-    const exception = pct(cnt(r => (r.Temperature_Violation === 1 || r.FC_SLA_Breach === 1 || r.Return_Flag === 1)), total);
-
-    const retRate = pct(cnt(r => r.Return_Flag === 1), total);
-    const retCostRate = pct(sum('Return_Cost'), totalSales);
-    const resell = pct(cnt(r => r.Return_Flag === 1 && r.Is_Resellable === 1), cnt(r => r.Return_Flag === 1));
-
-    const invTurn = avg(DATA.map(r => r.Inventory_Turnover));
-    const stockout = pct(cnt(r => r.Stockout_Flag === 1), total);
-    const overstock = pct(cnt(r => r.Overstock_Flag === 1), total);
-    const invAcc = avg(DATA.map(r => r.Inventory_Accuracy));
-    const shrink = avg(DATA.map(r => r.Inventory_Accuracy ? (100 - r.Inventory_Accuracy) : 0));
-    const wmsUse = pct(cnt(r => r.WMS_Usage === 'Active'), total);
-
-    // KPI 표시
-    setText('k_rocketShare', fmtPct(rocketShare));
-    setText('k_rocketSameDayRate', fmtPct(sameDaySuccess));
-    setText('k_rocketDawnRate', fmtPct(dawnOnTime));
-    setText('k_fastShipRate', fmtPct(fastShip));
-
-    setText('k_fcOnTimeShip', fmtPct(fcOnTime));
-    setText('k_fcAvgShipHour', (avgShipHr || 0).toFixed(2));
-    setText('k_fcPickSecPerItem', (pickSecPerItem || 0).toFixed(1));
-    setText('k_fcPackSecPerItem', (packSecPerItem || 0).toFixed(1));
-    setText('k_fcEfficiency', (effFulfill || 0).toFixed(1));
-    setText('k_fcShipUnder60', fmtPct(shipUnder60));
-
-    setText('k_wowShare', fmtPct(wowShare));
-    setText('k_wowPlusShare', '0'); // Placeholder
-    setText('k_wowAovGap', formatCurrencyKRW(wowAovGap));
-    setText('k_wowChurnRisk', wowChurnRisk.toLocaleString('ko-KR'));
-
-    setText('k_freshShare', fmtPct(freshShare));
-    setText('k_coldChainRate', fmtPct(coldChainRate));
-    setText('k_tempViolation', fmtPct(tempViol));
-    setText('k_frozenQuality', (frozenQuality || 0).toFixed(0));
-
-    setText('k_megaHubShare', fmtPct(pct(cnt(r => r.Is_Mega_Hub === 1), total)));
-    setText('k_seoulCoverage', fmtPct(metroCoverage));
-    setText('k_avgDistance', (avgDist || 0).toFixed(1));
-    setText('k_networkEff', (networkEff || 0).toFixed(0));
-
-    setText('k_aiOptimized', fmtPct(aiOpt));
-    setText('k_autoPickRate', (autoPickRate || 0).toFixed(1));
-    setText('k_avgPickTime', (avgPickTime || 0).toFixed(1));
-    setText('k_wmsAdvanced', (wmsAdv || 0).toFixed(0));
-
-    setText('k_totalSales', formatCurrencyKRW(totalSales));
-    setText('k_netMargin', (netMargin || 0).toFixed(2));
-    setText('k_aov', formatCurrencyKRW(aov));
-    setText('k_arppu', formatCurrencyKRW(arppu));
-
-    setText('k_ltvCac', ltvCac);
-    setText('k_retention', (100 - churnRate).toFixed(1));
-    setText('k_churn', churnRate.toFixed(1));
-    setText('k_ai', aiAcc.toFixed(1));
-
-    setText('k_onTime', fmtPct(onTime));
-    setText('k_sla', fmtPct(sla));
-    setText('k_load', (load || 0).toFixed(1));
-    setText('k_fuel', (fuel || 0).toFixed(2));
-    setText('k_route', (route || 0).toFixed(0));
-    setText('k_exception', fmtPct(exception));
-
-    setText('k_returnRate', fmtPct(retRate));
-    setText('k_returnCost', (retCostRate || 0).toFixed(2));
-    setText('k_resell', fmtPct(resell));
-
-    setText('k_invTurn', (invTurn || 0).toFixed(1));
-    setText('k_stockout', fmtPct(stockout));
-    setText('k_overstock', fmtPct(overstock));
-    setText('k_invAcc', (invAcc || 0).toFixed(1));
-    setText('k_shrink', (shrink || 0).toFixed(1));
-    setText('k_wms', fmtPct(wmsUse));
-  }
-
-  function updateValidationAndRisk() {
-    const list = qs('validateList');
-    list.innerHTML = '';
-    const risk = qs('riskList');
-    risk.innerHTML = '';
-    const perf = qs('perfList');
-    perf.innerHTML = '';
-
-    if (DATA.length === 0) {
-      qs('validateSummary').textContent = '-';
-      return;
+    // 상한 초과 시 상단에서 제거
+    const excess = tbody.children.length - RENDER_MAX_ROWS;
+    if(excess>0){
+      for(let i=0;i<excess;i++){ tbody.removeChild(tbody.firstChild); }
     }
+  }
 
-    const total = DATA.length;
-    const coldReq = DATA.filter(r => r.Is_Cold_Chain_Required === 1);
-    const tempViolRate = pct(coldReq.filter(r => r.Temperature_Violation === 1).length, coldReq.length || 1) / 100;
-    const lossRate = pct(DATA.filter(r => r.Is_Loss_Order === 1).length, total) / 100;
-    const jejuRate = pct(DATA.filter(r => r.Region === '제주특별자치도' && r.Is_Weather_Risk === 1).length, DATA.filter(r => r.Region === '제주특별자치도').length || 1) / 100;
-    const overStockRate = pct(DATA.filter(r => r.Overstock_Flag === 1).length, total) / 100;
-    const expirySoonRate = pct(DATA.filter(r => r.Expiry_Date && (new Date(r.Expiry_Date) - new Date(r.Order_Date) <= 86400000)).length, total) / 100;
+  /* ==========================
+     5) DIALS <-> CAL 매핑 (그대로)
+  ========================== */
+  let DIALS={
+    lossOrderTarget:[0.07,0.12],
+    tempViolationTarget:[0.01,0.02],
+    jejuWeatherExposureTarget:[0.10,0.15],
+    overstockTarget:[0.15,0.25],
+    expiryImminentTarget:[0.005,0.01]
+  };
+  let CAL={
+    costBias:1.0,
+    tempViolationBase:0.015,
+    jejuWeatherScale:1.0,
+    overstockProb:0.22,
+    expiryImminentRate:0.008
+  };
+  function applyDialsToCal(targetNetMargin){
+    const lossLo = parseFloat(qs('dial_loss_lo').value);
+    const lossHi = parseFloat(qs('dial_loss_hi').value);
+    const tempLo = parseFloat(qs('dial_temp_lo').value);
+    const tempHi = parseFloat(qs('dial_temp_hi').value);
+    const jejuLo = parseFloat(qs('dial_jeju_lo').value);
+    const jejuHi = parseFloat(qs('dial_jeju_hi').value);
+    const overLo = parseFloat(qs('dial_over_lo').value);
+    const overHi = parseFloat(qs('dial_over_hi').value);
+    const expLo = parseFloat(qs('dial_exp_lo').value);
+    const expHi = parseFloat(qs('dial_exp_hi').value);
 
-    function pill(text, type) {
-      const d = document.createElement('div');
-      d.className = 'alert ' + type;
-      d.textContent = text;
-      return d
+    DIALS.lossOrderTarget=[lossLo,lossHi];
+    DIALS.tempViolationTarget=[tempLo,tempHi];
+    DIALS.jejuWeatherExposureTarget=[jejuLo,jejuHi];
+    DIALS.overstockTarget=[overLo,overHi];
+    DIALS.expiryImminentTarget=[expLo,expHi];
+
+    CAL.tempViolationBase = clamp((tempLo + tempHi) / 2, 0.001, 0.20);
+    const jejuAvg = (jejuLo + jejuHi) / 2;
+    CAL.jejuWeatherScale = clamp(jejuAvg / 0.12, 0.6, 1.6);
+    CAL.overstockProb = clamp((overLo + overHi) / 2, 0, 0.60);
+    CAL.expiryImminentRate = clamp((expLo + expHi) / 2, 0, 0.20);
+
+    if (Number.isFinite(targetNetMargin)) {
+      const delta = clamp((3 - targetNetMargin) / 30, -0.1, 0.1);
+      CAL.costBias = clamp(1 + delta, 0.85, 1.15);
+    } else {
+      CAL.costBias = 1.0;
     }
-
-    // 정합성
-    const okText = `콜드체인 위반율 ${(tempViolRate * 100).toFixed(2)}% / 손실주문율 ${(lossRate * 100).toFixed(2)}%`;
-    qs('validateSummary').textContent = okText;
-
-    // 타깃 벗어나면 경보
-    const pushIf = (cond, text, type = 'warn') => {
-      if (cond) risk.appendChild(pill(text, type))
-    }
-    pushIf(tempViolRate > DIALS.tempViolationTarget[1], `콜드체인 위반율 상한 초과 (${(tempViolRate * 100).toFixed(2)}% > ${(DIALS.tempViolationTarget[1] * 100).toFixed(1)}%)`, 'bad');
-    pushIf(lossRate > DIALS.lossOrderTarget[1], `적자주문율 상한 초과 (${(lossRate * 100).toFixed(2)}%)`, 'bad');
-    pushIf(jejuRate > DIALS.jejuWeatherExposureTarget[1], `제주 악천후 노출 과다 (${(jejuRate * 100).toFixed(1)}%)`, 'warn');
-    pushIf(overStockRate > DIALS.overstockTarget[1], `과재고 비율 과다 (${(overStockRate * 100).toFixed(1)}%)`, 'warn');
-    pushIf(expirySoonRate > DIALS.expiryImminentTarget[1], `유통기한 임박 과다 (${(expirySoonRate * 100).toFixed(2)}%)`, 'warn');
-
-    // 성능/현실성
-    const rps = PROCESSING_STATE.processedRows / Math.max(1, ((Date.now() - PROCESSING_STATE.startTime) / 1000));
-    perf.appendChild(pill(`생성 처리속도: ${rps.toFixed(1)} rows/sec`, 'good'));
-    perf.appendChild(pill(`메모리 보호: 최대 ${CHUNK_CONFIG.maxMemoryRows.toLocaleString('ko-KR')} rows 유지`, 'good'));
+    qs('tuneStatus').textContent='DIALS APPLIED';
+    qs('tuneStatus').className='pill ok';
   }
 
-  // ==========================
-  // 5) 진행 표시
-  // ==========================
-  function setStatus(text, cls = 'ok') {
-    const st = qs('status');
-    st.textContent = text;
-    st.className = 'pill ' + cls;
+  /* ==========================
+     6) Web Worker 코드 생성 (Blob URL) — 행 생성 전담
+     (원본 로직/스키마 그대로 이동)
+  ========================== */
+  function createGeneratorWorker(){
+    // WORKER: 본문 문자열(원본 로직을 그대로 포함)
+    const workerCode = `
+      // ===== Worker Scope Begin =====
+      let SHOULD_STOP=false;
+
+      // 공유 키
+      const NET_PREFIX='${NET_PREFIX}';
+      const N=s=>NET_PREFIX+s;
+      const NET=Object.freeze({
+        ROUTE_TYPE:N('Route_Type'),
+        SORT_HUB_NAME:N('Sortation_Hub_Name'),
+        FC_EXIT:N('FC_Exit_TS'),
+        HUB_IN:N('Hub_In_TS'),
+        HUB_OUT:N('Hub_Out_TS'),
+        CAMP_IN:N('Camp_In_TS'),
+        LOAD_START:N('Loadout_Start_TS'),
+        LOAD_END:N('Loadout_End_TS'),
+        OFD:N('OFD_TS'),
+        FC_DWELL:N('FC_Dwell_Min'),
+        HUB_DWELL:N('Hub_Dwell_Min'),
+        CAMP_DWELL:N('Camp_Dwell_Min'),
+      });
+
+      // 원본 상수/맵/도우미 — (도메인 로직 동일)
+      const SHIP_SLA_MIN={'로켓당일':60,'로켓새벽':90,'로켓익일':90,'로켓프레시':60,'일반택배':120,DEFAULT:90};
+      const DELIVERY_MODES={
+        '로켓당일':{delayRate:0.005,baseDays:0,cutoffHour:20,regions:['수도권'],wowOnly:false,cost:1.2},
+        '로켓새벽':{delayRate:0.008,baseDays:1,regions:['수도권','영남','충청'],wowOnly:false,cost:1.1},
+        '로켓익일':{delayRate:0.012,baseDays:1,regions:['전국'],wowOnly:false,cost:1.0},
+        '로켓프레시':{delayRate:0.015,baseDays:0,cutoffHour:18,regions:['수도권'],wowOnly:false,cost:1.3,coldChain:true},
+        '일반택배':{delayRate:0.035,baseDays:2,regions:['전국'],wowOnly:false,cost:0.8}
+      };
+      const REGIONS=['서울특별시','부산광역시','대구광역시','인천광역시','광주광역시','대전광역시','울산광역시','세종특별자치시','경기도','강원특별자치도','충청북도','충청남도','전북특별자치도','전라남도','경상북도','경상남도','제주특별자치도'];
+      const CITIES_BY_REGION={ '서울특별시':['서울시'],'부산광역시':['부산시'],'대구광역시':['대구시'],'인천광역시':['인천시'],'광주광역시':['광주시'],'대전광역시':['대전시'],'울산광역시':['울산시'],'세종특별자치시':['세종시'],
+        '경기도':['성남시','용인시','수원시','고양시','남양주시'],'강원특별자치도':['춘천시','원주시','강릉시'],'충청북도':['청주시','충주시','제천시'],'충청남도':['천안시','아산시','서산시'],
+        '전북특별자치도':['전주시','익산시','군산시'],'전라남도':['순천시','여수시','목포시'],'경상북도':['포항시','구미시','경산시'],'경상남도':['창원시','김해시','진주시'],'제주특별자치도':['제주시','서귀포시'] };
+      const DISTRICTS_BY_CITY={'서울시':['강남구','서초구','송파구','마포구','성동구','강서구'],'부산시':['해운대구','수영구','남구','부산진구'],'대구시':['수성구','달서구','중구','동구'],'인천시':['남동구','연수구','부평구','미추홀구'],
+        '광주시':['서구','남구','북구','광산구'],'대전시':['서구','유성구','대덕구','동구'],'울산시':['남구','중구','북구','울주군'],'세종시':['세종동','새롬동','보람동'],
+        '성남시':['분당구','수정구','중원구'],'용인시':['수지구','기흥구','처인구'],'수원시':['영통구','권선구','팔달구','장안구'],'고양시':['일산서구','일산동구','덕양구'],
+        '남양주시':['화도읍','진접읍','별내동'],'춘천시':['퇴계동','석사동','후평동'],'원주시':['무실동','단구동','태장동'],'강릉시':['교동','포남동','입암동'],
+        '청주시':['흥덕구','서원구','청원구'],'충주시':['연수동','교현동','호암동'],'제천시':['신백동','청전동'],'천안시':['서북구','동남구'],'아산시':['배방읍','탕정면','온양동'],'서산시':['동문동','석남동'],
+        '전주시':['완산구','덕진구'],'익산시':['영등동','부송동'],'군산시':['나운동','수송동'],'순천시':['연향동','조례동'],'여수시':['웅천동','문수동'],'목포시':['하당동','신흥동'],
+        '포항시':['북구','남구'],'구미시':['원평동','형곡동'],'경산시':['중방동','서상동'],'창원시':['성산구','의창구','마산합포구'],'김해시':['삼계동','구산동','장유동'],'진주시':['상대동','평거동'],
+        '제주시':['노형동','연동','아라동'],'서귀포시':['서귀동','대정읍','표선면'] };
+      const MEGA_HUBS=['김포메가허브','곤지암메가허브','덕평허브','평택허브'];
+      const FC_SITES={'서울특별시':'서울동부FC','인천광역시':'인천FC','경기도':'경기남부FC','부산광역시':'부산FC','대구광역시':'대구FC','광주광역시':'광주FC','대전광역시':'대전FC','울산광역시':'울산FC','세종특별자치시':'세종FC','강원특별자치도':'강원FC','충청북도':'충북FC','충청남도':'충남FC','전북특별자치도':'전북FC','전라남도':'전남FC','경상북도':'경북FC','경상남도':'경남FC','제주특별자치도':'제주FC'};
+      const REGION_LOGISTICS={'서울특별시':{baseCost:2800,perKmCost:90,avgDistance:16,populationWeight:0.18},'부산광역시':{baseCost:3200,perKmCost:95,avgDistance:22,populationWeight:0.06},'대구광역시':{baseCost:3100,perKmCost:95,avgDistance:20,populationWeight:0.05},'인천광역시':{baseCost:2900,perKmCost:90,avgDistance:18,populationWeight:0.06},'광주광역시':{baseCost:3100,perKmCost:100,avgDistance:24,populationWeight:0.03},'대전광역시':{baseCost:3000,perKmCost:95,avgDistance:21,populationWeight:0.03},'울산광역시':{baseCost:3200,perKmCost:100,avgDistance:23,populationWeight:0.02},'세종특별자치시':{baseCost:3000,perKmCost:95,avgDistance:20,populationWeight:0.01},'경기도':{baseCost:3000,perKmCost:95,avgDistance:26,populationWeight:0.24},'강원특별자치도':{baseCost:3400,perKmCost:110,avgDistance:40,populationWeight:0.04},'충청북도':{baseCost:3100,perKmCost:100,avgDistance:28,populationWeight:0.04},'충청남도':{baseCost:3100,perKmCost:100,avgDistance:27,populationWeight:0.05},'전북특별자치도':{baseCost:3200,perKmCost:105,avgDistance:29,populationWeight:0.04},'전라남도':{baseCost:3300,perKmCost:110,avgDistance:36,populationWeight:0.04},'경상북도':{baseCost:3300,perKmCost:108,avgDistance:34,populationWeight:0.06},'경상남도':{baseCost:3250,perKmCost:105,avgDistance:31,populationWeight:0.06},'제주특별자치도':{baseCost:4200,perKmCost:130,avgDistance:38,populationWeight:0.02}};
+      const WEATHER_CONDITIONS=['맑음','흐림','비','눈','안개','강풍'];
+      function weatherSeverity(c){const m={'맑음':0.02,'흐림':0.15,'비':0.45,'눈':0.75,'안개':0.35,'강풍':0.55};return m[c]||0.2}
+      const COUPANG_CATEGORIES={
+        '신선식품':{margin:0.18,price:[2000,18000],coldChain:true,freshFood:true,tempRange:[0,4],returnRate:0.035,skus:['FRESH-APPLE-1KG','FRESH-PEAR-1KG','FRESH-LETTUCE','FRESH-MEAT-500G','FRESH-EGG-30','FRESH-MILK-1L']},
+        '냉동식품':{margin:0.22,price:[3000,22000],coldChain:true,freshFood:false,tempRange:[-18,-12],returnRate:0.028,skus:['FROZ-DUMPLING-1KG','FROZ-PIZZA','FROZ-ICECREAM','FROZ-SHRIMP-500G','FROZ-CHICKEN-1KG']},
+        '가전전자':{margin:0.14,price:[15000,700000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.022,skus:['ELEC-MOUSE','ELEC-KEYBOARD','ELEC-HEADSET','ELEC-MONITOR-27','ELEC-ROBOTVAC','ELEC-AIRFRYER']},
+        '패션의류':{margin:0.38,price:[9000,180000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.11,skus:['FASH-TSHIRT','FASH-JEANS','FASH-JACKET','FASH-DRESS','FASH-SNEAKERS','FASH-HAT']},
+        '생활용품':{margin:0.28,price:[2000,55000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.03,skus:['LIFE-TISSUE','LIFE-TOILETPAPER','LIFE-DETERGENT','LIFE-FABRICSOFT','LIFE-SHOWERGEL','LIFE-DISHSOAP']},
+        '주방용품':{margin:0.30,price:[4000,120000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.025,skus:['KITCHEN-PAN28','KITCHEN-POT20','KITCHEN-KNIFE','KITCHEN-CUPSET','KITCHEN-FOODBOX']},
+        '뷰티':{margin:0.35,price:[3000,250000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.06,skus:['BEAUTY-TONER','BEAUTY-LOTION','BEAUTY-SERUM','BEAUTY-SUNSCREEN','BEAUTY-LIP','BEAUTY-MASKPACK']},
+        '유아동':{margin:0.26,price:[4000,350000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.05,skus:['KIDS-DIAPER','KIDS-WIPES','KIDS-TOYBLOCK','KIDS-STROLLER','KIDS-BOTTLE']},
+        '반려동물':{margin:0.25,price:[3000,220000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.04,skus:['PET-DRYFOOD','PET-WETFOOD','PET-LITTER','PET-LEASH','PET-SHAMPOO']},
+        '스포츠·레저':{margin:0.24,price:[5000,400000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.035,skus:['SPRT-YOGA-MAT','SPRT-DUMBBELL','SPRT-BICYCLE','SPRT-TENT','SPRT-COOLER','SPRT-BALL']}
+      };
+      const ABC_DISTRIBUTION={A:0.15,B:0.35,C:0.5};
+      const VEHICLES=[{type:'오토바이',capacity:15,fuelEff:[28,45],regions:['도심']},{type:'소형밴',capacity:50,fuelEff:[11,16],regions:['전체']},{type:'중형트럭',capacity:200,fuelEff:[7,11],regions:['전체']},{type:'대형트럭',capacity:500,fuelEff:[5,8],regions:['간선']},{type:'전기차',capacity:40,fuelEff:[4.5,6.8],regions:['도심']}];
+      const DRIVER_GRADES=['신입','일반','숙련','베테랑','MVP'];
+      const RETURN_REASONS=['단순변심','상품불량','배송지연','오배송','파손','설명불일치','사이즈불일치','기타'];
+      const WOW_TIERS={'WOW_BASIC':{freeShippingThreshold:0,deliveryDiscount:0.0,ltvMultiplier:2.0,priorityShipping:true,returnBenefit:1.2}};
+      const AUTOMATION_LEVELS={
+        'MANUAL':{pickingTime:45,packingTime:25,errorRate:0.008,regions:['제주특별자치도','강원특별자치도']},
+        'SEMI_AUTO':{pickingTime:28,packingTime:18,errorRate:0.005,regions:['전라남도','경상북도','충청북도']},
+        'AUTO':{pickingTime:15,packingTime:12,errorRate:0.003,regions:['부산광역시','대구광역시','광주광역시']},
+        'AI_OPTIMIZED':{pickingTime:8,packingTime:6,errorRate:0.001,regions:['서울특별시','경기도','인천광역시']}
+      };
+      const HOURLY_ORDER_PATTERN={0:.008,1:.005,2:.003,3:.002,4:.002,5:.003,6:.008,7:.015,8:.025,9:.035,10:.045,11:.052,12:.058,13:.048,14:.042,15:.055,16:.065,17:.075,18:.085,19:.125,20:.135,21:.095,22:.068,23:.035};
+      function getOrderHour(){const e=Object.entries(HOURLY_ORDER_PATTERN).map(([h,p])=>[parseInt(h),p]);const total=e.reduce((s,[,p])=>s+p,0);const r=Math.random();let cum=0;for(const [h,p] of e){cum+=p/total;if(r<=cum)return h}return 23}
+      const rnd=(a,b)=>Math.random()*(b-a)+a;
+      const irnd=(a,b)=>Math.floor(rnd(a,b+1));
+      const pick=arr=>arr[irnd(0,arr.length-1)];
+      const weightedPick=w=>{const t=Object.values(w).reduce((s,x)=>s+x,0);let r=Math.random()*t,c=0;for(const [k,v] of Object.entries(w)){c+=v;if(r<=c)return k}return Object.keys(w)[0]};
+      const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+      const pad=(n,l=2)=>String(n).padStart(l,'0');
+
+      function macroRegionBySiDo(region){if(['서울특별시','경기도','인천광역시'].includes(region))return'수도권';if(['부산광역시','대구광역시','울산광역시','경상북도','경상남도'].includes(region))return'영남';if(['대전광역시','세종특별자치시','충청북도','충청남도'].includes(region))return'충청';if(['광주광역시','전북특별자치도','전라남도'].includes(region))return'호남';if(['강원특별자치도'].includes(region))return'강원';if(['제주특별자치도'].includes(region))return'제주';return'기타'}
+      function pickWeather(region,month,CAL){let w={'맑음':0.40,'흐림':0.22,'비':0.18,'눈':0.06,'안개':0.06,'강풍':0.08};if([6,7,8].includes(month)){w['비']+=0.10;w['강풍']+=0.03;w['맑음']-=0.08}if([12,1,2].includes(month)){w['눈']+=0.07;w['맑음']-=0.04}if(region==='제주특별자치도'){w['강풍']=Math.max(0.01,(w['강풍']+0.02)*(CAL.jejuWeatherScale||1.0));w['눈']=Math.max(0,w['눈']-0.05)}const macro=macroRegionBySiDo(region);if(['영남','호남'].includes(macro))w['강풍']+=0.02;const s=Object.values(w).reduce((a,b)=>a+b,0);let r=Math.random()*s,acc=0;for(const k of Object.keys(w)){acc+=w[k];if(r<=acc)return k}return'맑음'}
+      function selectFulfillmentCenter(region){return FC_SITES[region]||'지역FC'}
+      function genBinSlot(){const a=pad(irnd(1,40)),b=pad(irnd(1,30)),l=pad(irnd(1,5)),s=pad(irnd(1,20));return{Bin:\`A\${a}-B\${b}-L\${l}\`,Slot:\`S\${s}\`}}
+      function genLotAndExpiry(category,orderDate,receivingDate,CAL){const cold=COUPANG_CATEGORIES[category]?.coldChain;if(!cold)return{Lot_ID:null,Expiry_Date:null};const lot=\`LOT\${irnd(100000,999999)}\`;let daysAhead=90;if(category==='신선식품')daysAhead=irnd(3,10);else if(category==='냉동식품')daysAhead=irnd(180,365);let expiry=new Date(receivingDate.getTime()+daysAhead*86400000);if(expiry<=orderDate){expiry=new Date(orderDate.getTime()+irnd(2,5)*86400000)}if(Math.random()<(CAL.expiryImminentRate??0.008)){expiry=new Date(orderDate.getTime()+irnd(0,1)*86400000)}return{Lot_ID:lot,Expiry_Date:expiry.toISOString().split('T')[0]}}
+      function estimateUnitCost(category,unitPrice){const m=COUPANG_CATEGORIES[category]?.margin||0.3;return Math.round(unitPrice*(1-m)*rnd(0.97,1.03))}
+      function forecastByABC(abc){if(abc==='A')return irnd(20,60);if(abc==='B')return irnd(8,25);return irnd(2,8)}
+      function safetyStockCalc(forecastPerDay,leadDays){const z=1.28;const sigma=forecastPerDay*0.3;return Math.max(0,Math.round(z*sigma*Math.sqrt(Math.max(1,leadDays))))}
+      function selectRegionWeighted(){const w={};Object.entries(REGION_LOGISTICS).forEach(([r,d])=>w[r]=d.populationWeight);return weightedPick(w)}
+      function getAutomationLevel(region){for(const [level,cfg] of Object.entries(AUTOMATION_LEVELS)){if(cfg.regions.includes(region))return level}if(region.includes('서울')||region.includes('경기')||region.includes('인천'))return Math.random()<0.6?'AI_OPTIMIZED':'AUTO';return 'SEMI_AUTO'}
+      function calculateDistance(region,city){const base=REGION_LOGISTICS[region]?.avgDistance||25;const v=rnd(-0.3,0.3);return Math.max(3,Math.round(base*(1+v)))}
+      function generateAddress(region,city,district){const roads=['물류로','배송대로','쿠팡길','로켓로','허브대로','센터로'];const no=irnd(1,999),b=irnd(1,150);return \`\${city} \${district} \${pick(roads)} \${no}-\${b}\`}
+
+      function buildRocketPlan(total,ratePct){const k=Math.round(total*(ratePct/100));const arr=Array(total).fill(false).map((_,i)=>i<k);for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+      function preAssignCustomerProfiles(uniqueCustomers,wowRate){const profiles={};const wowPlan=buildRocketPlan(uniqueCustomers,wowRate);for(let i=0;i<uniqueCustomers;i++){const custId=\`CUST\${String(100000+i).padStart(7,'0')}\`;const isWow=wowPlan[i]?1:0;profiles[custId]={isWow,wowTier:isWow?'WOW_BASIC':null,churnFlag:Math.random()<0.08?1:0,joinDate:isWow?new Date(Date.now()-irnd(30,1095)*86400000):null,preferredRegion:selectRegionWeighted()};}return profiles}
+
+      function generateCoupangRealisticRow(index,totalUsers,yearStart,yearEnd,customerProfiles,forceRocket,CAL){
+        const custIndex=index%totalUsers;
+        const custId=\`CUST\${String(100000+custIndex).padStart(7,'0')}\`;
+        const customerProfile=customerProfiles[custId];
+        const region=Math.random()<0.7?customerProfile.preferredRegion:selectRegionWeighted();
+        const city=pick(CITIES_BY_REGION[region]||['기타시']);
+        const district=pick(DISTRICTS_BY_CITY[city]||['기타구']);
+        const address=generateAddress(region,city,district);
+        const distanceKm=calculateDistance(region,city);
+        const categoryKeys=Object.keys(COUPANG_CATEGORIES);
+        const month=irnd(1,12);
+        let categoryWeights={};categoryKeys.forEach(cat=>{let w=1;if(cat==='신선식품'&&[6,7,8].includes(month))w=1.8;if(cat==='냉동식품'&&[12,1,2].includes(month))w=1.5;if(cat==='패션의류'&&[3,4,9,10].includes(month))w=1.4;categoryWeights[cat]=w;});
+        const selectedCategory=weightedPick(categoryWeights);
+        const categoryData=COUPANG_CATEGORIES[selectedCategory]||COUPANG_CATEGORIES['생활용품'];
+        const skuList=(Array.isArray(categoryData.skus)&&categoryData.skus.length)?categoryData.skus:['GEN-ITEM-001','GEN-ITEM-002'];
+        const sku=pick(skuList);
+        const unitPrice=irnd(categoryData.price[0],categoryData.price[1]);
+        const quantity=Math.random()<0.7?1:irnd(2,5);
+        const orderAmount=unitPrice*quantity;
+        const abcRand=Math.random();
+        const abcGrade=abcRand<ABC_DISTRIBUTION.A?'A':(abcRand<ABC_DISTRIBUTION.A+ABC_DISTRIBUTION.B?'B':'C');
+        const year=irnd(yearStart,yearEnd);
+        const orderHour=getOrderHour();
+        const orderDate=new Date(year,month-1,irnd(1,28),orderHour,irnd(0,59),irnd(0,59));
+
+        let availableModes;const mReg=(region==='서울특별시'||region==='경기도'||region==='인천광역시')?'수도권':(region==='제주특별자치도'?'제주':(region.includes('충청')?'충청':(region.includes('경상')||['부산광역시','대구광역시','울산광역시'].includes(region))?'영남':(region.includes('전라')||region==='광주광역시')?'호남':'기타'));
+        if(forceRocket){
+          availableModes=['로켓당일','로켓새벽','로켓익일','로켓프레시'].filter(mode=>{const cfg=DELIVERY_MODES[mode];return cfg.regions.includes('전국')||cfg.regions.includes(region)||cfg.regions.includes(mReg)});
+          if(mReg!=='수도권')availableModes=availableModes.filter(m=>m!=='로켓당일');
+          if(categoryData.freshFood&&availableModes.includes('로켓프레시')&&Math.random()<0.6)availableModes=['로켓프레시'];
+          if(!availableModes.length)availableModes=['로켓익일'];
+        }else{availableModes=['일반택배']}
+        const deliveryMode=pick(availableModes);
+        const modeConfig=DELIVERY_MODES[deliveryMode];
+
+        const plannedDelivery=new Date(orderDate);
+        if(deliveryMode==='로켓당일'){
+          const cutoffHour=modeConfig.cutoffHour;
+          if(orderDate.getHours()>=cutoffHour){plannedDelivery.setDate(plannedDelivery.getDate()+1);plannedDelivery.setHours(6+irnd(0,3),irnd(0,59),0,0)}
+          else{const h=Math.max(3,cutoffHour-orderDate.getHours()+irnd(-1,2));plannedDelivery.setHours(orderDate.getHours()+h,irnd(0,59),0,0)}
+        }else if(deliveryMode==='로켓새벽'){
+          plannedDelivery.setDate(plannedDelivery.getDate()+modeConfig.baseDays);plannedDelivery.setHours(6,irnd(0,30),0,0)
+        }else{
+          plannedDelivery.setDate(plannedDelivery.getDate()+modeConfig.baseDays);plannedDelivery.setHours(irnd(9,18),irnd(0,59),0,0)
+        }
+
+        const weather=pickWeather(region,month,CAL);
+        const weatherSev=weatherSeverity(weather);
+        const isPeakTime=orderDate.getHours()>=19&&orderDate.getHours()<=21;
+        const isWeekend=[0,6].includes(orderDate.getDay());
+        let actualDelayRate=modeConfig.delayRate;
+        if(weatherSev>0.4)actualDelayRate*=1.8; if(isPeakTime)actualDelayRate*=1.3; if(isWeekend)actualDelayRate*=0.8; if(region==='제주특별자치도')actualDelayRate*=2.2;
+        const isDelayed=Math.random()<actualDelayRate;
+        let actualDelivery=new Date(plannedDelivery);
+        if(isDelayed){const baseDelay=deliveryMode.includes('로켓')?irnd(4,24):irnd(12,48);const delayHours=baseDelay+(weatherSev>0.6?irnd(0,24):0);actualDelivery.setHours(actualDelivery.getHours()+delayHours)}
+        else{const early=deliveryMode.includes('로켓')?rnd(0,4):rnd(0,2);actualDelivery.setTime(actualDelivery.getTime()-early*3600000)}
+
+        const suitableVehicles=VEHICLES.filter(v=>v.regions.includes('전체')||(v.regions.includes('도심')&&['서울특별시','부산광역시','인천광역시','대구광역시'].includes(region))||(v.regions.includes('간선')&&mReg!=='수도권'));
+        const vehicle=pick(suitableVehicles);const vehicleId=\`V\${irnd(10000,99999)}\`;const driverId=\`D\${irnd(1000,9999)}\`;const driverGrade=pick(DRIVER_GRADES);
+        const baseLoadFactor=Math.random()<0.3?rnd(40,70):rnd(70,95);const loadFactor=Math.round(clamp(baseLoadFactor,20,100));const fuelEfficiency=Math.round(rnd(vehicle.fuelEff[0],vehicle.fuelEff[1])*10)/10;
+        const automationLevel=getAutomationLevel(region);
+        const baseRouting=automationLevel==='AI_OPTIMIZED'?rnd(88,98):automationLevel==='AUTO'?rnd(78,92):automationLevel==='SEMI_AUTO'?rnd(65,85):rnd(50,75);
+        const routingScore=Math.round(baseRouting);
+
+        const regLog=REGION_LOGISTICS[region];
+        const baseCost=regLog.baseCost;const distanceCost=distanceKm*regLog.perKmCost;const modeCostMultiplier=modeConfig.cost;
+        const weatherMultiplier=weatherSev>0.6?1.25:(weatherSev>0.3?1.1:1.0);const peakMultiplier=isPeakTime?1.15:1.0;const handlingBase=500;
+        const islandMultiplier=region==='제주특별자치도'?(weatherSev>0.6?1.8:1.5):1.0;
+        const estCost=Math.round((baseCost+distanceCost+handlingBase)*modeCostMultiplier*weatherMultiplier*peakMultiplier*islandMultiplier);
+        const driverFactor=1+rnd(-0.05,0.05);const vehicleFactor=(vehicle.type==='대형트럭'?1.08:(vehicle.type==='오토바이'?0.92:1.0));
+        const hubFactor=(Math.random()<0.5&&(Math.random()<0.65))?1+rnd(0.02,0.08):1.0;const congestion=isPeakTime?irnd(0,400):0;const weatherSurcharge=(weather==='강풍'||weather==='눈')?irnd(200,700):0;const jitter=irnd(-150,150);
+        const actualLogisticsCost=Math.max(0,Math.round((estCost*driverFactor*vehicleFactor*hubFactor+congestion+weatherSurcharge+jitter)*(CAL.costBias||1.0)));
+
+        let customerDeliveryCharge=0;if(customerProfile.isWow===0&&orderAmount<50000){customerDeliveryCharge=deliveryMode.includes('로켓')?3500:3000}
+        customerDeliveryCharge=Math.round(customerDeliveryCharge);
+
+        // 콜드체인
+        function generateTemperatureData(category,coldChain,CAL){if(!coldChain)return{temp:null,violation:false,quality:null};const cfg=COUPANG_CATEGORIES[category];const target=cfg.tempRange;const targetTemp=rnd(target[0],target[1]);let actualTemp=targetTemp+rnd(-2,2);let violation=Math.random()< (CAL.tempViolationBase??0.015); if(violation){if(Math.random()<0.5)actualTemp=target[1]+rnd(4,8);else actualTemp=target[0]-rnd(4,8)}const quality=violation?rnd(60,85):rnd(85,98);return{targetTemp:Math.round(targetTemp*10)/10,actualTemp:Math.round(actualTemp*10)/10,violation,quality:Math.round(quality)}}
+        const tempData=generateTemperatureData(selectedCategory,!!categoryData.coldChain,CAL);
+
+        let returnRate=categoryData.returnRate;if(tempData.violation)returnRate*=2.5;if(isDelayed&&deliveryMode.includes('로켓'))returnRate*=1.8;
+        const returnFlag=Math.random()<returnRate?1:0;const returnReason=returnFlag?pick(RETURN_REASONS):null;const returnCost=returnFlag?Math.round(orderAmount*rnd(0.1,0.25)):0;
+        let resellable=null,resellReason=null;if(returnFlag){if(tempData.violation){resellable=0;resellReason='온도관리실패'}else if(['단순변심','기타'].includes(returnReason)){resellable=Math.random()<0.92?1:0;resellReason=resellable?'정상상품':'포장손상'}else{resellable=Math.random()<0.45?1:0;resellReason=resellable?'부분수리가능':'상품손상'}}
+
+        const currentStock=abcGrade==='A'?irnd(200,800):(abcGrade==='B'?irnd(50,300):irnd(10,100));
+        const reorderPoint=Math.round(currentStock*(abcGrade==='A'?0.4:abcGrade==='B'?0.3:0.2));
+        const stockTurnover=abcGrade==='A'?rnd(12,20):(abcGrade==='B'?rnd(6,12):rnd(2,8));
+        const stockoutFlag=Math.random()<(abcGrade==='A'?0.015:abcGrade==='B'?0.04:0.08)?1:0;
+        const overstockFlag=Math.random()< ( (typeof CAL.overstockProb==='number'?CAL.overstockProb:0.22) ) ?1:0;
+
+        const automationConfig=AUTOMATION_LEVELS[automationLevel];
+        const pickingTime=automationConfig.pickingTime+rnd(-3,5);
+        const packingTime=automationConfig.packingTime+rnd(-2,3);
+        const totalProcessTime=Math.round((pickingTime+packingTime)*10)/10;
+
+        const SLA=SHIP_SLA_MIN[deliveryMode]??SHIP_SLA_MIN.DEFAULT;
+        let orderToShipMinutes;if(Math.random()<0.90)orderToShipMinutes=irnd(10,Math.floor(SLA*0.8));else orderToShipMinutes=irnd(Math.floor(SLA*0.8)+1,Math.floor(SLA*1.2));
+        const autoBoost=automationLevel==='AI_OPTIMIZED'?0.85:automationLevel==='AUTO'?0.93:automationLevel==='SEMI_AUTO'?1.00:1.05;
+        const peakPenalty=(orderHour>=19&&orderHour<=21)?1.06:1.0;
+        orderToShipMinutes=Math.round(orderToShipMinutes*autoBoost*peakPenalty);
+        const pickStart=new Date(orderDate.getTime()+irnd(5,15)*60000);
+        const pickEnd=new Date(pickStart.getTime()+Math.max(5,pickingTime)*1000);
+        const packStart=new Date(pickEnd.getTime()+irnd(2,12)*60000);
+        const packEnd=new Date(packStart.getTime()+Math.max(4,packingTime)*1000);
+        const shipSlaDue=new Date(orderDate.getTime()+SLA*60000);
+        let fcExit=new Date(orderDate.getTime()+Math.max(orderToShipMinutes,5)*60000);
+        const minBufferMin=irnd(3,10);if(fcExit<new Date(packEnd.getTime()+minBufferMin*60000)){fcExit=new Date(packEnd.getTime()+minBufferMin*60000)}
+        orderToShipMinutes=Math.round((fcExit-orderDate)/60000);
+        const fastShipFlag=orderToShipMinutes<=30?1:0;
+        const fcSlaBreach=fcExit>shipSlaDue?1:0;
+
+        const baseCac=customerProfile.isWow?irnd(3500,7000):irnd(1200,2800);
+        const wowTierConfig=customerProfile.wowTier?WOW_TIERS[customerProfile.wowTier]:{ltvMultiplier:1.5};
+        const customerLTV=Math.round(orderAmount*wowTierConfig.ltvMultiplier*rnd(2.8,4.2));
+        const grossProfit=Math.round(orderAmount*categoryData.margin);
+        const inventoryCarryingCost=Math.round(currentStock*unitPrice*0.002/12);
+        const stockoutCost=stockoutFlag?Math.round(orderAmount*0.08):0;
+        const qualityCost=tempData.violation?Math.round(orderAmount*0.05):0;
+        const netProfit=grossProfit-actualLogisticsCost-returnCost-inventoryCarryingCost-stockoutCost-qualityCost;
+
+        let churnScore=customerProfile.churnFlag?rnd(0.65,0.95):rnd(0.05,0.55);
+        if(isDelayed&&deliveryMode.includes('로켓'))churnScore+=0.15;
+        if(returnFlag&&!resellable)churnScore+=0.1;
+        churnScore=Math.min(0.98,Math.round(churnScore*1000)/1000);
+
+        const serviceQualityScore=Math.round((100-(isDelayed?15:0)-(returnFlag?10:0)-(tempData.violation?20:0))*(automationLevel==='AI_OPTIMIZED'?1.05:1.0));
+        const wmsUsage=automationLevel==='MANUAL'?'Legacy':'Active';
+        const omsUsage=Math.random()<0.95?'Active':'Manual';
+        const wmsAdvancedScore=automationLevel==='AI_OPTIMIZED'?rnd(88,96):automationLevel==='AUTO'?rnd(75,87):automationLevel==='SEMI_AUTO'?rnd(55,74):rnd(30,54);
+        const isRocketDelivery=deliveryMode.includes('로켓')?1:0;
+        const isSameDayDelivery=deliveryMode==='로켓당일'?1:0;
+        const isDawnDelivery=deliveryMode==='로켓새벽'?1:0;
+        const isFreshDelivery=deliveryMode==='로켓프레시'?1:0;
+
+        const routeIsMetro=(['서울특별시','경기도','인천광역시'].includes(region));
+        const routeType=routeIsMetro?'FC→CAMP→OFD':'FC→HUB→CAMP→OFD';
+        const sortHub=routeIsMetro?null:(pick(MEGA_HUBS));
+        const isMegaHub=sortHub?1:0;
+        const fcDwellMin=irnd(5,20);
+        const hubDwellMin=sortHub?irnd(20,90):null;
+        const campDwellMin=irnd(8,25);
+        const fcExitTS=new Date(fcExit);
+        let hubInTS=null,hubOutTS=null;
+        if(sortHub){hubInTS=new Date(fcExitTS.getTime()+irnd(40,120)*60000);hubOutTS=new Date(hubInTS.getTime()+(hubDwellMin??30)*60000)}
+        const campInBase=sortHub?hubOutTS:fcExitTS;
+        const campInTS=new Date(campInBase.getTime()+irnd(25,80)*60000);
+        const loadStartTS=new Date(campInTS.getTime()+campDwellMin*60000);
+        const loadEndTS=new Date(loadStartTS.getTime()+irnd(5,20)*60000);
+        const ofdTS=new Date(loadEndTS.getTime()+irnd(15,90)*60000);
+
+        const plannedDeliveryDate=plannedDelivery.toISOString().split('T')[0];
+        const actualDeliveryDate=actualDelivery.toISOString().split('T')[0];
+        const delayHrs=Math.max(0,Math.round((actualDelivery-plannedDelivery)/3600000));
+        const deliveryStatus=isDelayed?'Delayed Delivered':'Delivered';
+        const slaBreach=isDelayed?1:0;
+
+        let distanceBucket,distanceBandLabel;
+        if(distanceKm<=10){distanceBucket=1;distanceBandLabel='≤10km'}
+        else if(distanceKm<=20){distanceBucket=2;distanceBandLabel='11–20km'}
+        else if(distanceKm<=30){distanceBucket=3;distanceBandLabel='21–30km'}
+        else if(distanceKm<=40){distanceBucket=4;distanceBandLabel='31–40km'}
+        else{distanceBucket=5;distanceBandLabel='>40km'}
+
+        const receivingDate=new Date(orderDate.getTime()-irnd(1,5)*86400000);
+        const putawayDate=new Date(receivingDate.getTime()+irnd(0,2)*86400000);
+        const {Bin,Slot}=genBinSlot();
+        const {Lot_ID,Expiry_Date}=genLotAndExpiry(selectedCategory,orderDate,receivingDate,CAL);
+        const unitCost=estimateUnitCost(selectedCategory,unitPrice);
+        const forecast=forecastByABC(abcGrade);
+        const safetyStock=safetyStockCalc(forecast,irnd(1,7));
+        const dailyOnHandSnapshot=irnd(Math.max(0,currentStock-50),currentStock+50);
+
+        const clvQuartile=(customerLTV>=600000)?1:(customerLTV>=300000)?2:(customerLTV>=150000)?3:4;
+
+        const asnId='ASN'+irnd(1000000,9999999);
+        const poId='PO'+irnd(1000000,9999999);
+        const replType=pick(['Regular','Safety Refill','Promotion','Seasonal']);
+
+        const processingErrorRate=AUTOMATION_LEVELS[automationLevel].errorRate;
+        const misShipFlag=Math.random()<processingErrorRate*1.2?1:0;
+        const isQualityIssue=(tempData.violation || ['상품불량','파손'].includes(returnReason)) ? 1 : (Math.random()<0.01?1:0);
+        let baseDamage = 0.004;
+        if(categoryData.freshFood) baseDamage += 0.010;
+        if(selectedCategory==='가전전자') baseDamage += 0.002;
+        const damageRateRaw = baseDamage
+          + (tempData.violation?0.06:0)
+          + (distanceKm>35?0.008:0)
+          + (weatherSev>0.5?0.010:0)
+          + (isQualityIssue?0.020:0)
+          + (misShipFlag?0.006:0);
+        const Damage_Rate = Math.min(0.35, Math.max(0, +(damageRateRaw).toFixed(3)));
+        const Damage_Flag = (['파손','상품불량'].includes(returnReason)) ? 1 : (Math.random() < Damage_Rate ? 1 : 0);
+
+        const customerNPS=Math.round(clamp(70+(isDelayed?-10:5)+(returnFlag?-12:0)+(tempData.violation?-15:0)+(automationLevel==='AI_OPTIMIZED'?5:0),0,100));
+        const wmsAdvanced=Math.round(wmsAdvancedScore);
+
+        return {
+          Order_ID:\`ORD\${String(1000000+index).padStart(7,'0')}\`,
+          Order_Date:orderDate.toISOString().split('T')[0],
+          Order_Timestamp:orderDate.toISOString(),
+          Order_Hour:orderHour,
+
+          Delivery_Mode:deliveryMode,
+          Planned_Delivery_Date:plannedDeliveryDate,
+          Actual_Delivery_Date:actualDeliveryDate,
+          Delivery_Timestamp:actualDelivery.toISOString(),
+          Is_Delayed:isDelayed?1:0,
+          Delay_Hours:delayHrs,
+          SLA_Breach:slaBreach,
+          Delivery_Status:deliveryStatus,
+
+          Fast_Ship_30min:fastShipFlag,
+          Order_To_Ship_Minutes:orderToShipMinutes,
+
+          Region:region,City:city,District:district,Address:address,
+          Fulfillment_Center:selectFulfillmentCenter(region),
+          Delivery_Center:\`\${city} 배송캠프\`,
+          Is_Mega_Hub:isMegaHub,
+          Distance_km:distanceKm,
+
+          Customer_ID:custId,
+          Is_WOW_Member:customerProfile.isWow,
+          WOW_Tier:customerProfile.wowTier,
+          WOW_Join_Date:customerProfile.joinDate?customerProfile.joinDate.toISOString().split('T')[0]:null,
+          WOW_Tenure_Days:customerProfile.joinDate?Math.round((orderDate-customerProfile.joinDate)/86400000):0,
+          Customer_Segment:pick(['일반','활성','핵심','휴면준비']),
+
+          Product_Category:selectedCategory,SKU:sku,ABC_Category:abcGrade,Unit_Price:unitPrice,Quantity:quantity,Order_Amount:orderAmount,
+
+          Is_Fresh_Food:categoryData.freshFood?1:0,
+          Is_Cold_Chain_Required:categoryData.coldChain?1:0,
+          Target_Temperature:tempData.targetTemp??null,
+          Actual_Temperature:tempData.actualTemp??null,
+          Temperature_Violation:tempData.violation?1:0,
+          Cold_Chain_Quality_Score:tempData.quality??null,
+
+          Vehicle_ID:vehicleId,Vehicle_Type:vehicle.type,Vehicle_Capacity:vehicle.capacity,Driver_ID:driverId
+          ,Driver_Grade:driverGrade,
+
+          Load_Factor:loadFactor,
+          Fuel_Efficiency:fuelEfficiency,
+          Routing_Score:routingScore,
+          GPS_Tracking:(Math.random()<0.97?1:0),
+
+          Actual_Logistics_Cost:actualLogisticsCost,
+          Customer_Delivery_Charge:customerDeliveryCharge,
+          Gross_Profit:grossProfit,
+          Net_Profit:netProfit,
+
+          CAC:baseCac,
+          Customer_LTV:customerLTV,
+          LTV_to_CAC:+(customerLTV/Math.max(1,baseCac)).toFixed(2),
+
+          Return_Flag:returnFlag,
+          Return_Reason:returnReason,
+          Return_Cost:returnCost,
+          Is_Resellable:resellable,
+          Resellability_Reason:resellReason,
+
+          Current_Stock:currentStock,
+          Reorder_Point:reorderPoint,
+          Stockout_Flag:stockoutFlag,
+          Overstock_Flag:overstockFlag,
+          Inventory_Turnover:+stockTurnover.toFixed(1),
+          Inventory_Accuracy:+(100 - (Damage_Rate*100)).toFixed(1),
+
+          Automation_Level:automationLevel,
+          Picking_Time_Seconds:Math.round(pickingTime),
+          Packing_Time_Seconds:Math.round(packingTime),
+          Total_Process_Time:totalProcessTime,
+
+          WMS_Usage:wmsUsage,
+          OMS_Usage:omsUsage,
+          WMS_Advanced_Score:wmsAdvanced,
+          Service_Quality_Score:serviceQualityScore,
+          Customer_NPS:customerNPS,
+          Processing_Error_Rate:processingErrorRate,
+
+          Weather_Condition:weather,
+          Weather_Severity_Score:+weatherSev.toFixed(2),
+
+          Churn_Flag:customerProfile.churnFlag?1:0,
+          Predicted_Churn_Score:+churnScore.toFixed(3),
+
+          Is_Rocket_Delivery:isRocketDelivery,
+          Is_Same_Day_Delivery:isSameDayDelivery,
+          Is_Dawn_Delivery:isDawnDelivery,
+          Is_Fresh_Delivery:isFreshDelivery,
+
+          Is_Premium_Order:(orderAmount>=200000)?1:0,
+          Is_Bulk_Order:(quantity>=3)?1:0,
+          Is_Weekend_Order:isWeekend?1:0,
+          Is_Peak_Hour_Order:isPeakTime?1:0,
+          Is_Free_Shipping:(customerDeliveryCharge===0)?1:0,
+
+          Is_Weather_Risk:(weatherSev>0.5)?1:0,
+          Is_Long_Distance:(distanceKm>30)?1:0,
+          Is_High_LTV:(clvQuartile===1)?1:0,
+          Is_Churn_Risk:(churnScore>=0.6)?1:0,
+          Is_VIP_Customer:(customerProfile.isWow===1 && clvQuartile===1)?1:0,
+
+          Is_Loss_Order:(netProfit<0)?1:0,
+          Is_AI_Optimized:(automationLevel==='AI_OPTIMIZED')?1:0,
+
+          Receiving_Date:receivingDate.toISOString().split('T')[0],
+          Putaway_Date:putawayDate.toISOString().split('T')[0],
+          Lot_ID:Lot_ID,
+          Expiry_Date:Expiry_Date,
+          Bin:Bin,
+          Slot:Slot,
+          Unit_Cost:unitCost,
+
+          Daily_OnHand_Snapshot:dailyOnHandSnapshot,
+          Safety_Stock:safetyStock,
+          Forecast_Demand:forecast,
+
+          ASN_ID:asnId,
+          PO_ID:poId,
+          Replenishment_Type:replType,
+
+          Picking_Start_TS:pickStart.toISOString(),
+          Picking_End_TS:pickEnd.toISOString(),
+          Packing_Start_TS:packStart.toISOString(),
+          Packing_End_TS:packEnd.toISOString(),
+
+          Planned_Ship_Timestamp:shipSlaDue.toISOString(),
+          Actual_Ship_Timestamp:fcExitTS.toISOString(),
+          On_Time_Dispatch_Flag:fcSlaBreach?0:1,
+
+          Is_Quality_Issue:isQualityIssue,
+          Mis_Ship_Flag:misShipFlag,
+          Damage_Rate:Damage_Rate,
+          Damage_Flag:Damage_Flag,
+
+          Distance_Bucket:distanceBucket,
+          Distance_Band_Label:distanceBandLabel,
+
+          [NET.ROUTE_TYPE]:routeType,
+          [NET.SORT_HUB_NAME]:sortHub,
+          [NET.FC_EXIT]:fcExitTS.toISOString(),
+          [NET.HUB_IN]:hubInTS?hubInTS.toISOString():null,
+          [NET.HUB_OUT]:hubOutTS?hubOutTS.toISOString():null,
+          [NET.CAMP_IN]:campInTS.toISOString(),
+          [NET.LOAD_START]:loadStartTS.toISOString(),
+          [NET.LOAD_END]:loadEndTS.toISOString(),
+          [NET.OFD]:ofdTS.toISOString(),
+          [NET.FC_DWELL]:fcDwellMin,
+          [NET.HUB_DWELL]:hubDwellMin,
+          [NET.CAMP_DWELL]:campDwellMin
+        };
+      }
+
+      // WORKER: 메시지 처리 — 배치 스트리밍
+      self.onmessage = async (e)=>{
+        const msg=e.data||{};
+        if(msg.type==='stop'){ SHOULD_STOP=true; return; }
+        if(msg.type!=='start') return;
+
+        try{
+          SHOULD_STOP=false;
+          const {
+            totalRows, userCount, startYear, endYear,
+            chunkSize, rocketRate, wowRate, CAL
+          } = msg;
+
+          const profiles = preAssignCustomerProfiles(userCount, wowRate);
+          const rocketPlan = buildRocketPlan(totalRows, rocketRate);
+
+          let processed=0;
+          let batch=[];
+          const effChunk = Math.max(100, chunkSize|0);
+
+          while(processed < totalRows && !SHOULD_STOP){
+            const idx=processed;
+            const row = generateCoupangRealisticRow(
+              idx, userCount, startYear, endYear, profiles, !!rocketPlan[idx], CAL
+            );
+            batch.push(row);
+            processed++;
+
+            if(batch.length>=effChunk || processed===totalRows){
+              // WORKER -> MAIN: rows
+              postMessage({type:'rows', rows:batch, processed, total:totalRows});
+              batch=[];
+              // 진동 완화
+              await new Promise(r=>setTimeout(r,0));
+            }
+
+            if(processed % (effChunk*2)===0){
+              postMessage({type:'progress', processed, total:totalRows});
+            }
+          }
+
+          postMessage({type:'done'});
+        }catch(err){
+          postMessage({type:'error', message:String(err&&err.message||err)});
+        }
+      };
+      // ===== Worker Scope End =====
+    `;
+    // WORKER: Blob URL로 동적 생성
+    const blob = new Blob([workerCode], {type:'text/javascript'});
+    return new Worker(URL.createObjectURL(blob));
   }
 
-  function showProgress(show) {
-    setDisplay('progressContainer', show);
+  /* ==========================
+     7) CSV 내보내기 (스트리밍/배치)
+  ========================== */
+  function buildCSVHeader(keys){
+    return keys.map(k=>CSV_SPECIAL_LABELS[k]||prettyHeader(k)).join(',')+'\n';
   }
-
-  function updateProgress() {
-    const {processedRows, totalRows} = PROCESSING_STATE;
-    const pctNum = Math.min(100, Math.round(processedRows / Math.max(1, totalRows) * 100));
-    qs('progressFill').style.width = pctNum + '%';
-    qs('progressText').textContent = `처리 중... ${processedRows.toLocaleString('ko-KR')} / ${totalRows.toLocaleString('ko-KR')}`;
-    const elapsed = (Date.now() - PROCESSING_STATE.startTime) / 1000;
-    const rps = processedRows / Math.max(0.1, elapsed);
-    const remain = (totalRows - processedRows) / Math.max(0.1, rps);
-    qs('progressStats').textContent = `속도 ${rps.toFixed(1)} r/s`;
-    qs('progressETA').textContent = `예상 완료: ${(remain).toFixed(0)}s`;
+  function escapeCsvCell(v){
+    if(v===null||v===undefined) return '';
+    const s=String(v);
+    return /[",\n]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s;
   }
+  async function downloadCSVFast(){
+    if(!TABLE_KEYS || DATA.length===0) return;
 
-  // ==========================
-  // 6) CSV
-  // ==========================
-  function toCSV(rows) {
-    if (!rows.length) return '';
-    const keys = Object.keys(rows[0]);
-    const header = keys.map(k => `"${(CSV_SPECIAL_LABELS[k] || k).replace(/"/g, '""')}"`).join(',');
-    const lines = rows.map(r => keys.map(k => {
-      const v = (r[k] === null || r[k] === undefined) ? '' : String(r[k]);
-      return `"${v.replace(/"/g, '""')}"`;
-    }).join(','));
-    return [header, ...lines].join('\n');
-  }
-
-  function downloadCSV() {
-    const csv = toCSV(DATA);
-    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `coupang_sim_${Date.now()}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  // ==========================
-  // 7) 생성 루프
-  // ==========================
-  async function startGeneration() {
-    const startYear = parseInt(qs('startYear').value, 10);
-    const endYear = parseInt(qs('endYear').value, 10);
-    const userCount = parseInt(qs('userCount').value, 10);
-    const orderCount = parseInt(qs('orderCount').value, 10);
-    const chunkSize = parseInt(qs('chunkSize').value, 10);
-    const rocketRate = parseFloat(qs('rocketRate').value);
-    const wowRate = parseFloat(qs('wowRate').value);
-
-    // 상태 초기화
-    DATA = [];
-    MONTHLY_BY_CUST = {};
-    VALIDATION_ISSUES = [];
-    PROCESSING_STATE = {
-      isRunning: true,
-      shouldStop: false,
-      startTime: Date.now(),
-      processedRows: 0,
-      totalRows: orderCount,
-      currentChunk: 0,
-      totalChunks: Math.ceil(orderCount / chunkSize)
-    };
-    setDisabled('btnStart', true);
-    setDisabled('btnStop', false);
-    setDisabled('btnCsv', true);
-    setStatus('RUNNING', 'running');
+    setStatus('EXPORTING','running');
     showProgress(true);
+    let processed=0;
+    const total=DATA.length;
 
-    const profiles = preAssignCustomerProfiles(userCount, wowRate);
-    ROCKET_PLAN = buildRocketPlan(orderCount, rocketRate);
+    const parts=[];
+    parts.push(buildCSVHeader(TABLE_KEYS));
 
-    const table = qs('tbl');
-    table.querySelector('thead').innerHTML = '';
-    table.querySelector('tbody').innerHTML = '';
-
-    const keysOrder = []; // 동적 헤더 보관
-    for (let i = 0; i < orderCount; i++) {
-      if (PROCESSING_STATE.shouldStop) break;
-      const row = generateCoupangRealisticRow(i, userCount, startYear, endYear, profiles, ROCKET_PLAN[i]);
-      if (!keysOrder.length) {
-        keysOrder.push(...Object.keys(row));
-        buildTableHeader(keysOrder)
-      }
-      DATA.push(row);
-
-      // 테이블에는 최근 200건만 추가 렌더링(브라우저 성능 보호)
-      if (i < 200) {
-        renderTableRows([row], keysOrder);
-      } else if (i === 200) {
-        const tbody = qs('tbl').querySelector('tbody');
-        tbody.innerHTML = ''; // 초기 200건만 유지
-        renderTableRows(DATA.slice(-200), keysOrder);
-      } else if (i % 50 === 0) {
-        const tbody = qs('tbl').querySelector('tbody');
-        tbody.innerHTML = '';
-        renderTableRows(DATA.slice(-200), keysOrder);
-      }
-
-      PROCESSING_STATE.processedRows = i + 1;
-      if ((i % 100 === 0) || i === orderCount - 1) {
-        updateProgress();
-      }
-      if (i % 1000 === 0) await sleep(0); // UI 양보
+    const BATCH=5000; // PERF: 배치 크기
+    for(let i=0;i<DATA.length;i+=BATCH){
+      const slice=DATA.slice(i,i+BATCH);
+      const lines = slice.map(row=>TABLE_KEYS.map(k=>escapeCsvCell(row[k])).join(',')).join('\n')+'\n';
+      parts.push(lines);
+      processed += slice.length;
+      updateExportProgress(processed,total);
+      await new Promise(r=>setTimeout(r,0)); // PERF: 메인스레드 양보
     }
 
-    setDisabled('btnStop', true);
-    setDisabled('btnStart', false);
-    setDisabled('btnCsv', DATA.length > 0 ? false : true);
-    PROCESSING_STATE.isRunning = false;
+    const blob=new Blob(parts,{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`coupang-logistics-${Date.now()}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
 
-    updateKPIs();
-    updateValidationAndRisk();
-
-    setStatus('DONE', 'ok');
+    URL.revokeObjectURL(url);
+    setStatus('READY','ok');
     showProgress(false);
   }
 
-  function stopGeneration() {
-    PROCESSING_STATE.shouldStop = true;
-    setStatus('STOPPING...', 'warn');
+  async function downloadCSVTurbo(){
+    if(!TABLE_KEYS || DATA.length===0) return;
+
+    setStatus('EXPORTING','running');
+    showProgress(true);
+
+    const header = buildCSVHeader(TABLE_KEYS);
+
+    // WORKER/STREAM: TextEncoderStream + CompressionStream(gzip)
+    const supportsGzip = typeof CompressionStream!=='undefined';
+    const encoder = new TextEncoder();
+
+    const readable = new ReadableStream({
+      pull(controller){
+        // 초기 헤더
+        controller.enqueue(encoder.encode(header));
+        // 이후 본문은 pushChunks에서 처리
+        controller.close();
+      }
+    });
+
+    // 본문 스트림 생성 (대용량에서도 부하 분산)
+    const bodyStream = new ReadableStream({
+      start(controller){
+        (async()=>{
+          const BATCH=8000;
+          let processed=0;
+          for(let i=0;i<DATA.length;i+=BATCH){
+            const slice=DATA.slice(i,i+BATCH);
+            const text = slice.map(row=>TABLE_KEYS.map(k=>escapeCsvCell(row[k])).join(',')).join('\n')+'\n';
+            controller.enqueue(encoder.encode(text));
+            processed+=slice.length;
+            updateExportProgress(processed,DATA.length);
+            await new Promise(r=>setTimeout(r,0)); // PERF: 양보
+          }
+          controller.close();
+        })().catch(err=>controller.error(err));
+      }
+    });
+
+    // 헤더 + 바디를 합치는 간단한 concatenate
+    const combined = new ReadableStream({
+      async start(controller){
+        const r1=readable.getReader(); const r2=bodyStream.getReader();
+        for await (const r of [r1,r2]){
+          while(true){
+            const {done,value}=await r.read();
+            if(done) break;
+            controller.enqueue(value);
+          }
+        }
+        controller.close();
+      }
+    });
+
+    let finalStream = combined;
+    let fileName = `coupang-logistics-${Date.now()}.csv`;
+
+    if(supportsGzip){
+      // PERF: gzip 압축
+      finalStream = combined.pipeThrough(new CompressionStream('gzip'));
+      fileName += '.gz';
+    }
+
+    // Response로 받아 Blob 생성
+    const blob = await new Response(finalStream).blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=fileName;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+
+    setStatus('READY','ok');
+    showProgress(false);
   }
 
-  // ==========================
-  // 8) DIALS
-  // ==========================
-  function applyDials() {
-    const get = id => parseFloat(qs(id).value);
-    DIALS = {
-      lossOrderTarget: [get('dial_loss_lo'), get('dial_loss_hi')],
-      tempViolationTarget: [get('dial_temp_lo'), get('dial_temp_hi')],
-      jejuWeatherExposureTarget: [get('dial_jeju_lo'), get('dial_jeju_hi')],
-      overstockTarget: [get('dial_over_lo'), get('dial_over_hi')],
-      expiryImminentTarget: [get('dial_exp_lo'), get('dial_exp_hi')],
+  /* ==========================
+     8) 시작/중단 및 UI 바인딩
+  ========================== */
+  function resetUIForRun(total){
+    // 초기화
+    DATA.length=0;
+    TABLE_KEYS=null;
+    const tbody=qs('tbl').querySelector('tbody'); tbody.innerHTML='';
+    Object.assign(AGG, resetAgg());
+
+    PROCESSING_STATE={isRunning:true,shouldStop:false,startTime:Date.now(),processedRows:0,totalRows:total};
+
+    setDisabled('btnStart',true);
+    setDisabled('btnStop',false);
+    setDisabled('btnCsv',true);
+    setDisabled('btnCsvTurbo',true);
+    setStatus('RUNNING','running');
+    showProgress(true);
+    updateProgressFromState('Generating');
+  }
+
+  function finishRun(label='READY'){           // ← 기본값은 기존처럼 READY
+    PROCESSING_STATE.isRunning=false;
+    setDisabled('btnStart',false);
+    setDisabled('btnStop',true);
+    setDisabled('btnCsv',DATA.length===0);
+    setDisabled('btnCsvTurbo',DATA.length===0);
+    setStatus(label,'ok');                    // ← 여기서 READY 대신 label 사용
+    showProgress(false);
+  }
+
+
+
+  function startGeneration(){
+    // 입력 파라미터 수집
+    const yearStart=parseInt(qs('startYear').value,10);
+    const yearEnd=parseInt(qs('endYear').value,10);
+    const userCount=parseInt(qs('userCount').value,10);
+    const orderCount=parseInt(qs('orderCount').value,10);
+    const chunkSize=parseInt(qs('chunkSize').value,10);
+    const rocketRate=parseFloat(qs('rocketRate').value);
+    const wowRate=parseFloat(qs('wowRate').value);
+    const targetNetMargin=parseFloat(qs('targetNetMargin').value);
+    FAST_MODE=!!qs('fastMode').checked;
+
+    applyDialsToCal(targetNetMargin); // PERF: 튜닝 반영
+
+    const effectiveChunk = Math.max(500, Math.round(chunkSize * (FAST_MODE? 1.6:1)));
+
+    resetUIForRun(orderCount);
+
+    if(typeof Worker==='undefined'){
+      // Fallback 통지 (간단 경고)
+      setStatus('NO WORKER: Degraded','warn');
+    }
+
+    // WORKER: 생성 및 실행
+    WORKER = createGeneratorWorker();
+    WORKER.onmessage = (e)=>{
+      const {data}=e;
+      if(!data) return;
+      if(data.type==='rows'){
+        ingestRows(data.rows);
+      }else if(data.type==='progress'){
+        PROCESSING_STATE.processedRows = data.processed;
+        PROCESSING_STATE.totalRows = data.total;
+        updateProgressFromState('Generating');
+      }else if(data.type==='done'){
+        finishRun();
+        // 완료 후 CSV 버튼 활성화
+        setDisabled('btnCsv',false);
+        setDisabled('btnCsvTurbo',false);
+      }else if(data.type==='error'){
+        console.error('Worker Error:', data.message);
+        setStatus('ERROR','ng');
+        finishRun();
+      }
     };
-    // 내부 확률 보정(간단)
-    CAL.tempViolationBase = clamp((DIALS.tempViolationTarget[0] + DIALS.tempViolationTarget[1]) / 2, 0.001, 0.10);
-    CAL.jejuWeatherScale = clamp(1 + (DIALS.jejuWeatherExposureTarget[1] - 0.12) * 2, 0.6, 1.8);
-    CAL.overstockProb = clamp((DIALS.overstockTarget[0] + DIALS.overstockTarget[1]) / 2, 0.05, 0.5);
-    CAL.expiryImminentRate = clamp((DIALS.expiryImminentTarget[0] + DIALS.expiryImminentTarget[1]) / 2, 0.001, 0.05);
 
-    qs('tuneStatus').textContent = 'DIALS APPLIED';
-    qs('tuneStatus').className = 'pill ok';
+    WORKER.postMessage({
+      type:'start',
+      totalRows:orderCount,
+      userCount,
+      startYear:yearStart,
+      endYear:yearEnd,
+      chunkSize:effectiveChunk,
+      rocketRate,
+      wowRate,
+      FAST_MODE:FAST_MODE,
+      CAL
+    });
+
+    WORKER = createGeneratorWorker();
+    WORKER.onmessage = (e)=>{
+      const {data}=e;
+      if(!data) return;
+      if(data.type==='rows'){
+        ingestRows(data.rows);
+      }else if(data.type==='progress'){
+        PROCESSING_STATE.processedRows = data.processed;
+        PROCESSING_STATE.totalRows = data.total;
+        updateProgressFromState('Generating');
+      }else if(data.type==='done'){     // ← 여기 블록을 교체
+        finishRun();
+        setDisabled('btnCsv',false);
+        setDisabled('btnCsvTurbo',false);
+      }else if(data.type==='error'){
+        console.error('Worker Error:', data.message);
+        setStatus('ERROR','ng');
+        finishRun();
+      }
+    };
+
   }
 
-  function resetDials() {
-    qs('dial_loss_lo').value = 0.07;
-    qs('dial_loss_hi').value = 0.12;
-    qs('dial_temp_lo').value = 0.01;
-    qs('dial_temp_hi').value = 0.02;
-    qs('dial_jeju_lo').value = 0.10;
-    qs('dial_jeju_hi').value = 0.15;
-    qs('dial_over_lo').value = 0.15;
-    qs('dial_over_hi').value = 0.25;
-    qs('dial_exp_lo').value = 0.005;
-    qs('dial_exp_hi').value = 0.01;
-    applyDials();
+  function stopGeneration(){
+    if(WORKER){
+      PROCESSING_STATE.shouldStop=true;
+      try{ WORKER.postMessage({type:'stop'}); }catch(e){}
+      try{ WORKER.terminate(); }catch(e){}
+      WORKER=null;
+    }
+    finishRun();
   }
 
-  // ==========================
-  // 9) 초기화 & 이벤트
-  // ==========================
-  function initYears() {
-    const s = qs('startYear'), e = qs('endYear');
-    const now = new Date().getFullYear();
-    const years = [];
-    for (let y = now - 5; y <= now; y++) years.push(y);
-    s.innerHTML = years.map(y => `<option value="${y}" ${y === now - 2 ? 'selected' : ''}>${y}</option>`).join('');
-    e.innerHTML = years.map(y => `<option value="${y}" ${y === now ? 'selected' : ''}>${y}</option>`).join('');
+  // DIALS 버튼들
+  function onApplyDials(){
+    const targetNetMargin=parseFloat(qs('targetNetMargin').value);
+    applyDialsToCal(targetNetMargin);
+  }
+  function onResetDials(){
+    // 기본값 복원
+    const def={loss:[0.07,0.12],temp:[0.01,0.02],jeju:[0.10,0.15],over:[0.15,0.25],exp:[0.005,0.01]};
+    qs('dial_loss_lo').value=def.loss[0]; qs('dial_loss_hi').value=def.loss[1];
+    qs('dial_temp_lo').value=def.temp[0]; qs('dial_temp_hi').value=def.temp[1];
+    qs('dial_jeju_lo').value=def.jeju[0]; qs('dial_jeju_hi').value=def.jeju[1];
+    qs('dial_over_lo').value=def.over[0]; qs('dial_over_hi').value=def.over[1];
+    qs('dial_exp_lo').value=def.exp[0]; qs('dial_exp_hi').value=def.exp[1];
+    onApplyDials();
+    qs('tuneStatus').textContent='DIALS RESET';
+    qs('tuneStatus').className='pill ok';
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initYears();
+  /* ==========================
+     9) 초기화
+  ========================== */
+  function initYears(){
+    const s=qs('startYear'), e=qs('endYear');
+    const nowY=(new Date()).getFullYear();
+    for(let y=nowY-6;y<=nowY;y++){
+      const o1=document.createElement('option'); o1.value=y; o1.textContent=y;
+      const o2=document.createElement('option'); o2.value=y; o2.textContent=y;
+      s.appendChild(o1); e.appendChild(o2);
+    }
+    s.value=nowY-1; e.value=nowY;
+  }
 
+  function bindUI(){
     qs('btnStart').addEventListener('click', startGeneration);
     qs('btnStop').addEventListener('click', stopGeneration);
-    qs('btnCsv').addEventListener('click', downloadCSV);
-    qs('btnTune').addEventListener('click', () => {
-      const pnl = qs('tunePanel');
-      pnl.style.display = (pnl.style.display === 'none' || pnl.style.display === '') ? 'block' : 'none';
+    qs('btnCsv').addEventListener('click', downloadCSVFast);
+    qs('btnCsvTurbo').addEventListener('click', downloadCSVTurbo);
+    qs('btnApplyDials').addEventListener('click', onApplyDials);
+    qs('btnResetDials').addEventListener('click', onResetDials);
+    qs('btnTune').addEventListener('click', ()=>{
+      const p=qs('tunePanel');
+      p.style.display = (p.style.display==='none'?'block':'none');
     });
-    qs('btnApplyDials').addEventListener('click', applyDials);
-    qs('btnResetDials').addEventListener('click', resetDials);
+  }
 
-    // ✅ 페이지 로드시 자동으로 "데이터 생성" 버튼 클릭
-    setTimeout(() => {
-      qs('btnStart').click();
-    }, 120);
+  // DOM 준비
+  document.addEventListener('DOMContentLoaded', ()=>{
+    initYears();
+    bindUI();
+    setStatus('READY','ok');
   });
-
-
-  // 작은 표본으로 자동 실행
-  window.addEventListener('load', () => {
-    // ① 작은 표본 값 주입 (원하는 값으로 조절 가능)
-    qs('userCount').value  = 300;   // 고객 수
-    qs('orderCount').value = 1500;  // 주문 수 (속도에 가장 영향 큼)
-    qs('chunkSize').value  = 500;   // 청크 크기(작게)
-
-    // ② DIALS 패널 자동 오픈 (토글 쓰지 않고 바로 보이게)
-    setDisplay('tunePanel', true);
-
-    // ③ 페이지 로드 직후 자동 생성 버튼 클릭
-    //    (이벤트 바인딩이 모두 끝난 뒤 실행되도록 load에서 호출)
-    qs('btnStart').click();
-  });
-
 </script>
 </body>
 </html>
-
