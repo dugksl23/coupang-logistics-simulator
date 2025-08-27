@@ -1,10 +1,1564 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta charset="UTF-8"/>
+  <title>🚀 쿠팡 물류 시뮬레이션 시스템 - 통합 안정판</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root {
+      --bg:#f7fafc; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --pri:#2563eb;
+      --good:#10b981; --warn:#f59e0b; --bad:#ef4444; --vio:#8b5cf6; --cyan:#06b6d4; --rocket:#ff6b35; --wow:#9333ea; --fresh:#059669
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:1800px;margin:0 auto;padding:20px}
+    .header{background:linear-gradient(135deg,#ff6b35 0%,#f7931e 50%,#9333ea 100%);color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:0 12px 32px rgba(255,107,53,.25);position:relative;overflow:hidden}
+    .header::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,.05) 10px,rgba(255,255,255,.05) 20px);animation:slide 20s linear infinite}
+    @keyframes slide{0%{transform:translateX(-50px)}100%{transform:translateX(50px)}}
+    .header h1{margin:0 0 8px 0;font-size:24px;position:relative;z-index:1}
+    .header .sub{opacity:.9;font-size:14px;position:relative;z-index:1}
+    .header .reality-badge{position:absolute;top:20px;right:30px;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);border-radius:12px;padding:8px 16px;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.3)}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 6px 20px rgba(2,6,23,.08)}
+    .controls{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+    .ctrl{display:flex;flex-direction:column;gap:6px}
+    .ctrl label{font-size:12px;color:var(--muted);font-weight:600}
+    .ctrl input,.ctrl select{padding:8px 12px;border:1px solid var(--line);border-radius:10px;min-width:130px}
+    .btn{background:var(--pri);color:#fff;border:none;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;transition:all .3s}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.3)}
+    .btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+    .btn.secondary{background:#374151}.btn.danger{background:var(--bad)}.btn.rocket{background:var(--rocket)}.btn.wow{background:var(--wow)}
+    .progress-container{margin:12px 0;display:none}
+    .progress-bar{width:100%;height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(45deg,var(--rocket),var(--wow));width:0%;transition:width .2s ease}
+    .progress-text{font-size:13px;color:var(--muted);margin-top:6px;text-align:center;font-weight:600}
+    .progress-stats{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+    .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative;transition:transform .3s}
+    .kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(2,6,23,.12)}
+    .kpi h4{margin:0 0 10px 0;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+    .kpi .v{font-size:28px;font-weight:800;margin-bottom:4px}.kpi .meta{font-size:11px;color:var(--muted)}
+    .kpi.primary{border-top:4px solid var(--pri)}.kpi.good{border-top:4px solid var(--good)}.kpi.warn{border-top:4px solid var(--warn)}.kpi.bad{border-top:4px solid var(--bad)}
+    .kpi.rocket{border-top:4px solid var(--rocket)}.kpi.wow{border-top:4px solid var(--wow)}.kpi.fresh{border-top:4px solid var(--fresh)}.kpi.cyan{border-top:4px solid var(--cyan)}
+    .pill{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600}
+    .pill.ok{background:#dcfce7;color:#065f46}.pill.ng{background:#fee2e2;color:#991b1b}.pill.running{background:#dbeafe;color:#1e40af}
+    .sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px;margin-top:12px}
+    .section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+    .section h3{margin:0 0 12px 0;font-size:17px;display:flex;align-items:center;gap:8px}
+    .alerts{display:flex;flex-direction:column;gap:10px;max-height:280px;overflow:auto}
+    .alert{padding:12px 15px;border-radius:12px;font-size:13px;border:1px solid;transition:all .3s}.alert:hover{transform:translateX(4px)}
+    .alert.good{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}.alert.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}.alert.bad{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+    .table-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0;margin-top:18px;overflow:hidden}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    thead{position:sticky;top:0;background:#f9fafb;border-bottom:2px solid var(--line)}
+    th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+    th{font-weight:700;color:var(--ink)}
+    .delivery-mode.rocket{color:var(--rocket);font-weight:600}
+    .delivery-mode.dawn{color:var(--wow);font-weight:600}
+    .delivery-mode.fresh{color:var(--fresh);font-weight:600}
+    @media (max-width:768px){
+      .controls{flex-direction:column;align-items:flex-start}
+      .ctrl input,.ctrl select{min-width:280px}
+      .sections{grid-template-columns:1fr}
+      .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+    }
+    .switch{position:relative;display:inline-block;width:44px;height:24px}
+    .switch input{display:none}
+    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e1;border-radius:999px;transition:.2s}
+    .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+    .switch input:checked + .slider{background:#22c55e}
+    .switch input:checked + .slider:before{transform:translateX(20px)}
+  </style>
 </head>
 <body>
-$END$
+<div class="wrap">
+  <div class="header">
+    <div class="reality-badge">현실성 95%</div>
+    <h1>🚀 쿠팡 물류 시뮬레이션 시스템 (Coupang Logistics Reality Simulator)</h1>
+    <div class="sub">🎯 로켓배송·신선식품·WOW·AI자동화 | FC·허브 분리 | 입고/적치/유통기한/로케이션 포함</div>
+  </div>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="ctrl"><label>시작년도 / Start Year</label><select id="startYear"></select></div>
+      <div class="ctrl"><label>종료년도 / End Year</label><select id="endYear"></select></div>
+      <div class="ctrl"><label>고객 수 / #Users</label><input id="userCount" type="number" min="100" max="200000" value="300"></div>
+      <div class="ctrl"><label>주문 수 / #Orders</label><input id="orderCount" type="number" min="500" max="10000000" step="1000" value="10000"></div>
+      <div class="ctrl"><label>청크 크기 / Chunk Size</label><input id="chunkSize" type="number" min="500" max="15000" step="500" value="3000"></div>
+      <div class="ctrl"><label>로켓배송 비중 / Rocket Rate (%)</label><input id="rocketRate" type="number" min="35" max="90" value="55"></div>
+      <div class="ctrl"><label>WOW 가입률 / WOW Rate (%)</label><input id="wowRate" type="number" min="60" max="100" value="80"></div>
+      <div class="ctrl"><label>목표 순이익률(%)</label><input id="targetNetMargin" type="number" step="0.1" value="3.2" min="-20" max="30"></div>
+      <div class="ctrl">
+        <label>FAST MODE</label>
+        <label class="switch"><input type="checkbox" id="fastMode"><span class="slider"></span></label>
+      </div>
+      <button class="btn rocket" id="btnStart">▶️ 데이터 생성 / Generate</button>
+      <button class="btn secondary" id="btnTune">⚙️ DIALS</button>
+      <button class="btn danger" id="btnStop" disabled>⏹️ 중단 / Stop</button>
+      <button class="btn wow" id="btnCsv" disabled>📥 CSV 다운로드 / Download CSV</button>
+      <button class="btn wow" id="btnCsvTurbo" disabled>⚡️ 초고속 CSV (GZIP)</button>
+      <div id="status" class="pill ok" style="margin-left:auto">READY</div>
+    </div>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">처리 중... / Processing...</div>
+      <div class="progress-stats"><span id="progressStats">-</span><span id="progressETA">예상 완료: - / ETA: -</span></div>
+    </div>
+  </div>
+
+  <!-- DIALS -->
+  <div class="panel" id="tunePanel" style="display:block">
+    <div class="controls" style="align-items:flex-start">
+      <div class="ctrl"><label>적자주문율 최소</label><input id="dial_loss_lo" type="number" step="0.001" min="0" max="1" value="0.07"></div>
+      <div class="ctrl"><label>적자주문율 최대</label><input id="dial_loss_hi" type="number" step="0.001" min="0" max="1" value="0.12"></div>
+      <div class="ctrl"><label>온도위반율 최소</label><input id="dial_temp_lo" type="number" step="0.001" min="0" max="1" value="0.01"></div>
+      <div class="ctrl"><label>온도위반율 최대</label><input id="dial_temp_hi" type="number" step="0.001" min="0" max="1" value="0.02"></div>
+      <div class="ctrl"><label>제주 악천후 최소</label><input id="dial_jeju_lo" type="number" step="0.001" min="0" max="1" value="0.10"></div>
+      <div class="ctrl"><label>제주 악천후 최대</label><input id="dial_jeju_hi" type="number" step="0.001" min="0" max="1" value="0.15"></div>
+      <div class="ctrl"><label>과재고 최소</label><input id="dial_over_lo" type="number" step="0.001" min="0" max="1" value="0.15"></div>
+      <div class="ctrl"><label>과재고 최대</label><input id="dial_over_hi" type="number" step="0.001" min="0" max="1" value="0.25"></div>
+      <div class="ctrl"><label>유통기한 임박 최소</label><input id="dial_exp_lo" type="number" step="0.001" min="0" max="1" value="0.005"></div>
+      <div class="ctrl"><label>유통기한 임박 최대</label><input id="dial_exp_hi" type="number" step="0.001" min="0" max="1" value="0.01"></div>
+    </div>
+    <div class="controls">
+      <button class="btn wow" id="btnApplyDials">적용</button>
+      <button class="btn secondary" id="btnResetDials">초기화</button>
+      <div id="tuneStatus" class="pill ok">DIALS READY</div>
+    </div>
+  </div>
+
+  <!-- KPI 섹션들 (동일) -->
+  <div class="sections">
+    <div class="section"><h3>🚀 로켓배송 성과</h3>
+      <div class="kpi-grid">
+        <div class="kpi rocket"><h4>로켓배송 비중</h4><div class="v" id="k_rocketShare">-</div><div class="meta">% of orders</div></div>
+        <div class="kpi rocket"><h4>로켓당일 성공률</h4><div class="v" id="k_rocketSameDayRate">-</div><div class="meta">%</div></div>
+        <div class="kpi rocket"><h4>로켓새벽 정시율</h4><div class="v" id="k_rocketDawnRate">-</div><div class="meta">%</div></div>
+        <div class="kpi rocket"><h4>30분내 출고율</h4><div class="v" id="k_fastShipRate">-</div><div class="meta">%</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>📦 출고·풀필먼트</h3>
+      <div class="kpi-grid">
+        <div class="kpi primary"><h4>정시 출고율</h4><div class="v" id="k_fcOnTimeShip">-</div><div class="meta">목표 ≥ 96%</div></div>
+        <div class="kpi"><h4>평균 출고 시간</h4><div class="v" id="k_fcAvgShipHour">-</div><div class="meta">시간</div></div>
+        <div class="kpi"><h4>피킹 속도</h4><div class="v" id="k_fcPickSecPerItem">-</div><div class="meta">초/개</div></div>
+        <div class="kpi"><h4>패킹 속도</h4><div class="v" id="k_fcPackSecPerItem">-</div><div class="meta">초/개</div></div>
+        <div class="kpi good"><h4>풀필먼트 효율</h4><div class="v" id="k_fcEfficiency">-</div><div class="meta">%</div></div>
+        <div class="kpi wow"><h4>60분내 출고율</h4><div class="v" id="k_fcShipUnder60">-</div><div class="meta">%</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>🌟 WOW 멤버십 & 프리미엄</h3>
+      <div class="kpi-grid">
+        <div class="kpi wow"><h4>WOW 가입률</h4><div class="v" id="k_wowShare">-</div><div class="meta">%</div></div>
+        <div class="kpi wow"><h4>WOW Plus 비중</h4><div class="v" id="k_wowPlusShare">0</div><div class="meta">%</div></div>
+        <div class="kpi wow"><h4>WOW vs 비회원 AOV 차이</h4><div class="v" id="k_wowAovGap">-</div><div class="meta">₩</div></div>
+        <div class="kpi warn"><h4>WOW 이탈 위험 고객</h4><div class="v" id="k_wowChurnRisk">-</div><div class="meta">명</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>❄️ 신선식품 & 콜드체인</h3>
+      <div class="kpi-grid">
+        <div class="kpi fresh"><h4>신선식품 비중</h4><div class="v" id="k_freshShare">-</div><div class="meta">%</div></div>
+        <div class="kpi fresh"><h4>콜드체인 준수율</h4><div class="v" id="k_coldChainRate">-</div><div class="meta">%</div></div>
+        <div class="kpi warn"><h4>온도 위반율</h4><div class="v" id="k_tempViolation">-</div><div class="meta">%</div></div>
+        <div class="kpi fresh"><h4>냉동식품 품질 점수</h4><div class="v" id="k_frozenQuality">-</div><div class="meta">/100</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>🏭 허브&스포크 물류망</h3>
+      <div class="kpi-grid">
+        <div class="kpi primary"><h4>메가허브 처리 비중</h4><div class="v" id="k_megaHubShare">-</div><div class="meta">%</div></div>
+        <div class="kpi primary"><h4>수도권 커버리지</h4><div class="v" id="k_seoulCoverage">-</div><div class="meta">%</div></div>
+        <div class="kpi good"><h4>평균 배송 거리</h4><div class="v" id="k_avgDistance">-</div><div class="meta">km</div></div>
+        <div class="kpi primary"><h4>네트워크 효율성</h4><div class="v" id="k_networkEff">-</div><div class="meta">점</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>🤖 AI & 자동화 수준</h3>
+      <div class="kpi-grid">
+        <div class="kpi cyan"><h4>AI 최적화 비율</h4><div class="v" id="k_aiOptimized">-</div><div class="meta">%</div></div>
+        <div class="kpi cyan"><h4>자동 피킹율</h4><div class="v" id="k_autoPickRate">-</div><div class="meta">%</div></div>
+        <div class="kpi good"><h4>평균 피킹 시간</h4><div class="v" id="k_avgPickTime">-</div><div class="meta">초</div></div>
+        <div class="kpi cyan"><h4>WMS 고도화 점수</h4><div class="v" id="k_wmsAdvanced">-</div><div class="meta">/100</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>💰 매출·수익</h3>
+      <div class="kpi-grid">
+        <div class="kpi primary"><h4>총 매출</h4><div class="v" id="k_totalSales">-</div><div class="meta">₩</div></div>
+        <div class="kpi good"><h4>순이익률</h4><div class="v" id="k_netMargin">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>평균주문금액</h4><div class="v" id="k_aov">-</div><div class="meta">₩</div></div>
+        <div class="kpi"><h4>ARPPU</h4><div class="v" id="k_arppu">-</div><div class="meta">₩</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>👥 고객</h3>
+      <div class="kpi-grid">
+        <div class="kpi"><h4>LTV:CAC</h4><div class="v" id="k_ltvCac">-</div></div>
+        <div class="kpi"><h4>유지율</h4><div class="v" id="k_retention">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>이탈률</h4><div class="v" id="k_churn">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>AI 이탈 예측 정확도</h4><div class="v" id="k_ai">-</div><div class="meta">%</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>🚚 배송·물류</h3>
+      <div class="kpi-grid">
+        <div class="kpi good"><h4>정시율</h4><div class="v" id="k_onTime">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>SLA 위반율</h4><div class="v" id="k_sla">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>적재율</h4><div class="v" id="k_load">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>연비</h4><div class="v" id="k_fuel">-</div><div class="meta">km/ℓ · km/kWh</div></div>
+        <div class="kpi"><h4>라우팅 점수</h4><div class="v" id="k_route">-</div><div class="meta">/100</div></div>
+        <div class="kpi warn"><h4>배송 예외율</h4><div class="v" id="k_exception">-</div><div class="meta">%</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>📦 반품</h3>
+      <div class="kpi-grid">
+        <div class="kpi warn"><h4>반품률</h4><div class="v" id="k_returnRate">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>반품 손실률</h4><div class="v" id="k_returnCost">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>재판매 가능률</h4><div class="v" id="k_resell">-</div><div class="meta">%</div></div>
+      </div>
+    </div>
+    <div class="section"><h3>🏭 WMS·재고</h3>
+      <div class="kpi-grid">
+        <div class="kpi"><h4>재고 회전율</h4><div class="v" id="k_invTurn">-</div><div class="meta">회</div></div>
+        <div class="kpi"><h4>품절률</h4><div class="v" id="k_stockout">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>과재고 비율</h4><div class="v" id="k_overstock">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>재고 정확도</h4><div class="v" id="k_invAcc">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>재고 손실률</h4><div class="v" id="k_shrink">-</div><div class="meta">%</div></div>
+        <div class="kpi"><h4>WMS 활용률</h4><div class="v" id="k_wms">-</div><div class="meta">%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sections">
+    <div class="section"><h3>✅ 쿠팡 특화 정합성 검사</h3>
+      <div id="validateSummary" class="pill ok">-</div>
+      <div class="alerts" id="validateList"></div>
+    </div>
+    <div class="section"><h3>⚠️ 쿠팡 복합 위험 요소</h3>
+      <div class="alerts" id="riskList"></div>
+    </div>
+    <div class="section"><h3>📊 처리 성능 & 현실성 지표</h3>
+      <div class="alerts" id="perfList"></div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     Coupang Logistics Reality Simulator — Improved Single File
+     v2025-11+ops — UI/IDs intact, logic improved
+     변경 포인트는 // v2025-11 CODE IMPROVED 로 표기
+     ============================================================ */
+
+  /* ==========================
+     0) 네트워크 타임라인 키
+  ========================== */
+  const NET_PREFIX='__net_';
+  const N=s=>NET_PREFIX+s;
+  const NET=Object.freeze({
+    ROUTE_TYPE:N('Route_Type'),
+    SORT_HUB_NAME:N('Sortation_Hub_Name'),
+    FC_EXIT:N('FC_Exit_TS'),
+    HUB_IN:N('Hub_In_TS'),
+    HUB_OUT:N('Hub_Out_TS'),
+    CAMP_IN:N('Camp_In_TS'),
+    LOAD_START:N('Loadout_Start_TS'),
+    LOAD_END:N('Loadout_End_TS'),
+    OFD:N('OFD_TS'),
+    FC_DWELL:N('FC_Dwell_Min'),
+    HUB_DWELL:N('Hub_Dwell_Min'),
+    CAMP_DWELL:N('Camp_Dwell_Min'),
+  });
+
+  /* ==========================
+     1) CSV 라벨/유틸 (원형 유지)
+  ========================== */
+  const CSV_SPECIAL_LABELS={
+    Order_ID:'Order ID',Order_Date:'Order Date',Order_Timestamp:'Order Timestamp',Order_Hour:'Order Hour',
+    Delivery_Mode:'Delivery Mode',Planned_Delivery_Date:'Planned Delivery Date',Actual_Delivery_Date:'Actual Delivery Date',
+    Delivery_Timestamp:'Delivery Timestamp',Is_Delayed:'Is Delayed',Delay_Hours:'Delay Hours',SLA_Breach:'SLA Breach',Delivery_Status:'Delivery Status',
+    Fast_Ship_30min:'Fast Ship 30min',Order_To_Ship_Minutes:'Order To Ship Minutes',
+    Region:'Region',City:'City',District:'District',Address:'Address',Fulfillment_Center:'Fulfillment Center',Delivery_Center:'Delivery Center',Is_Mega_Hub:'Is Mega Hub',Distance_km:'Distance km',
+    Customer_ID:'Customer ID',Is_WOW_Member:'Is WOW Member',WOW_Tier:'WOW Tier',WOW_Join_Date:'WOW Join Date',WOW_Tenure_Days:'WOW Tenure Days',Customer_Segment:'Customer Segment',
+    Product_Category:'Product Category',SKU:'SKU',ABC_Category:'ABC Category',Unit_Price:'Unit Price',Quantity:'Quantity',Order_Amount:'Order Amount',
+    Is_Fresh_Food:'Is Fresh Food',Is_Cold_Chain_Required:'Is Cold Chain Required',Target_Temperature:'Target Temperature',Actual_Temperature:'Actual Temperature',
+    Temperature_Violation:'Temperature Violation',Cold_Chain_Quality_Score:'Cold Chain Quality Score',
+    Vehicle_ID:'Vehicle ID',Vehicle_Type:'Vehicle Type',Vehicle_Capacity:'Vehicle Capacity',Driver_ID:'Driver ID',Driver_Grade:'Driver Grade',
+    Load_Factor:'Load Factor',Fuel_Efficiency:'Fuel Efficiency',Routing_Score:'Routing Score',GPS_Tracking:'GPS Tracking',
+    Actual_Logistics_Cost:'Actual Logistics Cost',Customer_Delivery_Charge:'Customer Delivery Charge',Gross_Profit:'Gross Profit',Net_Profit:'Net Profit',
+    CAC:'CAC',Customer_LTV:'Customer LTV',LTV_to_CAC:'LTV to CAC',
+    Return_Flag:'Is Returned',Return_Reason:'Return Reason',Return_Cost:'Return Cost',Is_Resellable:'Is Resellable',Resellability_Reason:'Resellability Reason',
+    Current_Stock:'Current Stock',Reorder_Point:'Reorder Point',Stockout_Flag:'Stockout Flag',Overstock_Flag:'Overstock Flag',Inventory_Turnover:'Inventory Turnover',Inventory_Accuracy:'Inventory Accuracy',
+    Automation_Level:'Automation Level',Picking_Time_Seconds:'Picking Time Seconds',Packing_Time_Seconds:'Packing Time Seconds',Total_Process_Time:'Total Process Time',
+    WMS_Usage:'WMS Usage',OMS_Usage:'OMS Usage',WMS_Advanced_Score:'WMS Advanced Score',Service_Quality_Score:'Service Quality Score',Customer_NPS:'Customer NPS',Processing_Error_Rate:'Processing Error Rate',
+    Weather_Condition:'Weather Condition',Weather_Severity_Score:'Weather Severity Score',Churn_Flag:'Churn Flag',Predicted_Churn_Score:'Predicted Churn Score',
+    Is_Rocket_Delivery:'Is Rocket Delivery',Is_Same_Day_Delivery:'Is Same Day Delivery',Is_Dawn_Delivery:'Is Dawn Delivery',Is_Fresh_Delivery:'Is Fresh Delivery',
+    Is_Premium_Order:'Is Premium Order',Is_Bulk_Order:'Is Bulk Order',Is_Weekend_Order:'Is Weekend Order',Is_Peak_Hour_Order:'Is Peak Hour Order',Is_Free_Shipping:'Is Free Shipping',
+    Is_Weather_Risk:'Is Weather Risk',Is_Long_Distance:'Is Long Distance',Is_High_LTV:'Is High LTV',Is_Churn_Risk:'Is Churn Risk',Is_VIP_Customer:'Is VIP Customer',
+    Is_Loss_Order:'Is Loss Order',Is_AI_Optimized:'Is AI Optimized',
+    Receiving_Date:'Receiving Date',Putaway_Date:'Putaway Date',Lot_ID:'Lot ID',Expiry_Date:'Expiry Date',Bin:'Bin',Slot:'Slot',Unit_Cost:'Unit Cost',
+    Daily_OnHand_Snapshot:'Daily OnHand Snapshot',Safety_Stock:'Safety Stock',Forecast_Demand:'Forecast Demand',ASN_ID:'Asn Id',PO_ID:'Po Id',Replenishment_Type:'Replenishment Type',
+    Picking_Start_TS:'Picking Start TS',Picking_End_TS:'Picking End TS',Packing_Start_TS:'Packing Start TS',Packing_End_TS:'Packing End TS',
+    Planned_Ship_Timestamp:'Planned Ship Timestamp',
+    Actual_Ship_Timestamp:'Actual Ship Timestamp',On_Time_Dispatch_Flag:'On-time Dispatch Flag',
+    Is_Quality_Issue:'Is Quality Issue',Mis_Ship_Flag:'Mis ship Flag',
+    Damage_Rate:'Damage Rate',Damage_Flag:'Damage Flag',
+    Distance_Bucket:'Distance Bucket',Distance_Band_Label:'Distance Band Label',
+    [NET.ROUTE_TYPE]:'Route Type',[NET.SORT_HUB_NAME]:'Sortation Hub Name',[NET.FC_EXIT]:'FC Exit TS',[NET.HUB_IN]:'Hub In TS',[NET.HUB_OUT]:'Hub Out TS',
+    [NET.CAMP_IN]:'Camp In TS',[NET.LOAD_START]:'Loadout Start TS',[NET.LOAD_END]:'Loadout End TS',[NET.OFD]:'OFD TS',
+    [NET.FC_DWELL]:'FC Dwell Min',[NET.HUB_DWELL]:'Hub Dwell Min',[NET.CAMP_DWELL]:'Camp Dwell Min',
+
+    // v2025-11 CODE IMPROVED (new derived/quality/meta)
+    fc_dispatch_ts:'FC Dispatch TS', camp_depart_ts:'Camp Depart TS',
+    o2s_min:'O2S Minutes', hub_total_dwell_min:'Hub Total Dwell (min)', camp_total_dwell_min:'Camp Total Dwell (min)',
+    camp_s1_wait_min:'Camp S1 Wait (min)', camp_s2_work_min:'Camp S2 Work (min)', camp_s3_wait_min:'Camp S3 Wait (min)',
+    camp_wait_min:'Camp Wait (S1+S3) (min)', camp_work_min:'Camp Work (S2) (min)',
+    post_fc_transit_min:'Post FC Transit (min)', hub_exit_wait_min:'Hub Exit Wait (min)',
+    fc_otd_flag:'FC OTD Flag', ofd_otd_flag:'OFD OTD Flag', sla_breach_flag:'SLA Breach (Recalc)',
+    hub_dispatch_breach_flag:'Hub P95 Breach', camp_s1_breach_flag:'Camp S1 Breach', camp_s2_breach_flag:'Camp S2 Breach', camp_s3_breach_flag:'Camp S3 Breach',
+    first_touch_breach:'First Touch Breach',
+    reason_category:'Reason Category',
+    q_ts_order_error:'Q TS Order Error', q_negative_duration:'Q Negative Duration', q_outlier_flag:'Q Outlier', q_missing_key:'Q Missing Key',
+    sim_version:'Sim Version', sim_seed:'Sim Seed', dial_snapshot_json:'Dials Snapshot', generated_at:'Generated At'
+  };
+  function prettyHeader(key){if(CSV_SPECIAL_LABELS[key])return CSV_SPECIAL_LABELS[key];return key.replace(/^_+/,'').replace(/__/g,'_').replace(/[_]/g,' ').replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/\s+/g,' ').trim().replace(/\b\w/g,m=>m.toUpperCase())}
+
+  /* ==========================
+     2) 전역 상태 / 유틸
+  ========================== */
+  let DATA=[]; // 전체 데이터(메모리 보관)
+  let TABLE_KEYS=null;
+  let WORKER=null;
+  let FAST_MODE=false;
+
+  const CHUNK_CONFIG={defaultSize:3000,maxMemoryRows:150000,batchUpdateInterval:3,gcInterval:8};
+  const RENDER_MAX_ROWS=2000;
+
+  let PROCESSING_STATE={isRunning:false,shouldStop:false,startTime:null,processedRows:0,totalRows:0};
+
+  // throttling & helpers
+  let _throttleTS=0; const _THROTTLE_MS=100;
+  const raf=(fn)=>window.requestAnimationFrame?requestAnimationFrame(fn):setTimeout(fn,16);
+  const qs=id=>document.getElementById(id);
+  const setText=(id,txt)=>{const el=qs(id);if(el)el.textContent=txt};
+  const setDisabled=(id,flag)=>{const el=qs(id);if(el)el.disabled=!!flag};
+  const setDisplay=(id,show)=>{const el=qs(id);if(el)el.style.display=show?'':'none'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const pad=(n,l=2)=>String(n).padStart(l,'0');
+  function formatCurrencyKRW(n){if(!isFinite(n))return '-';return '₩'+Math.round(n).toLocaleString('ko-KR')}
+
+  // 진행 바
+  function setStatus(text,cls='ok'){const st=qs('status');st.textContent=text;st.className='pill '+cls;}
+  function showProgress(show){setDisplay('progressContainer',show)}
+  function _updateProgressUI(label, processed, total){
+    const pctNum=Math.min(100,Math.round(processed/Math.max(1,total)*100));
+    qs('progressFill').style.width=pctNum+'%';
+    qs('progressText').textContent=`${label}... ${processed.toLocaleString('ko-KR')} / ${total.toLocaleString('ko-KR')} (${pctNum}%)`;
+    const elapsed=(Date.now()-PROCESSING_STATE.startTime)/1000;
+    const rps=processed/Math.max(0.1,elapsed);
+    qs('progressStats').textContent=`속도 ${rps.toFixed(1)} r/s`;
+    const remain=(total-processed)/Math.max(0.1,rps);
+    qs('progressETA').textContent=`예상 완료: ${remain.toFixed(0)}s`;
+  }
+  function updateProgressFromState(label='Generating'){
+    const now=Date.now();
+    if(now-_throttleTS<_THROTTLE_MS) return;
+    _throttleTS=now;
+    raf(()=>_updateProgressUI(label, PROCESSING_STATE.processedRows, PROCESSING_STATE.totalRows));
+  }
+  function updateExportProgress(done,total){
+    const pctNum=Math.min(100,Math.round(done/Math.max(1,total)*100));
+    qs('progressFill').style.width=pctNum+'%';
+    qs('progressText').textContent=`Exporting CSV... ${done.toLocaleString('ko-KR')} / ${total.toLocaleString('ko-KR')} (${pctNum}%)`;
+    qs('progressStats').textContent=`청크 진행`;
+    qs('progressETA').textContent='';
+  }
+
+  /* ==========================
+     3) KPI/검증 스트리밍 집계 (O(1) 업데이트)
+  ========================== */
+  const AGG=resetAgg();
+  function resetAgg(){
+    return {
+      total:0, rocket:0, sameDayTotal:0, sameDayOnTime:0, dawnTotal:0, dawnOnTime:0, fastShip30:0, shipUnder60:0,
+      fcSlaBreach:0, shipMinutesSum:0, pickPerItemSum:0, packPerItemSum:0, procErrRateSum:0,
+      wowCount:0, wowSales:0, nonWowSales:0, wowOrders:0, nonWowOrders:0, wowChurnRisk:0,
+      freshCount:0, coldReq:0, tempViol:0, frozenQualitySum:0, frozenCnt:0,
+      megaHub:0, metro:0, distanceSum:0, routingSum:0,
+      aiOpt:0, autoPickScoreSum:0, pickTimeSum:0, wmsAdvSum:0,
+      salesSum:0, netProfitSum:0,
+      ltvSum:0, cacSum:0, uniqueCustomers:new Set(), churnRisk:0, aiAccEqual:0,
+      onTime:0, delay:0, loadSum:0, fuelSum:0, routeSum:0, exception:0,
+      returnCnt:0, returnCostSum:0, resellCnt:0,
+      invTurnSum:0, stockoutCnt:0, overstockCnt:0, invAccSum:0, wmsActiveCnt:0,
+      lossOrderCnt:0, jejuWeatherRiskCnt:0, jejuTotal:0, expiryImminentCnt:0,
+
+      // ops: confusion matrix
+      cm_tp:0, cm_tn:0, cm_fp:0, cm_fn:0,
+    };
+  }
+
+  /* ==========================
+     3.1) 세그먼트 가드레일 저장소
+     - 윈저 P99 후 P95 계산
+     - 표본 n<500 → 상위 레벨 백오프
+     - EMA 보정(α=0.02)
+     // v2025-11 CODE IMPROVED
+  ========================== */
+  const Guardrails = {
+    store: new Map(), // key -> {arrs:{hub:[], s1:[], s2:[], s3:[]}, p95:{...}, n:0}
+    alpha: 0.02,
+    maxKeep: 10000, // per segment capped reservoir
+  };
+  function macroRegionBySiDo(region){
+    if(['서울특별시','경기도','인천광역시'].includes(region))return'수도권';
+    if(['부산광역시','대구광역시','울산광역시','경상북도','경상남도'].includes(region))return'영남';
+    if(['대전광역시','세종특별자치시','충청북도','충청남도'].includes(region))return'충청';
+    if(['광주광역시','전북특별자치도','전라남도'].includes(region))return'호남';
+    if(['강원특별자치도'].includes(region))return'강원';
+    if(['제주특별자치도'].includes(region))return'제주';
+    return'기타';
+  }
+  function daypart(h){return (h>=19 && h<=21)?'피크':'비피크'}
+  function weatherBucket(s){if(s<=0.3)return'≤0.3'; if(s<=0.6)return'0.3–0.6'; return'>0.6'}
+  function segmentKey(r){
+    const mode=r.Delivery_Mode||'NA';
+    const route=r[NET.ROUTE_TYPE]||'NA';
+    const macro=macroRegionBySiDo(r.Region||'NA');
+    const dp=daypart(Number(r.Order_Hour||0));
+    const wb=weatherBucket(Number(r.Weather_Severity_Score||0));
+    return `${mode}|${route}|${macro}|${dp}|${wb}`;
+  }
+  function winsorizeP99(values){
+    if(values.length===0) return [];
+    const sorted=[...values].sort((a,b)=>a-b);
+    const i99=Math.max(0, Math.min(sorted.length-1, Math.floor(sorted.length*0.99)));
+    const p99=sorted[i99];
+    return sorted.map(v=>Math.min(v,p99));
+  }
+  function quantileP(values, p){
+    if(values.length===0) return null;
+    const a=[...values].sort((x,y)=>x-y);
+    const pos=(a.length-1)*p;
+    const lo=Math.floor(pos), hi=Math.ceil(pos);
+    if(lo===hi) return a[lo];
+    return a[lo] + (a[hi]-a[lo])*(pos-lo);
+  }
+  function computeP95From(values){
+    if(values.length<20) return null;
+    const w = winsorizeP99(values);
+    return Math.round(quantileP(w, 0.95));
+  }
+  function ensureSeg(key){
+    if(!Guardrails.store.has(key)){
+      Guardrails.store.set(key, {arrs:{hub:[], s1:[], s2:[], s3:[]}, p95:{hub:null,s1:null,s2:null,s3:null}, n:0});
+    }
+    return Guardrails.store.get(key);
+  }
+  function pushReservoir(arr, v, cap){
+    if(v==null || !isFinite(v)) return;
+    if(arr.length<cap){arr.push(v);return;}
+    // reservoir sampling
+    const j = Math.floor(Math.random()*(arr.length+1));
+    if(j<arr.length) arr[j]=v;
+  }
+  function updateGuardrailsWithRow(row){
+    // 정상(SLA_Breach=0) & 비음수만 사용
+    if(Number(row.SLA_Breach)===1) return;
+    const hub = safePos(row.hub_total_dwell_min);
+    const s1  = safePos(row.camp_s1_wait_min);
+    const s2  = safePos(row.camp_s2_work_min);
+    const s3  = safePos(row.camp_s3_wait_min);
+    if(hub==null && s1==null && s2==null && s3==null) return;
+
+    const key = segmentKey(row);
+    const seg = ensureSeg(key);
+    if(hub!=null) pushReservoir(seg.arrs.hub, hub, Guardrails.maxKeep);
+    if(s1!=null)  pushReservoir(seg.arrs.s1 , s1 , Guardrails.maxKeep);
+    if(s2!=null)  pushReservoir(seg.arrs.s2 , s2 , Guardrails.maxKeep);
+    if(s3!=null)  pushReservoir(seg.arrs.s3 , s3 , Guardrails.maxKeep);
+    seg.n++;
+    // 초기 n가 충분할 때 p95 계산
+    if(seg.arrs.hub.length>=500 || seg.arrs.s1.length>=500 || seg.arrs.s2.length>=500 || seg.arrs.s3.length>=500){
+      const p95_new={
+        hub: computeP95From(seg.arrs.hub),
+        s1:  computeP95From(seg.arrs.s1),
+        s2:  computeP95From(seg.arrs.s2),
+        s3:  computeP95From(seg.arrs.s3),
+      };
+      // EMA 보정
+      for(const k of ['hub','s1','s2','s3']){
+        const prev=seg.p95[k];
+        const cur=p95_new[k];
+        if(cur==null) continue;
+        seg.p95[k] = (prev==null)?cur : Math.round(prev*(1-Guardrails.alpha) + cur*Guardrails.alpha);
+      }
+    }
+  }
+  function findP95For(row){
+    // 세그먼트 → 매크로 → 전사 평균 백오프
+    const k=segmentKey(row);
+    const seg=Guardrails.store.get(k);
+    if(seg && (seg.p95.hub||seg.p95.s1||seg.p95.s2||seg.p95.s3)) return seg.p95;
+
+    // macro only
+    const macro=macroRegionBySiDo(row.Region||'NA');
+    let agg={hub:[],s1:[],s2:[],s3:[]};
+    Guardrails.store.forEach((v,key)=>{
+      if(key.includes(`|${macro}|`)){
+        for(const f of ['hub','s1','s2','s3']){
+          if(v.p95[f]!=null) agg[f].push(v.p95[f]);
+        }
+      }
+    });
+    const macroP95={
+      hub: agg.hub.length?Math.round(agg.hub.reduce((a,b)=>a+b,0)/agg.hub.length):null,
+      s1:  agg.s1.length? Math.round(agg.s1.reduce((a,b)=>a+b,0)/agg.s1.length):null,
+      s2:  agg.s2.length? Math.round(agg.s2.reduce((a,b)=>a+b,0)/agg.s2.length):null,
+      s3:  agg.s3.length? Math.round(agg.s3.reduce((a,b)=>a+b,0)/agg.s3.length):null,
+    };
+    if(macroP95.hub||macroP95.s1||macroP95.s2||macroP95.s3) return macroP95;
+
+    // global fallback
+    let global={hub:[],s1:[],s2:[],s3:[]};
+    Guardrails.store.forEach(v=>{
+      for(const f of ['hub','s1','s2','s3']){
+        if(v.p95[f]!=null) global[f].push(v.p95[f]);
+      }
+    });
+    return {
+      hub: global.hub.length?Math.round(global.hub.reduce((a,b)=>a+b,0)/global.hub.length):null,
+      s1:  global.s1.length? Math.round(global.s1.reduce((a,b)=>a+b,0)/global.s1.length):null,
+      s2:  global.s2.length? Math.round(global.s2.reduce((a,b)=>a+b,0)/global.s2.length):null,
+      s3:  global.s3.length? Math.round(global.s3.reduce((a,b)=>a+b,0)/global.s3.length):null,
+    };
+  }
+
+  /* ==========================
+     4) 파생/품질/브리치 계산 유틸
+     // v2025-11 CODE IMPROVED
+  ========================== */
+  function msToMinPos(ms){
+    if(ms==null || !isFinite(ms)) return null;
+    const m = Math.round(ms/60000); // ±59초 관용
+    return (m<0)?null:m;
+  }
+  function safePos(v){ if(v==null||!isFinite(v)) return null; return v<0?null:v; }
+
+  function recalcTimelineDerived(r){
+    // 필수 TS
+    const ts = k => r[k] ? new Date(r[k]).getTime() : null;
+
+    const orderTS = ts('Order_Timestamp');
+    const fcExit  = ts(NET.FC_EXIT) || ts('Actual_Ship_Timestamp'); // generator 보정
+    const hubIn   = ts(NET.HUB_IN);
+    const hubOut  = ts(NET.HUB_OUT);
+    const campIn  = ts(NET.CAMP_IN);
+    const loadS   = ts(NET.LOAD_START);
+    const loadE   = ts(NET.LOAD_END);
+    const ofd     = ts(NET.OFD);
+
+    // Dispatch 일관화
+    r.fc_dispatch_ts = fcExit? new Date(fcExit).toISOString(): null;
+    r.camp_depart_ts = loadE? new Date(loadE).toISOString(): (ofd?new Date(ofd).toISOString():null);
+
+    // O2S
+    r.o2s_min = (orderTS!=null && fcExit!=null) ? msToMinPos(fcExit-orderTS) : null;
+
+    // 허브/캠프 dwell
+    r.hub_total_dwell_min  = (hubIn!=null && hubOut!=null) ? msToMinPos(hubOut-hubIn) : null;
+    r.camp_total_dwell_min = (campIn!=null && ofd!=null)    ? msToMinPos(ofd-campIn)   : null;
+
+    // 캠프 3분할
+    r.camp_s1_wait_min = (campIn!=null && loadS!=null) ? msToMinPos(loadS-campIn) : null;
+    r.camp_s2_work_min = (loadS!=null && loadE!=null) ? msToMinPos(loadE-loadS) : null;
+    r.camp_s3_wait_min = (loadE!=null && ofd!=null)   ? msToMinPos(ofd-loadE) : null;
+    r.camp_wait_min = (safePos(r.camp_s1_wait_min)||0) + (safePos(r.camp_s3_wait_min)||0);
+    r.camp_work_min = safePos(r.camp_s2_work_min);
+
+    // 기타 파생
+    r.post_fc_transit_min = (fcExit!=null) ? msToMinPos(((campIn??hubIn)??null) - fcExit) : null;
+    r.hub_exit_wait_min   = (hubOut!=null && campIn!=null) ? msToMinPos(campIn - hubOut) : null;
+
+    // OTD / SLA 재계산 (±59초 관용)
+    const planShip = ts('Planned_Ship_Timestamp');
+    r.fc_otd_flag = (planShip!=null && fcExit!=null) ? (fcExit<=planShip ? 1:0) : null;
+
+    // ofd_otd는 Planned_Delivery_Timestamp가 없으므로 null (스키마 유지용)
+    r.ofd_otd_flag = null;
+
+    // SLA(Breach) 업데이트: 기존 SLA_Breach가 고객 약속 위반으로 이미 생성됨 → 동기화
+    r.sla_breach_flag = (r.SLA_Breach!=null)? Number(r.SLA_Breach): null;
+
+    // Reason category (TEMP/DAMAGE/MISHIP/DELAY)
+    r.reason_category = (r.Temperature_Violation? 'TEMP' :
+      (r.Damage_Flag? 'DAMAGE' :
+        (r.Mis_Ship_Flag? 'MISHIP' :
+          (r.Is_Delayed? 'DELAY' : null))));
+
+    // 품질 플래그
+    r.q_ts_order_error    = ((orderTS && fcExit && fcExit<orderTS) || (hubOut && hubIn && hubOut<hubIn) ||
+      (loadS && campIn && loadS<campIn) || (loadE && loadS && loadE<loadS) ||
+      (ofd && loadE && ofd<loadE)) ? 1:0;
+    r.q_negative_duration = ([r.o2s_min, r.hub_total_dwell_min, r.camp_total_dwell_min, r.camp_s1_wait_min, r.camp_s2_work_min, r.camp_s3_wait_min]
+      .some(x=>x!=null && x<0))?1:0;
+
+    // 아웃라이어 상한
+    const outlier = ( (r.o2s_min!=null && r.o2s_min>1440) ||
+      (r.hub_total_dwell_min!=null && r.hub_total_dwell_min>720) ||
+      (r.camp_total_dwell_min!=null && r.camp_total_dwell_min>360) );
+    r.q_outlier_flag = outlier?1:0;
+
+    // 날짜 파생
+    try{
+      const od = r.Order_Timestamp? new Date(r.Order_Timestamp): null;
+      if(od){
+        r.month = Number(od.getMonth()+1);
+        const onejan = new Date(od.getFullYear(),0,1);
+        r.week = Math.floor((((od - onejan) / 86400000) + onejan.getDay()+1)/7);
+      }
+    }catch(e){ /* ignore */ }
+
+    return r;
+  }
+
+  function flagBreaches(row){
+    const p95 = findP95For(row);
+    row.hub_dispatch_breach_flag = (p95.hub!=null && row.hub_total_dwell_min!=null && row.hub_total_dwell_min>p95.hub)?1:0;
+    row.camp_s1_breach_flag = (p95.s1!=null && row.camp_s1_wait_min!=null && row.camp_s1_wait_min>p95.s1)?1:0;
+    row.camp_s2_breach_flag = (p95.s2!=null && row.camp_s2_work_min!=null && row.camp_s2_work_min>p95.s2)?1:0;
+    row.camp_s3_breach_flag = (p95.s3!=null && row.camp_s3_wait_min!=null && row.camp_s3_wait_min>p95.s3)?1:0;
+
+    // first touch breach
+    let first=null;
+    if(row.hub_dispatch_breach_flag) first='HUB';
+    else if(row.camp_s1_breach_flag) first='CAMP_S1';
+    else if(row.camp_s2_breach_flag) first='CAMP_S2';
+    else if(row.camp_s3_breach_flag) first='CAMP_S3';
+    row.first_touch_breach = first;
+    return row;
+  }
+
+  /* ==========================
+     5) 테이블 빌드/가상화 렌더
+  ========================== */
+  function buildTableHeader(keys){
+    const thead=qs('tbl').querySelector('thead');thead.innerHTML='';
+    const tr=document.createElement('tr');
+    keys.forEach(k=>{const th=document.createElement('th');th.textContent=prettyHeader(k);tr.appendChild(th)});
+    thead.appendChild(tr);
+  }
+  function renderTableRowsVirtual(rows, keys){
+    const tbody=qs('tbl').querySelector('tbody');
+    const frag=document.createDocumentFragment();
+    for(const r of rows){
+      const tr=document.createElement('tr');
+      for(const k of keys){
+        const td=document.createElement('td');
+        const v=r[k];
+        td.textContent=(v===null||v===undefined)?'':v;
+        if(k==='Delivery_Mode'){
+          td.className='delivery-mode '+(v==='로켓새벽'?'dawn':(v==='로켓프레시'?'fresh':(String(v).includes('로켓')?'rocket':'')));
+        }
+        tr.appendChild(td);
+      }
+      frag.appendChild(tr);
+    }
+    tbody.appendChild(frag);
+    const excess = tbody.children.length - RENDER_MAX_ROWS;
+    if(excess>0){ for(let i=0;i<excess;i++){ tbody.removeChild(tbody.firstChild); } }
+  }
+
+  /* ==========================
+     6) 스트리밍 집계 & 패널 업데이트
+  ========================== */
+  function ingestRows(rows){
+    if(!rows||!rows.length) return;
+
+    // 파생 & 가드레일 업데이트
+    for(const r of rows){
+      recalcTimelineDerived(r);
+      updateGuardrailsWithRow(r);
+      flagBreaches(r);
+    }
+
+    // 헤더 결정 (최초 1회): 기존 컬럼 + 새 파생/품질/메타 컬럼 꼬리 append
+    if(!TABLE_KEYS){
+      const baseKeys = Object.keys(rows[0]);
+      const extraKeys = [
+        'fc_dispatch_ts','camp_depart_ts','o2s_min','hub_total_dwell_min','camp_total_dwell_min',
+        'camp_s1_wait_min','camp_s2_work_min','camp_s3_wait_min','camp_wait_min','camp_work_min',
+        'post_fc_transit_min','hub_exit_wait_min','fc_otd_flag','ofd_otd_flag','sla_breach_flag',
+        'hub_dispatch_breach_flag','camp_s1_breach_flag','camp_s2_breach_flag','camp_s3_breach_flag',
+        'first_touch_breach','reason_category','q_ts_order_error','q_negative_duration','q_outlier_flag','q_missing_key',
+        'sim_version','sim_seed','dial_snapshot_json','generated_at'
+      ];
+      const set=new Set(baseKeys.concat(extraKeys));
+      TABLE_KEYS=[...set]; // 고정 순서(기본→추가)
+      buildTableHeader(TABLE_KEYS);
+    }
+
+    // 메모리 적재
+    for(const r of rows){ DATA.push(r); }
+    if(DATA.length>CHUNK_CONFIG.maxMemoryRows){ DATA.splice(0, DATA.length-CHUNK_CONFIG.maxMemoryRows); }
+
+    // 스트리밍 KPI 집계
+    for(const r of rows){
+      AGG.total++;
+      if(r.Is_Rocket_Delivery===1) AGG.rocket++;
+      if(r.Delivery_Mode==='로켓당일'){ AGG.sameDayTotal++; if(r.SLA_Breach===0) AGG.sameDayOnTime++; }
+      if(r.Delivery_Mode==='로켓새벽'){ AGG.dawnTotal++; if(r.SLA_Breach===0) AGG.dawnOnTime++; }
+      if(r.o2s_min!=null && r.o2s_min<=30) AGG.fastShip30++;
+      if(r.o2s_min!=null && r.o2s_min<=60) AGG.shipUnder60++;
+      if(Number(r.sla_breach_flag)===1) AGG.fcSlaBreach++;
+
+      AGG.shipMinutesSum += (r.o2s_min||0);
+      AGG.pickPerItemSum += (r.Picking_Time_Seconds/Math.max(1,r.Quantity));
+      AGG.packPerItemSum += (r.Packing_Time_Seconds/Math.max(1,r.Quantity));
+      AGG.procErrRateSum += (r.Processing_Error_Rate||0);
+
+      if(r.Is_WOW_Member===1){ AGG.wowCount++; AGG.wowSales+=r.Order_Amount; AGG.wowOrders++; if(r.Is_Churn_Risk===1) AGG.wowChurnRisk++; }
+      else { AGG.nonWowSales+=r.Order_Amount; AGG.nonWowOrders++; }
+
+      if(r.Is_Fresh_Food===1) AGG.freshCount++;
+      if(r.Is_Cold_Chain_Required===1){ AGG.coldReq++; if(r.Temperature_Violation===1) AGG.tempViol++; }
+      if(r.Product_Category==='냉동식품' && isFinite(r.Cold_Chain_Quality_Score)){ AGG.frozenQualitySum+=r.Cold_Chain_Quality_Score; AGG.frozenCnt++; }
+
+      if(r.Is_Mega_Hub===1) AGG.megaHub++;
+      if(['서울특별시','경기도','인천광역시'].includes(r.Region)) AGG.metro++;
+      AGG.distanceSum += (r.Distance_km||0);
+      AGG.routingSum += (r.Routing_Score||0);
+
+      if(r.Automation_Level==='AI_OPTIMIZED') AGG.aiOpt++;
+      AGG.autoPickScoreSum += (r.Automation_Level==='AI_OPTIMIZED'?90: r.Automation_Level==='AUTO'?70: r.Automation_Level==='SEMI_AUTO'?40:10);
+      AGG.pickTimeSum += (r.Picking_Time_Seconds||0);
+      AGG.wmsAdvSum += (r.WMS_Advanced_Score||0);
+
+      AGG.salesSum += (r.Order_Amount||0);
+      AGG.netProfitSum += (r.Net_Profit||0);
+
+      AGG.ltvSum += (r.Customer_LTV||0);
+      AGG.cacSum += (r.CAC||0);
+      AGG.uniqueCustomers.add(r.Customer_ID);
+      if(r.Is_Churn_Risk===1) AGG.churnRisk++;
+      // confusion matrix (threshold 0.6)
+      if(r.Predicted_Churn_Score!=null){
+        const pred = r.Predicted_Churn_Score>=0.6?1:0;
+        const act = r.Churn_Flag===1?1:0;
+        if(pred===1 && act===1) AGG.cm_tp++;
+        else if(pred===0 && act===0) AGG.cm_tn++;
+        else if(pred===1 && act===0) AGG.cm_fp++;
+        else if(pred===0 && act===1) AGG.cm_fn++;
+        if((pred===1)===(act===1)) AGG.aiAccEqual++;
+      }
+
+      if(r.SLA_Breach===0) AGG.onTime++; else AGG.delay++;
+      AGG.loadSum += (r.Load_Factor||0);
+      AGG.fuelSum += (r.Fuel_Efficiency||0);
+      AGG.routeSum += (r.Routing_Score||0);
+      if(r.Temperature_Violation===1 || Number(r.sla_breach_flag)===1 || r.Return_Flag===1) AGG.exception++;
+
+      if(r.Return_Flag===1){ AGG.returnCnt++; AGG.returnCostSum+=(r.Return_Cost||0); if(r.Is_Resellable===1) AGG.resellCnt++; }
+
+      AGG.invTurnSum += (r.Inventory_Turnover||0);
+      if(r.Stockout_Flag===1) AGG.stockoutCnt++;
+      if(r.Overstock_Flag===1) AGG.overstockCnt++;
+      AGG.invAccSum += (r.Inventory_Accuracy||0);
+      if(r.WMS_Usage==='Active') AGG.wmsActiveCnt++;
+
+      if(r.Is_Loss_Order===1) AGG.lossOrderCnt++;
+      if(r.Region==='제주특별자치도'){ AGG.jejuTotal++; if(r.Is_Weather_Risk===1) AGG.jejuWeatherRiskCnt++; }
+      if(r.Expiry_Date){
+        const d = (new Date(r.Expiry_Date)) - (new Date(r.Order_Date));
+        if(d<=86400000 && d>=-31536000000) AGG.expiryImminentCnt++;
+      }
+    }
+
+    // 테이블 렌더
+    renderTableRowsVirtual(rows, TABLE_KEYS);
+
+    // KPI/검증 업데이트
+    updateKPIsFromAgg();
+    updateValidationAndRiskFromAgg();
+
+    // 진행률 상태 갱신
+    PROCESSING_STATE.processedRows += rows.length;
+    updateProgressFromState('Generating');
+  }
+
+  function updateKPIsFromAgg(){
+    const total=Math.max(1,AGG.total);
+    const fmtPct=v=>(isFinite(v)?(Number(v).toFixed(1)+'%'):'-');
+
+    const rocketShare=(AGG.rocket/total*100);
+    const sameDaySuccess=(AGG.sameDayTotal?AGG.sameDayOnTime/AGG.sameDayTotal*100:0);
+    const dawnOnTime=(AGG.dawnTotal?AGG.dawnOnTime/AGG.dawnTotal*100:0);
+    const fastShip=(AGG.fastShip30/total*100);
+
+    const fcOnTime=100-(AGG.fcSlaBreach/total*100);
+    const avgShipHr=((AGG.shipMinutesSum/total)/60);
+    const pickSecPerItem=(AGG.pickPerItemSum/total);
+    const packSecPerItem=(AGG.packPerItemSum/total);
+    const effFulfill=clamp(100-((AGG.procErrRateSum/total)*100*2),0,100);
+    const shipUnder60=(AGG.shipUnder60/total*100);
+
+    const wowShare=(AGG.wowCount/total*100);
+    const wowAov = (AGG.wowOrders?AGG.wowSales/AGG.wowOrders:0);
+    const nonWowAov = (AGG.nonWowOrders?AGG.nonWowSales/AGG.nonWowOrders:0);
+    const wowAovGap = (wowAov - nonWowAov);
+    const wowChurnRisk = AGG.wowChurnRisk;
+
+    const freshShare=(AGG.freshCount/total*100);
+    const coldChainRate=(AGG.coldReq? (1-AGG.tempViol/AGG.coldReq)*100 : 100);
+    const tempViolRate=(AGG.coldReq? (AGG.tempViol/AGG.coldReq*100) : 0);
+    const frozenQuality=(AGG.frozenCnt? AGG.frozenQualitySum/AGG.frozenCnt : 0);
+
+    const megaHubShare=(AGG.megaHub/total*100);
+    const metroCoverage=(AGG.metro/total*100);
+    const avgDist=(AGG.distanceSum/total);
+    const networkEff=(AGG.routingSum/total);
+
+    const aiOptimized=(AGG.aiOpt/total*100);
+    const autoPickRate=(AGG.autoPickScoreSum/total);
+    const avgPickTime=(AGG.pickTimeSum/total);
+    const wmsAdvanced=(AGG.wmsAdvSum/total);
+
+    const totalSales=AGG.salesSum;
+    const netMargin=(AGG.salesSum?AGG.netProfitSum/AGG.salesSum*100:0);
+    const aov=(AGG.salesSum/total);
+    const uniqueCust=Math.max(1,AGG.uniqueCustomers.size);
+    const arppu=(AGG.salesSum/uniqueCust);
+
+    const ltvAvg=(AGG.ltvSum/total);
+    const cacAvg=(AGG.cacSum/total);
+    const ltvCac=(cacAvg? (ltvAvg/cacAvg).toFixed(2):'0.00');
+
+    const churnRate=(AGG.churnRisk/total*100);
+    const aiAcc=(AGG.aiAccEqual/total*100);
+
+    const onTime=(AGG.onTime/total*100);
+    const sla=(AGG.fcSlaBreach/total*100);
+    const load=(AGG.loadSum/total);
+    const fuel=(AGG.fuelSum/total);
+    const route=(AGG.routeSum/total);
+    const exception=(AGG.exception/total*100);
+
+    const retRate=(AGG.returnCnt/total*100);
+    const retCostRate=(AGG.salesSum?AGG.returnCostSum/AGG.salesSum*100:0);
+    const resell=(AGG.returnCnt?AGG.resellCnt/AGG.returnCnt*100:0);
+
+    const invTurn=(AGG.invTurnSum/total);
+    const stockout=(AGG.stockoutCnt/total*100);
+    const overstock=(AGG.overstockCnt/total*100);
+    const invAcc=(AGG.invAccSum/total);
+    const shrink=(100 - invAcc);
+    const wmsUse=(AGG.wmsActiveCnt/total*100);
+
+    setText('k_rocketShare',fmtPct(rocketShare));
+    setText('k_rocketSameDayRate',fmtPct(sameDaySuccess));
+    setText('k_rocketDawnRate',fmtPct(dawnOnTime));
+    setText('k_fastShipRate',fmtPct(fastShip));
+
+    setText('k_fcOnTimeShip',fmtPct(fcOnTime));
+    setText('k_fcAvgShipHour',(avgShipHr||0).toFixed(2));
+    setText('k_fcPickSecPerItem',(pickSecPerItem||0).toFixed(1));
+    setText('k_fcPackSecPerItem',(packSecPerItem||0).toFixed(1));
+    setText('k_fcEfficiency',(effFulfill||0).toFixed(1));
+    setText('k_fcShipUnder60',fmtPct(shipUnder60));
+
+    setText('k_wowShare',fmtPct(wowShare));
+    setText('k_wowPlusShare','0');
+    setText('k_wowAovGap',formatCurrencyKRW(wowAovGap));
+    setText('k_wowChurnRisk',wowChurnRisk.toLocaleString('ko-KR'));
+
+    setText('k_freshShare',fmtPct(freshShare));
+    setText('k_coldChainRate',fmtPct(coldChainRate));
+    setText('k_tempViolation',fmtPct(tempViolRate));
+    setText('k_frozenQuality',(frozenQuality||0).toFixed(0));
+
+    setText('k_megaHubShare',fmtPct(megaHubShare));
+    setText('k_seoulCoverage',fmtPct(metroCoverage));
+    setText('k_avgDistance',(avgDist||0).toFixed(1));
+    setText('k_networkEff',(networkEff||0).toFixed(0));
+
+    setText('k_aiOptimized',fmtPct(aiOptimized));
+    setText('k_autoPickRate',(autoPickRate||0).toFixed(1));
+    setText('k_avgPickTime',(avgPickTime||0).toFixed(1));
+    setText('k_wmsAdvanced',(wmsAdvanced||0).toFixed(0));
+
+    setText('k_totalSales',formatCurrencyKRW(totalSales));
+    setText('k_netMargin',(netMargin||0).toFixed(2));
+    setText('k_aov',formatCurrencyKRW(aov));
+    setText('k_arppu',formatCurrencyKRW(arppu));
+
+    setText('k_ltvCac',ltvCac);
+    setText('k_retention',(100-churnRate).toFixed(1));
+    setText('k_churn',churnRate.toFixed(1));
+    setText('k_ai',aiAcc.toFixed(1));
+
+    setText('k_onTime',fmtPct(onTime));
+    setText('k_sla',fmtPct(sla));
+    setText('k_load',(load||0).toFixed(1));
+    setText('k_fuel',(fuel||0).toFixed(2));
+    setText('k_route',(route||0).toFixed(0));
+    setText('k_exception',fmtPct(exception));
+
+    setText('k_returnRate',fmtPct(retRate));
+    setText('k_returnCost',(retCostRate||0).toFixed(2));
+    setText('k_resell',fmtPct(resell));
+
+    setText('k_invTurn',(invTurn||0).toFixed(1));
+    setText('k_stockout',fmtPct(stockout));
+    setText('k_overstock',fmtPct(overstock));
+    setText('k_invAcc',(invAcc||0).toFixed(1));
+    setText('k_shrink',(shrink||0).toFixed(1));
+    setText('k_wms',fmtPct(wmsUse));
+  }
+
+  function updateValidationAndRiskFromAgg(){
+    const list=qs('validateList');list.innerHTML='';
+    const risk=qs('riskList');risk.innerHTML='';
+    const perf=qs('perfList');perf.innerHTML='';
+    if(AGG.total===0){qs('validateSummary').textContent='-';return;}
+
+    const total=AGG.total;
+    const tempViolRate=(AGG.coldReq?AGG.tempViol/AGG.coldReq:0);
+    const lossRate=(AGG.lossOrderCnt/total);
+    const jejuRate=(AGG.jejuTotal?AGG.jejuWeatherRiskCnt/AGG.jejuTotal:0);
+    const overStockRate=(AGG.overstockCnt/total);
+    const expirySoonRate=(AGG.expiryImminentCnt/total);
+
+    const DIALS_CUR={
+      tempHi: parseFloat(qs('dial_temp_hi').value),
+      lossHi: parseFloat(qs('dial_loss_hi').value),
+      jejuHi: parseFloat(qs('dial_jeju_hi').value),
+      overHi: parseFloat(qs('dial_over_hi').value),
+      expHi: parseFloat(qs('dial_exp_hi').value),
+    };
+    const pill=(text,type)=>{const d=document.createElement('div');d.className='alert '+type;d.textContent=text;return d}
+
+    const okText=`콜드체인 위반율 ${(tempViolRate*100).toFixed(2)}% / 손실주문율 ${(lossRate*100).toFixed(2)}%`;
+    qs('validateSummary').textContent=okText;
+
+    if(tempViolRate > DIALS_CUR.tempHi) risk.appendChild(pill(`콜드체인 위반율 상한 초과 (${(tempViolRate*100).toFixed(2)}% > ${(DIALS_CUR.tempHi*100).toFixed(1)}%)`,'bad'));
+    if(lossRate > DIALS_CUR.lossHi) risk.appendChild(pill(`적자주문율 상한 초과 (${(lossRate*100).toFixed(2)}%)`,'bad'));
+    if(jejuRate > DIALS_CUR.jejuHi) risk.appendChild(pill(`제주 악천후 노출 과다 (${(jejuRate*100).toFixed(1)}%)`,'warn'));
+    if(overStockRate > DIALS_CUR.overHi) risk.appendChild(pill(`과재고 비율 과다 (${(overStockRate*100).toFixed(1)}%)`,'warn'));
+    if(expirySoonRate > DIALS_CUR.expHi) risk.appendChild(pill(`유통기한 임박 과다 (${(expirySoonRate*100).toFixed(2)}%)`,'warn'));
+
+    // 세그먼트 위험 Top5 (간단 메시지)
+    const breaches=DATA.slice(-5000).map(r=>{
+      const key=segmentKey(r);
+      const label=key.replaceAll('|',' · ');
+      const rate = (r.camp_s1_breach_flag + r.camp_s2_breach_flag + r.camp_s3_breach_flag + r.hub_dispatch_breach_flag);
+      return {label,rate};
+    });
+    const top = Object.values(breaches.reduce((acc,x)=>{acc[x.label]=(acc[x.label]||0)+(x.rate||0);return acc;},{}));
+    const keys = Object.keys(breaches.reduce((acc,x)=>{acc[x.label]=true;return acc;},{}));
+    const arr = keys.map(k=>({label:k, score: breaches.filter(b=>b.label===k).reduce((a,b)=>a+b.rate,0)}))
+      .sort((a,b)=>b.score-a.score).slice(0,5);
+    for(const t of arr){ risk.appendChild(pill(`${t.label}: 캠프/허브 P95 초과 누적=${t.score}`, t.score>50?'bad':(t.score>20?'warn':'good'))); }
+
+    const rps=PROCESSING_STATE.processedRows/Math.max(1,((Date.now()-PROCESSING_STATE.startTime)/1000));
+    perf.appendChild(pill(`생성 처리속도: ${rps.toFixed(1)} rows/sec`,'good'));
+    perf.appendChild(pill(`메모리 보호: 최대 ${CHUNK_CONFIG.maxMemoryRows.toLocaleString('ko-KR')} rows 유지`,'good'));
+
+    // 간단 혼동행렬
+    const cm=`TP:${AGG.cm_tp} / TN:${AGG.cm_tn} / FP:${AGG.cm_fp} / FN:${AGG.cm_fn}`;
+    perf.appendChild(pill(`AI 이탈 예측 혼동행렬(τ=0.6): ${cm}`,'good'));
+  }
+
+  /* ==========================
+     7) CSV 내보내기
+  ========================== */
+  function buildCSVHeader(keys){ return keys.map(k=>CSV_SPECIAL_LABELS[k]||prettyHeader(k)).join(',')+'\n'; }
+  function escapeCsvCell(v){
+    if(v===null||v===undefined) return '';
+    const s=String(v);
+    return /[",\n]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s;
+  }
+  async function downloadCSVFast(){
+    if(!TABLE_KEYS || DATA.length===0) return;
+    setStatus('EXPORTING','running'); showProgress(true);
+    let processed=0; const total=DATA.length;
+
+    const parts=[]; parts.push(buildCSVHeader(TABLE_KEYS));
+    const BATCH=5000;
+    for(let i=0;i<DATA.length;i+=BATCH){
+      const slice=DATA.slice(i,i+BATCH);
+      const lines = slice.map(row=>TABLE_KEYS.map(k=>escapeCsvCell(row[k])).join(',')).join('\n')+'\n';
+      parts.push(lines);
+      processed += slice.length;
+      updateExportProgress(processed,total);
+      await new Promise(r=>setTimeout(r,0));
+    }
+    const blob=new Blob(parts,{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`coupang-logistics-${Date.now()}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    setStatus('READY','ok'); showProgress(false);
+  }
+  async function downloadCSVTurbo(){
+    if(!TABLE_KEYS || DATA.length===0) return;
+    setStatus('EXPORTING','running'); showProgress(true);
+    const encoder = new TextEncoder();
+    const header = buildCSVHeader(TABLE_KEYS);
+
+    const stream = new ReadableStream({
+      async start(controller){
+        controller.enqueue(encoder.encode(header));
+        const BATCH=8000; let processed=0;
+        for(let i=0;i<DATA.length;i+=BATCH){
+          const slice=DATA.slice(i,i+BATCH);
+          const text = slice.map(row=>TABLE_KEYS.map(k=>escapeCsvCell(row[k])).join(',')).join('\n')+'\n';
+          controller.enqueue(encoder.encode(text));
+          processed+=slice.length; updateExportProgress(processed,DATA.length);
+          await new Promise(r=>setTimeout(r,0));
+        }
+        controller.close();
+      }
+    });
+    let finalStream = stream;
+    let fileName = `coupang-logistics-${Date.now()}.csv`;
+    if(typeof CompressionStream!=='undefined'){
+      finalStream = stream.pipeThrough(new CompressionStream('gzip'));
+      fileName += '.gz';
+    }
+    const blob = await new Response(finalStream).blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=fileName;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    setStatus('READY','ok'); showProgress(false);
+  }
+
+  /* ==========================
+     8) DIALS ←→ CAL 매핑
+  ========================== */
+  let DIALS={
+    lossOrderTarget:[0.07,0.12],
+    tempViolationTarget:[0.01,0.02],
+    jejuWeatherExposureTarget:[0.10,0.15],
+    overstockTarget:[0.15,0.25],
+    expiryImminentTarget:[0.005,0.01]
+  };
+  let CAL={
+    costBias:1.0,
+    tempViolationBase:0.015,
+    jejuWeatherScale:1.0,
+    overstockProb:0.22,
+    expiryImminentRate:0.008
+  };
+  function applyDialsToCal(targetNetMargin){
+    const lossLo = parseFloat(qs('dial_loss_lo').value);
+    const lossHi = parseFloat(qs('dial_loss_hi').value);
+    const tempLo = parseFloat(qs('dial_temp_lo').value);
+    const tempHi = parseFloat(qs('dial_temp_hi').value);
+    const jejuLo = parseFloat(qs('dial_jeju_lo').value);
+    const jejuHi = parseFloat(qs('dial_jeju_hi').value);
+    const overLo = parseFloat(qs('dial_over_lo').value);
+    const overHi = parseFloat(qs('dial_over_hi').value);
+    const expLo = parseFloat(qs('dial_exp_lo').value);
+    const expHi = parseFloat(qs('dial_exp_hi').value);
+
+    DIALS.lossOrderTarget=[lossLo,lossHi];
+    DIALS.tempViolationTarget=[tempLo,tempHi];
+    DIALS.jejuWeatherExposureTarget=[jejuLo,jejuHi];
+    DIALS.overstockTarget=[overLo,overHi];
+    DIALS.expiryImminentTarget=[expLo,expHi];
+
+    CAL.tempViolationBase = clamp((tempLo + tempHi) / 2, 0.001, 0.20);
+    const jejuAvg = (jejuLo + jejuHi) / 2;
+    CAL.jejuWeatherScale = clamp(jejuAvg / 0.12, 0.6, 1.6);
+    CAL.overstockProb = clamp((overLo + overHi) / 2, 0, 0.60);
+    CAL.expiryImminentRate = clamp((expLo + expHi) / 2, 0, 0.20);
+
+    if (Number.isFinite(targetNetMargin)) {
+      const delta = clamp((3 - targetNetMargin) / 30, -0.1, 0.1);
+      CAL.costBias = clamp(1 + delta, 0.85, 1.15);
+    } else {
+      CAL.costBias = 1.0;
+    }
+    qs('tuneStatus').textContent='DIALS APPLIED';
+    qs('tuneStatus').className='pill ok';
+  }
+
+  /* ==========================
+     9) Web Worker — 데이터 생성기
+     (현실성 보강, UI/스키마 호환)
+  ========================== */
+  function createGeneratorWorker(){
+    const workerCode = `
+      let SHOULD_STOP=false;
+
+      const NET_PREFIX='${NET_PREFIX}';
+      const N=s=>NET_PREFIX+s;
+      const NET=Object.freeze({
+        ROUTE_TYPE:N('Route_Type'),
+        SORT_HUB_NAME:N('Sortation_Hub_Name'),
+        FC_EXIT:N('FC_Exit_TS'),
+        HUB_IN:N('Hub_In_TS'),
+        HUB_OUT:N('Hub_Out_TS'),
+        CAMP_IN:N('Camp_In_TS'),
+        LOAD_START:N('Loadout_Start_TS'),
+        LOAD_END:N('Loadout_End_TS'),
+        OFD:N('OFD_TS'),
+        FC_DWELL:N('FC_Dwell_Min'),
+        HUB_DWELL:N('Hub_Dwell_Min'),
+        CAMP_DWELL:N('Camp_Dwell_Min'),
+      });
+
+      const SHIP_SLA_MIN={'로켓당일':60,'로켓새벽':90,'로켓익일':90,'로켓프레시':60,'일반택배':120,DEFAULT:90};
+      const DELIVERY_MODES={
+        '로켓당일':{delayRate:0.006,baseDays:0,cutoffHour:20,regions:['수도권'],wowOnly:false,cost:1.2},
+        '로켓새벽':{delayRate:0.010,baseDays:1,regions:['수도권','영남','충청'],wowOnly:false,cost:1.1},
+        '로켓익일':{delayRate:0.014,baseDays:1,regions:['전국'],wowOnly:false,cost:1.0},
+        '로켓프레시':{delayRate:0.016,baseDays:0,cutoffHour:18,regions:['수도권'],wowOnly:false,cost:1.3,coldChain:true},
+        '일반택배':{delayRate:0.035,baseDays:2,regions:['전국'],wowOnly:false,cost:0.8}
+      };
+      const REGIONS=['서울특별시','부산광역시','대구광역시','인천광역시','광주광역시','대전광역시','울산광역시','세종특별자치시','경기도','강원특별자치도','충청북도','충청남도','전북특별자치도','전라남도','경상북도','경상남도','제주특별자치도'];
+      const CITIES_BY_REGION={ '서울특별시':['서울시'],'부산광역시':['부산시'],'대구광역시':['대구시'],'인천광역시':['인천시'],'광주광역시':['광주시'],'대전광역시':['대전시'],'울산광역시':['울산시'],'세종특별자치시':['세종시'],
+        '경기도':['성남시','용인시','수원시','고양시','남양주시'],'강원특별자치도':['춘천시','원주시','강릉시'],'충청북도':['청주시','충주시','제천시'],'충청남도':['천안시','아산시','서산시'],
+        '전북특별자치도':['전주시','익산시','군산시'],'전라남도':['순천시','여수시','목포시'],'경상북도':['포항시','구미시','경산시'],'경상남도':['창원시','김해시','진주시'],'제주특별자치도':['제주시','서귀포시'] };
+      const DISTRICTS_BY_CITY={'서울시':['강남구','서초구','송파구','마포구','성동구','강서구'],'부산시':['해운대구','수영구','남구','부산진구'],'대구시':['수성구','달서구','중구','동구'],'인천시':['남동구','연수구','부평구','미추홀구'],
+        '광주시':['서구','남구','북구','광산구'],'대전시':['서구','유성구','대덕구','동구'],'울산시':['남구','중구','북구','울주군'],'세종시':['세종동','새롬동','보람동'],
+        '성남시':['분당구','수정구','중원구'],'용인시':['수지구','기흥구','처인구'],'수원시':['영통구','권선구','팔달구','장안구'],'고양시':['일산서구','일산동구','덕양구'],
+        '남양주시':['화도읍','진접읍','별내동'],'춘천시':['퇴계동','석사동','후평동'],'원주시':['무실동','단구동','태장동'],'강릉시':['교동','포남동','입암동'],
+        '청주시':['흥덕구','서원구','청원구'],'충주시':['연수동','교현동','호암동'],'제천시':['신백동','청전동'],'천안시':['서북구','동남구'],'아산시':['배방읍','탕정면','온양동'],'서산시':['동문동','석남동'],
+        '전주시':['완산구','덕진구'],'익산시':['영등동','부송동'],'군산시':['나운동','수송동'],'순천시':['연향동','조례동'],'여수시':['웅천동','문수동'],'목포시':['하당동','신흥동'],
+        '포항시':['북구','남구'],'구미시':['원평동','형곡동'],'경산시':['중방동','서상동'],'창원시':['성산구','의창구','마산합포구'],'김해시':['삼계동','구산동','장유동'],'진주시':['상대동','평거동'],
+        '제주시':['노형동','연동','아라동'],'서귀포시':['서귀동','대정읍','표선면'] };
+
+      const MEGA_HUBS=['김포메가허브','곤지암메가허브','덕평허브','평택허브'];
+      const VEHICLES=[{type:'오토바이',capacity:15,fuelEff:[28,45],regions:['도심']},{type:'소형밴',capacity:50,fuelEff:[11,16],regions:['전체']},{type:'중형트럭',capacity:200,fuelEff:[7,11],regions:['전체']},{type:'대형트럭',capacity:500,fuelEff:[5,8],regions:['간선']},{type:'전기차',capacity:40,fuelEff:[4.5,6.8],regions:['도심']}];
+      const DRIVER_GRADES=['신입','일반','숙련','베테랑','MVP'];
+      const WEATHER_CONDITIONS=['맑음','흐림','비','눈','안개','강풍'];
+      function weatherSeverity(c){const m={'맑음':0.02,'흐림':0.15,'비':0.45,'눈':0.75,'안개':0.35,'강풍':0.55};return m[c]||0.2}
+
+      const CATEGORIES={
+        '신선식품':{margin:0.18,price:[2000,18000],coldChain:true,freshFood:true,tempRange:[0,4],returnRate:0.035},
+        '냉동식품':{margin:0.22,price:[3000,22000],coldChain:true,freshFood:false,tempRange:[-18,-12],returnRate:0.028},
+        '가전전자':{margin:0.14,price:[15000,700000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.022},
+        '패션의류':{margin:0.38,price:[9000,180000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.11},
+        '생활용품':{margin:0.28,price:[2000,55000],coldChain:false,freshFood:false,tempRange:null,returnRate:0.03}
+      };
+
+      const rnd=(a,b)=>Math.random()*(b-a)+a;
+      const irnd=(a,b)=>Math.floor(rnd(a,b+1));
+      const pick=arr=>arr[irnd(0,arr.length-1)];
+      function macroRegionBySiDo(region){if(['서울특별시','경기도','인천광역시'].includes(region))return'수도권';if(['부산광역시','대구광역시','울산광역시','경상북도','경상남도'].includes(region))return'영남';if(['대전광역시','세종특별자치시','충청북도','충청남도'].includes(region))return'충청';if(['광주광역시','전북특별자치도','전라남도'].includes(region))return'호남';if(['강원특별자치도'].includes(region))return'강원';if(['제주특별자치도'].includes(region))return'제주';return'기타'}
+
+      // 고객 프로파일(WOW/지역 선호)
+      function buildProfiles(nUsers, wowRate){
+        const profiles={};
+        const arr=new Array(nUsers).fill(0).map((_,i)=>i);
+        const wowK=Math.round(nUsers*(wowRate/100));
+        const wowMask=arr.map((x,i)=>i<wowK); // 초기 true wowK개
+        for(let i=wowMask.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[wowMask[i],wowMask[j]]=[wowMask[j],wowMask[i]];}
+        for(let i=0;i<nUsers;i++){
+          const id=\`CUST\${String(100000+i).padStart(7,'0')}\`;
+          profiles[id]={isWow: wowMask[i]?1:0, churnFlag: Math.random()<0.08?1:0, preferredRegion: pick(REGIONS)};
+        }
+        return profiles;
+      }
+
+      // 메인 행 생성
+      function genRow(i, totalUsers, profiles, years, forceRocket, CAL){
+        const custIndex=i%totalUsers;
+        const customerId=\`CUST\${String(100000+custIndex).padStart(7,'0')}\`;
+        const profile=profiles[customerId];
+        const region= Math.random()<0.7?profile.preferredRegion: pick(REGIONS);
+        const city= pick((CITIES_BY_REGION[region]||['기타시']));
+        const district= pick((DISTRICTS_BY_CITY[city]||['기타구']));
+
+        // 주문 시각 (월/피크 가중 약식)
+        const year= irnd(years[0],years[1]);
+        const month= irnd(1,12);
+        const hour = (Math.random()<0.2? irnd(19,21): irnd(8,18));
+        const orderDate= new Date(year, month-1, irnd(1,28), hour, irnd(0,59), irnd(0,59));
+
+        // 카테고리 & 금액
+        const cats=Object.keys(CATEGORIES);
+        const cat= pick(cats);
+        const catCfg=CATEGORIES[cat];
+        const unitPrice= irnd(catCfg.price[0], catCfg.price[1]);
+        const qty= Math.random()<0.7?1:irnd(2,4);
+        const amount= unitPrice*qty;
+
+        // 배송 모드
+        let mode= forceRocket? pick(['로켓당일','로켓새벽','로켓익일','로켓프레시']) : '일반택배';
+        if(mode==='로켓당일' && !['서울특별시','경기도','인천광역시'].includes(region)) mode='로켓익일';
+
+        // 계획/실제 배송
+        const plan=new Date(orderDate);
+        if(mode==='로켓당일'){ const cut=20; if(orderDate.getHours()>=cut){ plan.setDate(plan.getDate()+1); plan.setHours(6,0,0,0);} else { plan.setHours(orderDate.getHours()+irnd(3,6),irnd(0,59),0,0);} }
+        else if(mode==='로켓새벽'){ plan.setDate(plan.getDate()+1); plan.setHours(6,irnd(0,30),0,0); }
+        else if(mode==='로켓프레시'){ plan.setDate(plan.getDate()); plan.setHours(7,irnd(0,30),0,0); }
+        else { plan.setDate(plan.getDate()+ (mode==='로켓익일'?1:2) ); plan.setHours(irnd(9,18),irnd(0,59),0,0); }
+
+        const weather = pick(WEATHER_CONDITIONS);
+        const ws = weatherSeverity(weather) * (region==='제주특별자치도'? (CAL.jejuWeatherScale||1.0):1.0);
+        let delayRate=(DELIVERY_MODES[mode]?.delayRate||0.02) * (ws>0.4?1.5:1.0) * (hour>=19&&hour<=21?1.3:1.0);
+        const isDelayed= Math.random()<delayRate;
+        const actual = new Date(plan);
+        if(isDelayed) actual.setHours(actual.getHours()+ (mode.includes('로켓')? irnd(3,18): irnd(12,36)));
+        else actual.setMinutes(actual.getMinutes()- irnd(10,120));
+
+        // FC 내부 시간 근사
+        const SLA = SHIP_SLA_MIN[mode]??SHIP_SLA_MIN.DEFAULT;
+        let o2s = irnd(10, Math.floor(SLA*0.9));
+        if(hour>=19&&hour<=21) o2s=Math.round(o2s*1.08);
+        const fcExit = new Date(orderDate.getTime()+o2s*60000);
+
+        // 라우팅(허브/캠프)
+        const routeMetro=(['서울특별시','경기도','인천광역시'].includes(region));
+        const routeType= routeMetro? 'FC→CAMP→OFD':'FC→HUB→CAMP→OFD';
+        const sortHub= routeMetro? null : pick(MEGA_HUBS);
+        const isMegaHub= sortHub?1:0;
+
+        const hubIn = sortHub? new Date(fcExit.getTime()+irnd(30,90)*60000): null;
+        const hubDwell = sortHub? irnd(20,90): null;
+        const hubOut= sortHub? new Date(hubIn.getTime()+hubDwell*60000): null;
+
+        const campInBase = sortHub? hubOut: fcExit;
+        const campIn = new Date(campInBase.getTime()+irnd(25,80)*60000);
+        const loadStart = new Date(campIn.getTime()+irnd(5,25)*60000);
+        const loadEnd   = new Date(loadStart.getTime()+irnd(5,25)*60000);
+        const ofd = new Date(loadEnd.getTime()+irnd(15,90)*60000);
+
+        // 비용/차량 등 약식
+        const distanceKm = routeMetro? irnd(6,26) : irnd(18,55);
+        const vehicle = pick(VEHICLES);
+        const driverGrade = pick(DRIVER_GRADES);
+        const loadFactor = Math.round(Math.min(100, Math.max(20, (routeMetro? 75:65) + (ws>0.4? -10:0) + rnd(-8,12))));
+        const fuelEff = vehicle.type==='전기차'? +rnd(4.5,6.8).toFixed(1) : +rnd(6,16).toFixed(1);
+
+        const grossProfit = Math.round(amount*catCfg.margin);
+        const logisticsCost = Math.round((2800 + distanceKm*90 + 500) * (DELIVERY_MODES[mode]?.cost||1.0) * (ws>0.6?1.25:1.0) * (loadFactor>90?1.05:1.0) * (CAL.costBias||1.0));
+        const returnFlag = Math.random() < (catCfg.returnRate * (isDelayed && mode.includes('로켓')?1.6:1.0) * (catCfg.freshFood?1.2:1.0));
+        const returnCost = returnFlag? Math.round(amount*rnd(0.1,0.25)) : 0;
+        const tempViolation = catCfg.coldChain? (Math.random() < (CAL.tempViolationBase||0.015)) : false;
+        const damageFlag = Math.random() < (0.006 + (tempViolation?0.03:0) + (distanceKm>35?0.006:0));
+        const misShipFlag = Math.random() < 0.004;
+
+        const netProfit = grossProfit - logisticsCost - returnCost - (tempViolation? Math.round(amount*0.05):0);
+
+        const predChurn = +( (profile.churnFlag? rnd(0.65,0.92): rnd(0.05,0.55)) + (isDelayed?0.12:0) + (returnFlag&&!damageFlag?0.05:0) ).toFixed(3);
+
+        const picking= irnd(8,40), packing= irnd(6,25);
+
+        return {
+          Order_ID:\`ORD\${String(1000000+i).padStart(7,'0')}\`,
+          Order_Date: orderDate.toISOString().split('T')[0],
+          Order_Timestamp: orderDate.toISOString(),
+          Order_Hour: orderDate.getHours(),
+
+          Delivery_Mode: mode,
+          Planned_Delivery_Date: actual.toISOString().split('T')[0],
+          Actual_Delivery_Date: actual.toISOString().split('T')[0],
+          Delivery_Timestamp: actual.toISOString(),
+          Is_Delayed: isDelayed?1:0,
+          Delay_Hours: Math.max(0, Math.round((actual - plan)/3600000)),
+          SLA_Breach: isDelayed?1:0,
+          Delivery_Status: isDelayed?'Delayed Delivered':'Delivered',
+
+          Fast_Ship_30min: (o2s<=30)?1:0,
+          Order_To_Ship_Minutes: o2s,
+
+          Region: region, City: city, District: district, Address: \`\${city} \${district} 물류로 \${irnd(1,200)}-\${irnd(1,80)}\`,
+          Fulfillment_Center: routeMetro?'서울동부FC':'지역FC',
+          Delivery_Center: \`\${city} 배송캠프\`,
+          Is_Mega_Hub: isMegaHub,
+          Distance_km: distanceKm,
+
+          Customer_ID: customerId,
+          Is_WOW_Member: profile.isWow,
+          WOW_Tier: profile.isWow?'WOW_BASIC':null,
+          WOW_Join_Date: profile.isWow? new Date(orderDate.getTime()-irnd(60,720)*86400000).toISOString().split('T')[0]: null,
+          WOW_Tenure_Days: profile.isWow? irnd(60,720): 0,
+          Customer_Segment: pick(['일반','활성','핵심','휴면준비']),
+
+          Product_Category: cat, SKU: \`\${cat}-SKU\`, ABC_Category: pick(['A','B','C']),
+          Unit_Price: unitPrice, Quantity: qty, Order_Amount: amount,
+
+          Is_Fresh_Food: catCfg.freshFood?1:0,
+          Is_Cold_Chain_Required: catCfg.coldChain?1:0,
+          Target_Temperature: catCfg.coldChain? (catCfg.tempRange[0]+catCfg.tempRange[1])/2 : null,
+          Actual_Temperature: catCfg.coldChain? +rnd((catCfg.tempRange[0]-3),(catCfg.tempRange[1]+3)).toFixed(1): null,
+          Temperature_Violation: tempViolation?1:0,
+          Cold_Chain_Quality_Score: catCfg.coldChain? (tempViolation? irnd(65,85): irnd(86,98)) : null,
+
+          Vehicle_ID: \`V\${irnd(10000,99999)}\`,
+          Vehicle_Type: vehicle.type,
+          Vehicle_Capacity: vehicle.capacity,
+          Driver_ID: \`D\${irnd(1000,9999)}\`,
+          Driver_Grade: driverGrade,
+
+          Load_Factor: loadFactor, Fuel_Efficiency: fuelEff, Routing_Score: irnd(60,98), GPS_Tracking:1,
+
+          Actual_Logistics_Cost: logisticsCost, Customer_Delivery_Charge: profile.isWow?0:(amount<50000?(mode.includes('로켓')?3500:3000):0),
+          Gross_Profit: grossProfit, Net_Profit: netProfit,
+
+          CAC: profile.isWow? irnd(3000,6000): irnd(1200,2800),
+          Customer_LTV: Math.round(amount*(profile.isWow? rnd(3.2,4.5): rnd(1.8,3.0))),
+          LTV_to_CAC: 0, // 채워짐
+
+          Return_Flag: returnFlag?1:0, Return_Reason: returnFlag? pick(['단순변심','상품불량','배송지연','오배송','파손','기타']): null,
+          Return_Cost: returnCost, Is_Resellable: returnFlag? (tempViolation?0:(Math.random()<0.7?1:0)) : null,
+          Resellability_Reason: returnFlag? (tempViolation?'온도관리실패': (Math.random()<0.7?'정상상품':'포장손상')): null,
+
+          Current_Stock: irnd(20,500), Reorder_Point: irnd(10,150),
+          Stockout_Flag: Math.random()<0.04?1:0, Overstock_Flag: Math.random()< (CAL.overstockProb||0.22)?1:0,
+          Inventory_Turnover: +rnd(2,18).toFixed(1), Inventory_Accuracy: +rnd(92,99.5).toFixed(1),
+
+          Automation_Level: pick(['MANUAL','SEMI_AUTO','AUTO','AI_OPTIMIZED']),
+          Picking_Time_Seconds: picking, Packing_Time_Seconds: packing, Total_Process_Time: +(picking+packing).toFixed(1),
+
+          WMS_Usage:'Active', OMS_Usage:'Active', WMS_Advanced_Score: irnd(55,96), Service_Quality_Score: irnd(65,98),
+          Customer_NPS: irnd(40,95), Processing_Error_Rate: +rnd(0.001,0.01).toFixed(3),
+
+          Weather_Condition: weather, Weather_Severity_Score: +ws.toFixed(2),
+
+          Churn_Flag: profile.churnFlag?1:0, Predicted_Churn_Score: Math.min(0.98, Math.max(0.01, predChurn)),
+
+          Is_Rocket_Delivery: mode.includes('로켓')?1:0,
+          Is_Same_Day_Delivery: mode==='로켓당일'?1:0, Is_Dawn_Delivery: mode==='로켓새벽'?1:0, Is_Fresh_Delivery: mode==='로켓프레시'?1:0,
+
+          Is_Premium_Order: amount>=200000?1:0, Is_Bulk_Order: qty>=3?1:0, Is_Weekend_Order: [0,6].includes(orderDate.getDay())?1:0,
+          Is_Peak_Hour_Order: (hour>=19&&hour<=21)?1:0, Is_Free_Shipping: 0,
+
+          Is_Weather_Risk: ws>0.5?1:0, Is_Long_Distance: distanceKm>30?1:0, Is_High_LTV: 0, Is_Churn_Risk: (predChurn>=0.6)?1:0, Is_VIP_Customer: (profile.isWow?1:0),
+
+          Receiving_Date: new Date(orderDate.getTime()-irnd(1,5)*86400000).toISOString().split('T')[0],
+          Putaway_Date: new Date(orderDate.getTime()-irnd(0,2)*86400000).toISOString().split('T')[0],
+          Lot_ID: 'LOT'+irnd(100000,999999), Expiry_Date: (catCfg.coldChain? new Date(orderDate.getTime()+irnd(catCfg.freshFood?3:180, catCfg.freshFood?10:365)*86400000).toISOString().split('T')[0] : null),
+          Bin: 'A'+irnd(1,40)+'-B'+irnd(1,30)+'-L'+irnd(1,5), Slot:'S'+irnd(1,20), Unit_Cost: Math.round(unitPrice*(1-catCfg.margin)*rnd(0.97,1.03)),
+
+          Daily_OnHand_Snapshot: irnd(10,600), Safety_Stock: irnd(5,200), Forecast_Demand: irnd(2,60),
+          ASN_ID:'ASN'+irnd(1000000,9999999), PO_ID:'PO'+irnd(1000000,9999999), Replenishment_Type: pick(['Regular','Safety Refill','Promotion','Seasonal']),
+
+          Picking_Start_TS: new Date(orderDate.getTime()+irnd(5,15)*60000).toISOString(),
+          Picking_End_TS: new Date(orderDate.getTime()+irnd(20,40)*60000).toISOString(),
+          Packing_Start_TS: new Date(orderDate.getTime()+irnd(45,80)*60000).toISOString(),
+          Packing_End_TS: new Date(orderDate.getTime()+irnd(90,120)*60000).toISOString(),
+
+          Planned_Ship_Timestamp: new Date(orderDate.getTime()+(SHIP_SLA_MIN[mode]??90)*60000).toISOString(),
+          Actual_Ship_Timestamp: fcExit.toISOString(),
+          On_Time_Dispatch_Flag: (fcExit <= new Date(orderDate.getTime()+(SHIP_SLA_MIN[mode]??90)*60000))?1:0,
+
+          Is_Quality_Issue: (tempViolation||damageFlag)?1:0,
+          Mis_Ship_Flag: misShipFlag?1:0,
+          Damage_Rate: +(damageFlag? rnd(0.03,0.15): rnd(0.001,0.02)).toFixed(3),
+          Damage_Flag: damageFlag?1:0,
+
+          Distance_Bucket: distanceKm<=10?1: distanceKm<=20?2: distanceKm<=30?3: distanceKm<=40?4:5,
+          Distance_Band_Label: distanceKm<=10?'≤10km': distanceKm<=20?'11–20km': distanceKm<=30?'21–30km': distanceKm<=40?'31–40km': '>40km',
+
+          [NET.ROUTE_TYPE]: routeType,
+          [NET.SORT_HUB_NAME]: sortHub,
+          [NET.FC_EXIT]: fcExit.toISOString(),
+          [NET.HUB_IN]: hubIn? hubIn.toISOString(): null,
+          [NET.HUB_OUT]: hubOut? hubOut.toISOString(): null,
+          [NET.CAMP_IN]: campIn.toISOString(),
+          [NET.LOAD_START]: loadStart.toISOString(),
+          [NET.LOAD_END]: loadEnd.toISOString(),
+          [NET.OFD]: ofd.toISOString(),
+          [NET.FC_DWELL]: irnd(5,20),
+          [NET.HUB_DWELL]: hubDwell,
+          [NET.CAMP_DWELL]: irnd(8,25)
+        };
+      }
+
+      self.onmessage = async (e)=>{
+        const msg=e.data||{};
+        if(msg.type==='stop'){ SHOULD_STOP=true; return; }
+        if(msg.type!=='start') return;
+        try{
+          SHOULD_STOP=false;
+          const {
+            totalRows, userCount, startYear, endYear,
+            chunkSize, rocketRate, wowRate, CAL
+          } = msg;
+
+          const profiles = buildProfiles(userCount, wowRate);
+          // rocket plan (간단): 비율만 반영
+          let processed=0, batch=[], effChunk=Math.max(200, chunkSize|0);
+          while(processed<totalRows && !SHOULD_STOP){
+            const forceRocket = (Math.random()*100 < rocketRate);
+            const row = genRow(processed, userCount, profiles, [startYear, endYear], forceRocket, CAL);
+            // 파생 LTV: CAC
+            row.LTV_to_CAC = +(row.Customer_LTV/Math.max(1,row.CAC)).toFixed(2);
+            batch.push(row);
+            processed++;
+            if(batch.length>=effChunk || processed===totalRows){
+              postMessage({type:'rows', rows:batch, processed, total:totalRows});
+              batch=[];
+              await new Promise(r=>setTimeout(r,0));
+            }
+            if(processed % (effChunk*2)===0) postMessage({type:'progress', processed, total:totalRows});
+          }
+          postMessage({type:'done'});
+        }catch(err){ postMessage({type:'error', message:String(err&&err.message||err)}); }
+      };
+    `;
+    const blob = new Blob([workerCode], {type:'text/javascript'});
+    return new Worker(URL.createObjectURL(blob));
+  }
+
+  /* ==========================
+     10) 컨트롤 바인딩 & 런타임
+  ========================== */
+  function initYears(){
+    const now=new Date().getFullYear();
+    const s=qs('startYear'), e=qs('endYear');
+    for(let y=2019;y<=now;y++){ const o=document.createElement('option'); o.value=String(y); o.textContent=String(y); s.appendChild(o); }
+    for(let y=2019;y<=now;y++){ const o=document.createElement('option'); o.value=String(y); o.textContent=String(y); e.appendChild(o); }
+    s.value=String(now-2); e.value=String(now);
+  }
+
+  function startGeneration(){
+    if(PROCESSING_STATE.isRunning) return;
+    const startYear = parseInt(qs('startYear').value);
+    const endYear   = parseInt(qs('endYear').value);
+    const userCount = parseInt(qs('userCount').value);
+    const totalRows = parseInt(qs('orderCount').value);
+    const chunkSize = parseInt(qs('chunkSize').value);
+    const rocketRate= parseFloat(qs('rocketRate').value);
+    const wowRate   = parseFloat(qs('wowRate').value);
+    const targetNet = parseFloat(qs('targetNetMargin').value);
+    FAST_MODE = !!qs('fastMode').checked;
+
+    // reset
+    DATA=[]; TABLE_KEYS=null;
+    for(const k of Object.keys(AGG)) if(AGG[k] instanceof Set) AGG[k].clear(); else if(typeof AGG[k]==='number') AGG[k]=0;
+    AGG.uniqueCustomers=new Set();
+
+    applyDialsToCal(targetNet);
+
+    WORKER = createGeneratorWorker();
+    PROCESSING_STATE={isRunning:true,shouldStop:false,startTime:Date.now(),processedRows:0,totalRows:totalRows};
+    setDisabled('btnStart',true); setDisabled('btnStop',false); setDisabled('btnCsv',true); setDisabled('btnCsvTurbo',true);
+    setStatus('RUNNING','running'); showProgress(true);
+
+    WORKER.onmessage=(e)=>{
+      const msg=e.data||{};
+      if(msg.type==='rows'){
+        // 메타 필드 부여
+        const nowIso = new Date().toISOString();
+        const seed = Math.floor(Math.random()*1e9);
+        const dialSnap = JSON.stringify(DIALS);
+        msg.rows.forEach(r=>{
+          r.sim_version='v2025-11+ops';
+          r.sim_seed=seed;
+          r.dial_snapshot_json=dialSnap;
+          r.generated_at=nowIso;
+          r.q_missing_key= (r[NET.FC_EXIT]&&r[NET.CAMP_IN]&&r[NET.LOAD_START]&&r[NET.LOAD_END]&&r[NET.OFD])?0:1;
+        });
+        ingestRows(msg.rows);
+      }else if(msg.type==='progress'){
+        PROCESSING_STATE.processedRows = msg.processed;
+        updateProgressFromState('Generating');
+      }else if(msg.type==='done'){
+        PROCESSING_STATE.isRunning=false;
+        setDisabled('btnStart',false); setDisabled('btnStop',true); setDisabled('btnCsv',false); setDisabled('btnCsvTurbo',false);
+        setStatus('READY','ok'); showProgress(false);
+        WORKER.terminate(); WORKER=null;
+      }else if(msg.type==='error'){
+        setStatus('ERROR','ng'); showProgress(false);
+        console.error('Worker error:', msg.message);
+        try{WORKER.terminate();}catch(_){}
+        WORKER=null; PROCESSING_STATE.isRunning=false;
+        setDisabled('btnStart',false); setDisabled('btnStop',true);
+      }
+    };
+
+    WORKER.postMessage({
+      type:'start',
+      totalRows, userCount, startYear, endYear,
+      chunkSize: FAST_MODE? Math.max(1000, Math.round(chunkSize*1.5)) : chunkSize,
+      rocketRate, wowRate, CAL
+    });
+  }
+
+  function stopGeneration(){
+    if(WORKER){ WORKER.postMessage({type:'stop'}); try{WORKER.terminate();}catch(_){} WORKER=null; }
+    PROCESSING_STATE.isRunning=false; PROCESSING_STATE.shouldStop=true;
+    setDisabled('btnStart',false); setDisabled('btnStop',true);
+    setStatus('STOPPED','ng'); showProgress(false);
+  }
+
+  // buttons
+  window.addEventListener('DOMContentLoaded',()=>{
+    initYears();
+    qs('btnStart').addEventListener('click', startGeneration);
+    qs('btnStop').addEventListener('click', stopGeneration);
+    qs('btnCsv').addEventListener('click', downloadCSVFast);
+    qs('btnCsvTurbo').addEventListener('click', downloadCSVTurbo);
+    qs('btnApplyDials').addEventListener('click', ()=>applyDialsToCal(parseFloat(qs('targetNetMargin').value)));
+    qs('btnResetDials').addEventListener('click', ()=>{
+      qs('dial_loss_lo').value='0.07'; qs('dial_loss_hi').value='0.12';
+      qs('dial_temp_lo').value='0.01'; qs('dial_temp_hi').value='0.02';
+      qs('dial_jeju_lo').value='0.10'; qs('dial_jeju_hi').value='0.15';
+      qs('dial_over_lo').value='0.15'; qs('dial_over_hi').value='0.25';
+      qs('dial_exp_lo').value='0.005'; qs('dial_exp_hi').value='0.01';
+      applyDialsToCal(parseFloat(qs('targetNetMargin').value));
+    });
+  });
+
+  /* ==========================
+     11) BigQuery Templates (주석)
+     // v2025-11 CODE IMPROVED
+  ========================== */
+
+  // -- TEMPLATE: monthly_otd_late_sla_matrix
+  // SELECT
+  //   DATE_TRUNC(DATE(Order_Timestamp), MONTH) AS month,
+  //   Delivery_Mode,
+  //   COUNT(*) AS orders,
+  //   AVG(CASE WHEN sla_breach_flag=1 THEN 1 ELSE 0 END) AS sla_breach_rate,
+  //   AVG(CASE WHEN fc_otd_flag=1 THEN 1 ELSE 0 END) AS fc_otd_rate,
+  //   APPROX_QUANTILES(o2s_min, 100)[SAFE_OFFSET(95)] AS o2s_p95
+  // FROM dataset.table
+  // WHERE Order_Timestamp IS NOT NULL
+  // GROUP BY 1,2
+  // ORDER BY 1,2;
+
+  // -- TEMPLATE: guardrail_stage_substage_breaches
+  // WITH base AS (
+  //   SELECT
+  //     Delivery_Mode,
+  //     __net_Route_Type AS route_type,
+  //     CASE WHEN Weather_Severity_Score<=0.3 THEN '≤0.3' WHEN Weather_Severity_Score<=0.6 THEN '0.3–0.6' ELSE '>0.6' END AS wb,
+  //     SAFE_CAST(hub_total_dwell_min AS INT64) AS hub,
+  //     SAFE_CAST(camp_s1_wait_min AS INT64) AS s1,
+  //     SAFE_CAST(camp_s2_work_min AS INT64) AS s2,
+  //     SAFE_CAST(camp_s3_wait_min AS INT64) AS s3
+  //   FROM dataset.table
+  //   WHERE SLA_Breach=0
+  // )
+  // SELECT
+  //   Delivery_Mode, route_type, wb,
+  //   APPROX_QUANTILES(hub, 100)[OFFSET(95)] AS hub_p95,
+  //   APPROX_QUANTILES(s1,  100)[OFFSET(95)] AS s1_p95,
+  //   APPROX_QUANTILES(s2,  100)[OFFSET(95)] AS s2_p95,
+  //   APPROX_QUANTILES(s3,  100)[OFFSET(95)] AS s3_p95
+  // FROM base
+  // GROUP BY 1,2,3;
+
+  // -- TEMPLATE: e2e_consistency_checker
+  // SELECT
+  //   COUNTIF(__net_FC_Exit_TS < Order_Timestamp) AS ts_order_error_fc,
+  //   COUNTIF(__net_Hub_Out_TS < __net_Hub_In_TS) AS ts_order_error_hub,
+  //   COUNTIF(__net_Loadout_Start_TS < __net_Camp_In_TS) AS ts_order_error_camp_s1,
+  //   COUNTIF(__net_Loadout_End_TS < __net_Loadout_Start_TS) AS ts_order_error_camp_s2,
+  //   COUNTIF(__net_OFD_TS < __net_Loadout_End_TS) AS ts_order_error_camp_s3,
+  //   COUNTIF(o2s_min>1440) AS outlier_o2s,
+  //   COUNTIF(hub_total_dwell_min>720) AS outlier_hub,
+  //   COUNTIF(camp_total_dwell_min>360) AS outlier_camp
+  // FROM dataset.table;
+
+</script>
 </body>
 </html>
